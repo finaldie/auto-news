@@ -135,7 +135,10 @@ def tweets_category_and_rank(args, data):
         ranked_list = ranked.setdefault(list_name, [])
 
         for tweet in tweets:
-            text = tweet["text"]
+            text = ""
+            if tweet["reply_text"]:
+                text += f"{tweet['reply_to_name']: {tweet['reply_text']}}"
+            text += f"{tweet['name']}: {tweet['text']}"
 
             category_and_rank = llm_agent.run(text)
             print(f"Category and Rank: text: {text}, rank_resp: {category_and_rank}")
@@ -178,7 +181,8 @@ def push_to_read(args, data):
                 for ranked_tweet in tweets:
                     topics = ranked_tweet["__topics"]
                     categories = ranked_tweet["__categories"]
-                    rate = ranked_tweet["__rate"]
+                    # The __rate is [0, 1], scale to [0, 100]
+                    rate = ranked_tweet["__rate"] * 100
 
                     notion_agent.createDatabaseItem_ToRead(
                         database_id, [list_name], ranked_tweet,
