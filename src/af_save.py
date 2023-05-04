@@ -42,6 +42,7 @@ def retrieve_twitter(args):
 
     data = utils.read_data_json(full_path)
 
+    print("retrieve twitter data: {data}")
 
 
 
