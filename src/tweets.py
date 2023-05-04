@@ -24,12 +24,23 @@ class TwitterAgent:
         api = tweepy.API(self.auth, wait_on_rate_limit=True)
         return api
 
+    def _extractEmbed(self, tweet):
+        tweet_embed = ""
+
+        # get the last one
+        if tweet._json["entities"].get("media") and tweet._json["entities"]["media"][-1].get("expanded_url"): 
+            tweet_embed = tweet._json["entities"]["media"][-1]["expanded_url"]
+
+        # if not found, fallback to 'urls' field
+        if (not tweet_embed
+            and tweet._json["entities"].get("urls")
+            and tweet._json["entities"]["urls"][-1]["expanded_url"]):
+            tweet_embed = tweet._json["entities"]["urls"][-1]["expanded_url"])
+
+        return tweet_embed
+
     def _extractTweet(self, tweet, pull_reply=True):
         print(f"extractTweet: {tweet}")
-
-        tweet_embed = ""
-        if tweet._json["entities"].get("media") and tweet._json["entities"]["media"][0].get("expanded_url"): 
-            tweet_embed = tweet._json["entities"]["media"][0]["expanded_url"]
 
         output = {
             "name": tweet.user.name,
@@ -39,7 +50,8 @@ class TwitterAgent:
             "created_at_pdt": tweet.created_at.astimezone(pytz.timezone('America/Los_Angeles')).isoformat(),
 
             "text": tweet.text,
-            "embed": tweet_embed,
+            "embed": self._extractEmbed(tweet),
+            "url": f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}",
 
             "reply_to_screen_name": tweet.in_reply_to_screen_name,
             "reply_to_user_id": tweet.in_reply_to_user_id,
@@ -57,15 +69,12 @@ class TwitterAgent:
             reply_name = reply_tweet.user.name
             reply_screen_name = reply_tweet.user.screen_name
 
-            reply_embed = None
-
-            if reply_tweet._json["entities"].get("media") and reply_tweet._json["entities"]["media"][0].get("expanded_url"):
-                reply_embed = reply_tweet._json["entities"]["media"][0]["expanded_url"]
-
+            output["reply_tweet_id"] = reply_tweet.id
             output["reply_to_name"] = reply_name
             output["reply_to_screen_name"] = reply_screen_name
-            output["reply_embed"] = reply_embed
+            output["reply_embed"] = self._extractEmbed(reply_tweet)
             output["reply_text"] = reply_tweet.full_text
+            output["reply_url"] = f"https://twitter.com/{reply_screen_name}/status/{reply_tweet.id}"
 
         return output
 
