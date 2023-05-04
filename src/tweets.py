@@ -65,6 +65,7 @@ class TwitterAgent:
         }
 
         if pull_reply and tweet.in_reply_to_status_id:
+            print(f"pulling reply tweet id: {tweet.in_reply_to_status_id}")
             reply_tweet = self.api.get_status(tweet.in_reply_to_status_id, tweet_mode='extended')
 
             reply_name = reply_tweet.user.name
