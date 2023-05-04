@@ -2,6 +2,7 @@ import random
 import argparse
 import sys
 import os
+import copy
 
 import time
 import math
@@ -16,6 +17,7 @@ from tweets import TwitterAgent
 import utils
 import data_model
 from notion import NotionAgent
+from llm_agent import LLMAgentCategoryAndRanking
 
 
 parser = argparse.ArgumentParser()
@@ -74,6 +76,7 @@ def tweets_dedup(args, tweets):
             if utils.redis_get(redis_conn, key):
                 print(f"Duplicated tweet found, key: {key}")
 
+                # TODO: Remove it after debugging
                 tweets_list.append(tweet)
             else:
                 # mark as visited
@@ -111,18 +114,78 @@ def push_to_inbox(args, data):
                     notion_agent.createDatabaseItem_TwitterInbox(
                         database_id, [list_name], tweet)
 
-                    print(f"Insert one tweet into inbox")
+                    print("Insert one tweet into inbox")
 
         else:
-            print("[ERROR]: Unknown target {target}, skip")
+            print(f"[ERROR]: Unknown target {target}, skip")
 
 
-def tweets_category_and_rank(args, tweets):
-    return True
+def tweets_category_and_rank(args, data):
+    print("#####################################################")
+    print("# Category and Rank                                 #")
+    print("#####################################################")
+
+    llm_agent = LLMAgentCategoryAndRanking()
+    llm_agent.init_prompt()
+
+    ranked = {}
+
+    for list_name, tweets in data.items():
+        ranked_list = ranked.setdefault(list_name, [])
+
+        for tweet in tweets:
+            text = tweet["text"]
+
+            category_and_rank = llm_agent.run(text)
+
+            ranked_tweet = copy.deepcopy(tweet)
+            ranked_tweet["__topics"] = [x["topic"] for x in category_and_rank["topics"]]
+            ranked_tweet["__categories"] = [x["category"] for x in category_and_rank["topics"]]
+            ranked_tweet["__rate"] = category_and_rank["overall_score"]
+
+            ranked_list.append(ranked_tweet)
+
+    print(f"Ranked tweets: {ranked}")
+    return ranked
 
 
 def push_to_read(args, data):
-    return True
+    """
+    data: {list_name1: [ranked_tweet1, ranked_tweet2, ...],
+           list_name2: [...], ...}
+    """
+
+    print("#####################################################")
+    print("# Push to ToRead database                           #")
+    print("#####################################################")
+
+    targets = args.targets.split(",")
+
+    print(f"input data: {data}")
+
+    for target in targets:
+        print(f"Pushing data to target: {target} ...")
+
+        if target == "notion":
+            notion_api_key = os.getenv("NOTION_TOKEN")
+            notion_agent = NotionAgent(notion_api_key)
+
+            database_id = os.getenv("NOTION_DATABASE_ID_TOREAD")
+
+            for list_name, tweets in data.items():
+                for ranked_tweet in tweets:
+                    topics = ranked_tweet["__topics"]
+                    categories = ranked_tweet["__categories"]
+                    rate = ranked_tweet["__rate"]
+
+                    notion_agent.createDatabaseItem_ToRead(
+                        database_id, [list_name], ranked_tweet,
+                        topics, categories, rate)
+
+                    print("Insert one tweet into ToRead database")
+
+        else:
+            print(f"[ERROR]: Unknown target {target}, skip")
 
 
 def run(args):
