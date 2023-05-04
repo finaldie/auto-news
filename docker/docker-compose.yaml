@@ -82,7 +82,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/run:/opt/airflow/run
-    - ${AIRFLOW_PROJ_DIR:-.}/run:/opt/airflow/data
+    - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
     - /var/run/docker.sock:/var/run/docker.sock
     - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
   # user: "${AIRFLOW_UID:-50000}:0"
