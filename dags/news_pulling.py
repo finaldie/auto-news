@@ -61,30 +61,35 @@ with DAG(
     )
 
     t2 = BashOperator(
+        task_id='git_pull',
+        bash_command='cd ~/airflow/data && mkdir -p {{ run_id }}',
+    )
+
+    t3 = BashOperator(
         task_id='pull',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_pull.py '
             '--start {{ ds }} '
             '--prefix=./run '
             '--run-id={{ run_id }} '
             '--job-id={{ ti.job_id }} '
-            '--data-folder=../data '
+            '--data-folder=~/airflow/data '
             '--sources={{ dag_run.conf.setdefault("sources", "twitter") }} ',
     )
 
-    t3 = BashOperator(
+    t4 = BashOperator(
         task_id='save',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_save.py '
             '--start {{ ds }} '
             '--prefix=./run '
             '--run-id={{ run_id }} '
             '--job-id={{ ti.job_id }} '
-            '--data-folder=../data '
+            '--data-folder=~/airflow/data '
             '--sources={{ dag_run.conf.setdefault("sources", "twitter") }} '
             '--targets={{ dag_run.conf.setdefault("targets", "notion") }} ',
     )
     
 
-    t4 = BashOperator(
+    t5 = BashOperator(
         task_id='finish',
         depends_on_past=False,
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_end.py '
@@ -92,4 +97,4 @@ with DAG(
         '--prefix=./run ',
     )
 
-    t0 >> t1 >> t2 >> t3 >> t4
+    t0 >> t1 >> t2 >> t3 >> t4 >> t5
