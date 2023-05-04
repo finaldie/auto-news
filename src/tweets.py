@@ -41,7 +41,7 @@ class TwitterAgent:
         return tweet_embed
 
     def _extractTweet(self, tweet, pull_reply=True):
-        print(f"extractTweet: {tweet}")
+        # print(f"extractTweet: {tweet}")
 
         output = {
             "name": tweet.user.name,
