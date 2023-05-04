@@ -57,8 +57,6 @@ def retrieve_twitter(args):
 
 
 def push_to_targets(args, data):
-    print(f"environment: {os.environ}")
-
     targets = args.targets.split(",")
 
     for target in targets:
@@ -69,6 +67,7 @@ def push_to_targets(args, data):
 
 
 def run(args):
+    print(f"environment: {os.environ}")
     sources = args.sources.split(",")
 
     for source in sources:
