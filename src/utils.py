@@ -13,7 +13,7 @@ def save_data_json(full_path, data):
 
 
 def read_data_json(full_path):
-    if not os.path.exists(full_path)
+    if not os.path.exists(full_path):
         return {}
 
     f = open(full_path, "r")
