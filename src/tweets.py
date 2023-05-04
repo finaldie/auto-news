@@ -32,7 +32,8 @@ class TwitterAgent:
             tweet_embed = tweet._json["entities"]["media"][0]["expanded_url"]
 
         output = {
-            "screen_name": tweet.screen_name,
+            "name": tweet.user.name,
+            "screen_name": tweet.user.screen_name,
             "tweet_id": tweet.id,
             "created_at_utc": tweet.created_at.isoformat(),
             "created_at_pdt": tweet.created_at.astimezone(pytz.timezone('America/Los_Angeles')).isoformat(),
@@ -54,6 +55,7 @@ class TwitterAgent:
             reply_tweet = self.api.get_status(tweet.in_reply_to_status_id, tweet_mode='extended')
 
             reply_name = reply_tweet.user.name
+            reply_screen_name = reply_tweet.user.screen_name
 
             reply_embed = None
 
@@ -61,6 +63,7 @@ class TwitterAgent:
                 reply_embed = reply_tweet._json["entities"]["media"][0]["expanded_url"]
 
             output["reply_to_name"] = reply_name
+            output["reply_to_screen_name"] = reply_screen_name
             output["reply_embed"] = reply_embed
             output["reply_text"] = reply_tweet.full_text
 
