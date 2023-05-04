@@ -61,7 +61,7 @@ with DAG(
     )
 
     t2 = BashOperator(
-        task_id='git_pull',
+        task_id='prepare',
         bash_command='cd ~/airflow/data && mkdir -p {{ run_id }}',
     )
 
