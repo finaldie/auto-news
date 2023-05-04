@@ -83,7 +83,7 @@ class TwitterAgent:
     def pull(self):
         output = {}
 
-        for source in self.lists:
+        for source_name, source in self.lists.items():
             screen_names = source["screen_names"]
             recent_count = source["recent_count"]
             pull_interval = source["pull_interval"]
