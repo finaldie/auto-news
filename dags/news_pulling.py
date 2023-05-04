@@ -72,7 +72,7 @@ with DAG(
             '--prefix=./run '
             '--run-id={{ run_id }} '
             '--job-id={{ ti.job_id }} '
-            '--data-folder=~/airflow/data '
+            '--data-folder="~/airflow/data" '
             '--sources={{ dag_run.conf.setdefault("sources", "twitter") }} ',
     )
 
@@ -83,7 +83,7 @@ with DAG(
             '--prefix=./run '
             '--run-id={{ run_id }} '
             '--job-id={{ ti.job_id }} '
-            '--data-folder=~/airflow/data '
+            '--data-folder="~/airflow/data" '
             '--sources={{ dag_run.conf.setdefault("sources", "twitter") }} '
             '--targets={{ dag_run.conf.setdefault("targets", "notion") }} ',
     )
