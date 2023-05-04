@@ -84,7 +84,7 @@ class NotionAgent:
 
         return extracted_pages
 
-    def _createDatabaseItem_TwitterInbox(self, list_names, tweet):
+    def _createDatabaseItem_TwitterBase(self, list_names, tweet):
         """
         Create page properties and blocks
         """
@@ -203,7 +203,7 @@ class NotionAgent:
         database_id: the target notion database id
         tweet: the extracted tweet from TwitterAgent
         """
-        properties, blocks = self._createDatabaseItem_TwitterInbox(list_names, tweet)
+        properties, blocks = self._createDatabaseItem_TwitterBase(list_names, tweet)
         print(f"notion twitter inbox: database_id: {database_id}, properties: {properties}, blocks: {blocks}")
 
         # Add the new page to the database
@@ -216,7 +216,7 @@ class NotionAgent:
 
 
     def createDatabaseItem_ToRead(self, database_id, list_names: list, tweet, topics: list, categories: list, rate_number):
-        properties, blocks = self._createDatabaseItem_TwitterInbox(list_names, tweet)
+        properties, blocks = self._createDatabaseItem_TwitterBase(list_names, tweet)
 
         # assemble topics
         topics_list = [{"name": t} for t in topics]
@@ -234,17 +234,17 @@ class NotionAgent:
             ]
         }
 
-        properties["Topic"] = {
+        properties.update({"Topic": {
             "multi_select": topics_list,
-        },
+        }})
 
-        properties["Category"] = {
+        properties.update({"Category": {
             "multi_select": categories_list,
-        },
+        }})
 
-        properties["Rate"] = {
+        properties.update({"Rate": {
             "number": rate_number
-        },
+        }})
 
         print(f"notion ToRead: database_id: {database_id}, properties: {properties}, blocks: {blocks}")
 
