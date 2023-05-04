@@ -9,7 +9,6 @@ def gen_filename(data_folder, filename):
 def save_data_json(full_path, data):
     with open(full_path, "w") as out_file:
         json.dump(data, out_file)
-        out_file.flush()
 
 
 def read_data_json(full_path):
