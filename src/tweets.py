@@ -94,6 +94,7 @@ class TwitterAgent:
             output[source_name] = []
 
             for screen_name in screen_names:
+                print(f"Pull tweet from source {source_name}, user screen_name: {screen_name}")
                 tweets = self.api.user_timeline(screen_name=screen_name, count=recent_count)
 
                 if len(tweets) == 0:
