@@ -62,7 +62,7 @@ def tweets_dedup(args, tweets):
     tweets_deduped = {}
 
     for list_name, data in tweets.items():
-        tweets_list = tweets_deduped.setdefault(list_name, {})
+        tweets_list = tweets_deduped.setdefault(list_name, [])
 
         for tweet in data:
             tweet_id = tweet["tweet_id"]
@@ -85,6 +85,10 @@ def push_to_inbox(args, data):
     """
     data: {list_name1: [tweet1, tweet2, ...], list_name2: [...], ...}
     """
+    print("#####################################################")
+    print("# Push Tweets to Inbox                              #")
+    print("#####################################################")
+
     targets = args.targets.split(",")
 
     for target in targets:
@@ -102,7 +106,7 @@ def push_to_inbox(args, data):
                         database_id, [list_name], tweet)
 
                     print(f"Insert one tweet into inbox")
-            
+
         else:
             print("[ERROR]: Unknown target {target}, skip")
 
@@ -126,12 +130,12 @@ def run(args):
         if source == "twitter":
             data = retrieve_twitter(args)
             data_deduped = tweets_dedup(args, data)
-            push_to_inbox(args, data_deduped) 
+            push_to_inbox(args, data_deduped)
 
             data_ranked = tweets_category_and_rank(args, data_deduped)
-            push_to_read(args, data_ranked) 
+            push_to_read(args, data_ranked)
 
-    
+
 if __name__ == "__main__":
     args = parser.parse_args()
     load_dotenv()
