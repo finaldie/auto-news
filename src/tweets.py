@@ -51,7 +51,7 @@ class TwitterAgent:
             # "json": tweet._json,
         }
 
-        if pull_reply:
+        if pull_reply and tweet.in_reply_to_status_id:
             reply_tweet = self.api.get_status(tweet.in_reply_to_status_id, tweet_mode='extended')
 
             reply_name = reply_tweet.user.name
