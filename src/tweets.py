@@ -69,6 +69,11 @@ class TwitterAgent:
         list_name: AI, Famous people, ...
         screen_names: elonmusk, JeffDean, ...
         """
+
+        if len(screen_names) == 0:
+            print(f"[WARN]: Input screen_names is empty, skip")
+            return
+
         self.lists[list_name] = {
             "screen_names": screen_names,
             "recent_count": recent_count,
