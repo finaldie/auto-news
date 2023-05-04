@@ -88,7 +88,7 @@ class TwitterAgent:
             recent_count = source["recent_count"]
             pull_interval = source["pull_interval"]
 
-            output[source] = []
+            output[source_name] = []
 
             for screen_name in screen_names:
                 tweets = api.user_timeline(screen_name=screen_name, count=recent_count)
@@ -98,6 +98,6 @@ class TwitterAgent:
 
                 for tweet in tweets:
                     data = self._extractTweet(tweet)
-                    output[source].append(data)
+                    output[source_name].append(data)
 
         return output
