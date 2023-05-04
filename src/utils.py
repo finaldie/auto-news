@@ -7,9 +7,8 @@ def gen_filename(data_folder, filename):
 
 
 def save_data_json(full_path, data):
-    f = open(full_path, "w+")
-    json.dump(data, f)
-    f.close()
+    with open(full_path, "w") as out_file
+        json.dump(data, out_file)
 
 
 def read_data_json(full_path):
