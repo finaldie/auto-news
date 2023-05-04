@@ -138,6 +138,7 @@ def tweets_category_and_rank(args, data):
             text = tweet["text"]
 
             category_and_rank = llm_agent.run(text)
+            print(f"Category and Rank: text: {text}, rank_resp: {category_and_rank}")
 
             ranked_tweet = copy.deepcopy(tweet)
             ranked_tweet["__topics"] = [x["topic"] for x in category_and_rank["topics"]]
