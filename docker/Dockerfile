@@ -1,4 +1,4 @@
-FROM apache/airflow:latest-python3.10
+FROM apache/airflow:2.6.0-python3.10
 
 # keep them same as docker-compose volume path
 VOLUME /opt/airflow
@@ -33,8 +33,12 @@ RUN set -ex; \
 # The tradingbot will be placed at /opt/airflow/run/tradingbot,
 # add it to git safe.directory first, so root user can operate as well
 RUN set -ex; \
-  git config --global --add safe.directory /opt/airflow/run/tradingbot \
+  git config --global --add safe.directory /opt/airflow/run/auto-news \
   && git config --global pull.ff only
+
+# To fix redis bg save warning
+RUN set -ex; \
+  echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf
 
 # Add ssh config (mount ~/.ssh/config will lead bad file owner issue)
 # here we simply create one line .ssh/config, then we only need to
