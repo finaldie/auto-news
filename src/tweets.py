@@ -25,6 +25,8 @@ class TwitterAgent:
         return api
 
     def _extractTweet(self, tweet, pull_reply=True):
+        print(f"extractTweet: {tweet}")
+
         tweet_embed = ""
         if tweet._json["entities"].get("media") and tweet._json["entities"]["media"][0].get("expanded_url"): 
             tweet_embed = tweet._json["entities"]["media"][0]["expanded_url"]
