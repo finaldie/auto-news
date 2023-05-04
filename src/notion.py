@@ -246,6 +246,8 @@ class NotionAgent:
             "number": rate_number
         },
 
+        print(f"notion ToRead: database_id: {database_id}, properties: {properties}, blocks: {blocks}")
+
         # Add the new page to the database
         new_page = self.api.pages.create(
                 parent={"database_id": database_id},
