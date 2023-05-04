@@ -21,7 +21,7 @@ class TwitterAgent:
     def _init_client(self):
         self.auth = tweepy.OAuthHandler(self.api_key, self.api_key_secret)
         self.auth.set_access_token(self.access_token, self.access_token_secret)
-        api = tweepy.API(auth, wait_on_rate_limit=True)
+        api = tweepy.API(self.auth, wait_on_rate_limit=True)
         return api
 
     def _extractTweet(self, tweet, pull_reply=True):
