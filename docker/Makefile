@@ -33,6 +33,7 @@ build:
 
 deploy: deploy-airflow post-deploy
 
+
 init: init-airflow push_dags
 
 
@@ -46,6 +47,9 @@ stop:
 logs:
 	docker-compose logs -f
 
+push_dags:
+	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags
+	cd $(topdir)/dags && cp *.py $(AIRFLOW_PROJ_DIR)/dags
 
 .PHONY: help deploy init start stop
 .PHONY: init-airflow post-deploy deploy-code

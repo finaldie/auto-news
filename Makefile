@@ -58,7 +58,6 @@ clean:
 	docker system prune -f
 
 push_dags:
-	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags
-	cd dags && cp *.py $(AIRFLOW_PROJ_DIR)/dags
+	cd docker && make push_dags topdir=$(topdir)
 
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags
