@@ -12,6 +12,7 @@ import requests
 import json
 
 from tweets import TwitterAgent
+import utils
 
 
 parser = argparse.ArgumentParser()
@@ -31,6 +32,7 @@ parser.add_argument("--sources", help="sources to pull, comma separated",
 
 def pull_twitter(args):
     agent = TwitterAgent()
+    print(f"environment: {os.environ}")
 
     screen_names_famous = os.getenv("TWITTER_LIST_FAMOUS", "")
     screen_names_ai = os.getenv("TWITTER_LIST_AI", "")
