@@ -1,0 +1,15 @@
+python-dotenv
+pytz
+requests
+
+langchain
+tiktoken
+openai
+
+notion-client
+tweepy
+pymilvus
+pinecone-client
+chromadb
+mysql-connector-python
+redis
