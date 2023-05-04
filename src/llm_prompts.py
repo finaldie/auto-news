@@ -7,10 +7,10 @@ I’ll give u a content, and you will output a response with each topic, categor
 
 You should only respond in JSON format as described below
 Reponse format:
-{
+{{
   'topics': [ an array of dicts, each dict has 3 fields 'topic', 'category' and 'score'],
   'overall_score': 0.9
-}
+}}
 
 Ensure the response can be parsed by Python json.loads. The content is {content}
 """
