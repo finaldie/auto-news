@@ -60,13 +60,21 @@ class TwitterAgent:
             "reply_to_name": "",
             "reply_embed": "",
             "reply_text": "",
+            "reply_deleted": False,
 
             # "json": tweet._json,
         }
 
         if pull_reply and tweet.in_reply_to_status_id:
             print(f"pulling reply tweet id: {tweet.in_reply_to_status_id}")
-            reply_tweet = self.api.get_status(tweet.in_reply_to_status_id, tweet_mode='extended')
+            reply_tweet = None
+
+            try:
+                reply_tweet = self.api.get_status(tweet.in_reply_to_status_id, tweet_mode='extended')
+            except Exception as e:
+                print(f"[ERROR]: Reply tweet fetching error, could be deleted, skip it: {e}")
+                output["reply_deleted"] = True
+                continue
 
             reply_name = reply_tweet.user.name
             reply_screen_name = reply_tweet.user.screen_name
