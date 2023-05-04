@@ -10,6 +10,7 @@ from datetime import date, timedelta, datetime
 
 import requests
 import json
+from dotenv import load_dotenv
 
 from tweets import TwitterAgent
 import utils
@@ -31,7 +32,6 @@ parser.add_argument("--sources", help="sources to pull, comma separated",
 
 
 def pull_twitter(args):
-    agent = TwitterAgent()
     print(f"environment: {os.environ}")
 
     screen_names_famous = os.getenv("TWITTER_LIST_FAMOUS", "")
@@ -39,6 +39,13 @@ def pull_twitter(args):
 
     print(f"screen name famous: {screen_names_famous}")
     print(f"screen name ai: {screen_names_ai}")
+
+    api_key = os.getenv("TWITTER_API_KEY")
+    api_key_secret = os.getenv("TWITTER_API_KEY_SECRET")
+    access_token = os.getenv("TWITTER_ACCESS_TOKEN")
+    access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+
+    agent = TwitterAgent(api_key, api_key_secret, access_token, access_token_secret)
 
     agent.subscribe("Famous", screen_names_famous.split(","))
     agent.subscribe("AI", screen_names_ai.split(","))
@@ -75,5 +82,6 @@ def run(args):
     
 if __name__ == "__main__":
     args = parser.parse_args()
+    load_dotenv()
 
     run(args)

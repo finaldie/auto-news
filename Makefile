@@ -36,11 +36,13 @@ deps: prepare-env docker-network
 build:
 	cd docker && make build topdir=$(topdir)
 
-deploy-env:
-	cp $(build_dir)/.env $(WORKSPACE)/
+deploy-airflow:
+	cd docker && make deploy topdir=$(topdir) build_dir=$(build_dir)
 
-deploy: deploy-env
-	cd docker && make deploy topdir=$(topdir)
+deploy-env:
+	cp $(build_dir)/.env $(BOT_HOME)/src
+
+deploy: deploy-airflow deploy-env
 
 init:
 	cd docker && make init topdir=$(topdir)

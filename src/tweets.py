@@ -14,6 +14,7 @@ class TwitterAgent:
         self.access_token = access_token
         self.access_token_secret = access_token_secret
         self.api = self._init_client()
+        print(f"Initialized twitter API: {self.api}")
 
         self.lists = {}
 

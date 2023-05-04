@@ -1,4 +1,3 @@
-BOT_HOME := $(AIRFLOW_PROJ_DIR)/run/auto-news
 
 help:
 	@echo "deploy|init|start|stop"
