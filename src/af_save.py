@@ -137,7 +137,7 @@ def tweets_category_and_rank(args, data):
         for tweet in tweets:
             text = ""
             if tweet["reply_text"]:
-                text += f"{tweet['reply_to_name']: {tweet['reply_text']}}"
+                text += f"{tweet['reply_to_name']}: {tweet['reply_text']}"
             text += f"{tweet['name']}: {tweet['text']}"
 
             category_and_rank = llm_agent.run(text)
