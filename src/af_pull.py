@@ -64,6 +64,8 @@ def save_twitter(args, data):
     real_path = os.path.realpath(args.data_folder)
     data_path = f"{real_path}/{args.run_id}"
 
+    print(f"save_twitter: args.data_folder: {args.data_folder}, real_path: {real_path}, data_path: {data_path}")
+
     full_path = utils.gen_filename(data_path, filename)
 
     print(f"Save data to {full_path}, data: {data}")
