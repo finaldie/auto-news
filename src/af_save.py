@@ -127,6 +127,7 @@ def tweets_category_and_rank(args, data):
 
     llm_agent = LLMAgentCategoryAndRanking()
     llm_agent.init_prompt()
+    llm_agent.init_llm()
 
     ranked = {}
 
