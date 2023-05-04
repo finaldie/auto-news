@@ -33,3 +33,23 @@ def redis_conn(url):
         print(f"[ERROR]: Connect to redis @{url} failed: {e}")
 
     return conn
+
+
+def redis_get(conn, key: str):
+    data = None
+
+    try:
+        data = conn.get(key)
+    except Exception as e:
+        print(f"[ERROR]: Failed to get key {key}: {e}")
+
+    return data
+
+
+def redis_set(conn, key: str, val: str):
+    try:
+        conn.set(key, val)
+        return True
+    except Exception as e:
+        print(f"[ERROR]: Failed to get key {key} and val {val}: {e}")
+        return False

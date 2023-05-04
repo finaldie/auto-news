@@ -44,9 +44,11 @@ class TwitterAgent:
         # print(f"extractTweet: {tweet}")
 
         output = {
+            "tweet_id": tweet.id,
+
             "name": tweet.user.name,
             "screen_name": tweet.user.screen_name,
-            "tweet_id": tweet.id,
+            "user_id": tweet.user.id,
             "created_at_utc": tweet.created_at.isoformat(),
             "created_at_pdt": tweet.created_at.astimezone(pytz.timezone('America/Los_Angeles')).isoformat(),
 

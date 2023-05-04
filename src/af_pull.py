@@ -47,8 +47,8 @@ def pull_twitter(args):
 
     agent = TwitterAgent(api_key, api_key_secret, access_token, access_token_secret)
 
-    agent.subscribe("Famous", screen_names_famous.split(","))
-    agent.subscribe("AI", screen_names_ai.split(","))
+    agent.subscribe("Famous", screen_names_famous.split(","), 2)
+    agent.subscribe("AI", screen_names_ai.split(","), 2)
 
     data = agent.pull()
     print(f"Pulled from twitter: {data}")
