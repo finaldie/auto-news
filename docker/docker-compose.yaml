@@ -77,16 +77,6 @@ x-airflow-common:
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
-    # Tradingbot environment variables
-    BOT_BROKER_API_URL: ${BOT_BROKER_API_URL:-}
-    BOT_BROKER_KEY: ${BOT_BROKER_KEY:-}
-    BOT_MYSQL_HOSTNAME: ${BOT_MYSQL_HOSTNAME:-}
-    BOT_MYSQL_PORT: ${BOT_MYSQL_PORT:-}
-    BOT_MYSQL_USER: ${BOT_MYSQL_USER:-}
-    BOT_MYSQL_PASSWORD: ${BOT_MYSQL_PASSWORD:-}
-    BOT_NETWORK_NAME: ${BOT_NETWORK_NAME:-}
-    BOT_MON_HOSTNAME: ${BOT_MON_HOSTNAME:-}
-    BOT_REDIS_URL: ${BOT_MON_HOSTNAME:-}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs

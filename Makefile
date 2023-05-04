@@ -8,7 +8,6 @@ help:
 topdir := $(shell pwd)
 build_dir := $(topdir)/build
 
--include .Makefile.env
 -include $(build_dir)/install.env
 
 docker-network:
@@ -25,8 +24,8 @@ prepare-env:
 	mkdir -p $(WORKSPACE)
 	chmod -R 777 $(WORKSPACE)
 	@echo "creating environment files..."
-	cp $(topdir)/install.env $(build_dir)/
-	echo "export HOSTNAME=`hostname`" >> $(build_dir)/install.env
+	cp .env.template $(build_dir)/.env
+	echo "export HOSTNAME=`hostname`" >> $(build_dir)/.env
 	chmod -R 777 $(build_dir)
 
 
@@ -38,7 +37,7 @@ build:
 	cd docker && make build
 
 deploy-env:
-	cp $(build_dir)/install.env $(WORKSPACE)/
+	cp $(build_dir)/.env $(AIRFLOW_PROJ_DIR)/
 
 deploy: deploy-env
 	cd docker && make deploy
