@@ -1,4 +1,4 @@
-FROM apache/airflow:2.6.0
+FROM apache/airflow:latest-python3.10
 
 # keep them same as docker-compose volume path
 VOLUME /opt/airflow
@@ -11,6 +11,7 @@ USER root
 RUN set -ex; \
   deps=' \
     make \
+    g++ \
     vim \
     net-tools \
     curl \

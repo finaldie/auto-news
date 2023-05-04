@@ -8,7 +8,7 @@ help:
 topdir := $(shell pwd)
 build_dir := $(topdir)/build
 
--include $(build_dir)/install.env
+include $(topdir)/install.env
 
 docker-network:
 	@echo "creating docker network for bot..."
@@ -25,7 +25,7 @@ prepare-env:
 	chmod -R 777 $(WORKSPACE)
 	@echo "creating environment files..."
 	cp .env.template $(build_dir)/.env
-	echo "export HOSTNAME=`hostname`" >> $(build_dir)/.env
+	echo "HOSTNAME=`hostname`" >> $(build_dir)/.env
 	chmod -R 777 $(build_dir)
 
 
@@ -34,28 +34,31 @@ prepare-env:
 deps: prepare-env docker-network
 
 build:
-	cd docker && make build
+	cd docker && make build topdir=$(topdir)
 
 deploy-env:
-	cp $(build_dir)/.env $(AIRFLOW_PROJ_DIR)/
+	cp $(build_dir)/.env $(WORKSPACE)/
 
 deploy: deploy-env
-	cd docker && make deploy
+	cd docker && make deploy topdir=$(topdir)
 
 init:
-	cd docker && make init
+	cd docker && make init topdir=$(topdir)
 
 start:
-	cd docker && make start
+	cd docker && make start topdir=$(topdir)
 
 stop:
-	cd docker && make stop
+	cd docker && make stop topdir=$(topdir)
 
 logs:
-	cd docker && make logs
+	cd docker && make logs topdir=$(topdir)
 
 clean:
 	docker system prune -f
 
 push_dags:
-	cd docker && make push_dags
+	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags
+	cd dags && cp *.py $(AIRFLOW_PROJ_DIR)/dags
+
+.PHONY: deps build deploy deploy-env init start stop logs clean push_dags

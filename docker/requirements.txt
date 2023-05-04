@@ -10,6 +10,7 @@ notion-client
 tweepy
 pymilvus
 pinecone-client
-chromadb
 mysql-connector-python
 redis
+
+# chromadb

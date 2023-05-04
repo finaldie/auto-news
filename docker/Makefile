@@ -1,16 +1,13 @@
-include $(topdir)/.Makefile.env
-
-AIRFLOW_HOME ?= $(WORKSPACE)/airflow
-BOT_HOME := $(AIRFLOW_HOME)/run/auto-news
+BOT_HOME := $(AIRFLOW_PROJ_DIR)/run/auto-news
 
 help:
 	@echo "deploy|init|start|stop"
 
 deploy-code:
 	echo "Deploying code ..."
-	mkdir -p $(AIRFLOW_HOME)
+	mkdir -p $(AIRFLOW_PROJ_DIR)
 	if [ ! -d $(BOT_HOME) ]; then \
-		mkdir -p $(AIRFLOW_HOME)/run; \
+		mkdir -p $(AIRFLOW_PROJ_DIR)/run; \
 		cp -r $(topdir) $(BOT_HOME); \
 	fi
 	cd $(BOT_HOME) && rm -rf build
@@ -21,8 +18,8 @@ deploy-code:
 # - Then go to airflow home, start web and scheduler
 deploy-airflow: deploy-code
 	@echo "Assembling airflow ..."
-	mkdir -p $(AIRFLOW_HOME)
-	cd $(AIRFLOW_HOME) && mkdir -p dags logs plugins run data
+	mkdir -p $(AIRFLOW_PROJ_DIR)
+	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs plugins run data
 	@echo "Airflow deployment finished"
 
 post-deploy:
@@ -48,11 +45,6 @@ stop:
 
 logs:
 	docker-compose logs -f
-
-
-push_dags:
-	test -d $(AIRFLOW_HOME)/dags || mkdir -p $(AIRFLOW_HOME)/dags
-	cd dags && cp *.py $(AIRFLOW_HOME)/dags
 
 
 .PHONY: help deploy init start stop
