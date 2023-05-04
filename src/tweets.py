@@ -74,7 +74,7 @@ class TwitterAgent:
             except Exception as e:
                 print(f"[ERROR]: Reply tweet fetching error, could be deleted, skip it: {e}")
                 output["reply_deleted"] = True
-                continue
+                return output
 
             reply_name = reply_tweet.user.name
             reply_screen_name = reply_tweet.user.screen_name
