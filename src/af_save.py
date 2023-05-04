@@ -36,14 +36,15 @@ def retrieve_twitter(args):
     """
     get data from local data folder
     """
+    workdir = os.getenv("WORKDIR")
+
     filename = "twitter.json"
-    real_path = os.path.realpath(args.data_folder)
-    data_path = f"{real_path}/{args.run_id}"
+    data_path = f"{workdir}/{args.data_folder}/{args.run_id}"
     full_path = utils.gen_filename(data_path, filename)
 
     data = utils.read_data_json(full_path)
 
-    print(f"retrieve twitter data: {data}")
+    print(f"retrieve twitter data from {full_path}, data: {data}")
 
 
 def push_to_targets(args, data):

@@ -3,6 +3,7 @@ FROM apache/airflow:2.6.0-python3.10
 # keep them same as docker-compose volume path
 VOLUME /opt/airflow
 WORKDIR /opt/airflow
+ENV WORKDIR=/opt/airflow
 
 # Switch to root in order to install system deps
 USER root

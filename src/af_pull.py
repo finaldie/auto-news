@@ -60,12 +60,10 @@ def save_twitter(args, data):
     """
     Save the middle result (json) to data folder
     """
+    workdir = os.getenv("WORKDIR")
+
     filename = "twitter.json"
-    real_path = os.path.realpath(args.data_folder)
-    data_path = f"{real_path}/{args.run_id}"
-
-    print(f"save_twitter: args.data_folder: {args.data_folder}, real_path: {real_path}, data_path: {data_path}")
-
+    data_path = f"{workdir}/{args.data_folder}/{args.run_id}"
     full_path = utils.gen_filename(data_path, filename)
 
     print(f"Save data to {full_path}, data: {data}")
