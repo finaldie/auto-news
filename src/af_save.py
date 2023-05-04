@@ -46,8 +46,19 @@ def retrieve_twitter(args):
 
     print(f"retrieve twitter data from {full_path}, data: {data}")
 
+    # test redis
+    redis_url = os.getenv("BOT_REDIS_URL")
+    redis_conn = utils.redis_conn(redis_url)
+
+    redis_resp = redis_conn.info()
+    print(f"Test redis, info: {redis_resp}")
+
+    return data
+
 
 def push_to_targets(args, data):
+    print(f"environment: {os.environ}")
+
     targets = args.targets.split(",")
 
     for target in targets:

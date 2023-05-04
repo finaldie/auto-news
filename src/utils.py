@@ -1,6 +1,8 @@
 import os
 import json
 
+import redis
+
 
 def gen_filename(data_folder, filename):
     return f"{data_folder}/{filename}"
@@ -20,3 +22,14 @@ def read_data_json(full_path):
     f.close()
 
     return data
+
+
+def redis_conn(url):
+    conn = None
+
+    try:
+        conn = redis.from_url(url)
+    except Exception as e:
+        print(f"[ERROR]: Connect to redis @{url} failed: {e}")
+
+    return conn
