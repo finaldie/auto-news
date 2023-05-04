@@ -11,6 +11,7 @@ from datetime import date, timedelta, datetime
 import requests
 import json
 
+from dotenv import load_dotenv
 from tweets import TwitterAgent
 import utils
 
@@ -80,5 +81,6 @@ def run(args):
     
 if __name__ == "__main__":
     args = parser.parse_args()
+    load_dotenv()
 
     run(args)
