@@ -73,6 +73,8 @@ def tweets_dedup(args, tweets):
 
             if utils.redis_get(redis_conn, key):
                 print(f"Duplicated tweet found, key: {key}")
+
+                tweets_list.append(tweet)
             else:
                 # mark as visited
                 utils.redis_set(redis_conn, key, "true")
