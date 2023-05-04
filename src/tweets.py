@@ -29,7 +29,7 @@ class TwitterAgent:
 
         # get the last one
         if (tweet._json["entities"].get("media")
-            and tweet._json["entities"]["media"][-1].get("expanded_url")): 
+            and tweet._json["entities"]["media"][-1].get("expanded_url")):
             tweet_embed = tweet._json["entities"]["media"][-1]["expanded_url"]
 
         # if not found, fallback to 'urls' field
