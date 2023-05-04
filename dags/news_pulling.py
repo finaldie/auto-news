@@ -44,7 +44,7 @@ with DAG(
     default_args=default_args,
     max_active_runs=1,
     description='news pulling, config: {}',
-    schedule_interval=timedelta(minutes=30),
+    schedule_interval=timedelta(minutes=60),
     # schedule_interval=None,
     start_date=days_ago(0),
     tags=['NewsBot'],
