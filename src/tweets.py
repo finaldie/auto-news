@@ -30,7 +30,7 @@ class TwitterAgent:
             tweet_embed = tweet._json["entities"]["media"][0]["expanded_url"]
 
         output = {
-            "screen_name": screen_name,
+            "screen_name": tweet.screen_name,
             "tweet_id": tweet.id,
             "created_at_utc": tweet.created_at.isoformat(),
             "created_at_pdt": tweet.created_at.astimezone(pytz.timezone('America/Los_Angeles')).isoformat(),
@@ -49,7 +49,7 @@ class TwitterAgent:
         }
 
         if pull_reply:
-            reply_tweet = api.get_status(tweet.in_reply_to_status_id, tweet_mode='extended')
+            reply_tweet = self.api.get_status(tweet.in_reply_to_status_id, tweet_mode='extended')
 
             reply_name = reply_tweet.user.name
 
@@ -64,20 +64,19 @@ class TwitterAgent:
 
         return output
 
-    def subscribe(self, list_name, screen_names, recent_count=10, pull_interval=900):
+    def subscribe(self, list_name, screen_names, recent_count=10):
         """
         list_name: AI, Famous people, ...
         screen_names: elonmusk, JeffDean, ...
         """
 
         if len(screen_names) == 0:
-            print(f"[WARN]: Input screen_names is empty, skip")
+            print("[WARN]: Input screen_names is empty, skip")
             return
 
         self.lists[list_name] = {
             "screen_names": screen_names,
             "recent_count": recent_count,
-            "pull_interval": pull_interval,
         }
 
     def pull(self):
@@ -86,12 +85,11 @@ class TwitterAgent:
         for source_name, source in self.lists.items():
             screen_names = source["screen_names"]
             recent_count = source["recent_count"]
-            pull_interval = source["pull_interval"]
 
             output[source_name] = []
 
             for screen_name in screen_names:
-                tweets = api.user_timeline(screen_name=screen_name, count=recent_count)
+                tweets = self.api.user_timeline(screen_name=screen_name, count=recent_count)
 
                 if len(tweets) == 0:
                     continue
