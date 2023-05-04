@@ -66,7 +66,7 @@ def save_twitter(args, data):
     full_path = utils.gen_filename(data_path, filename)
 
     print(f"Create data folder: {data_path}")
-    os.mkdir(data_path)
+    os.makedirs(data_path, exist_ok=True)
 
     print(f"Save data to {full_path}")
     utils.save_data_json(full_path, data)
