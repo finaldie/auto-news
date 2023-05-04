@@ -54,6 +54,9 @@ def retrieve_twitter(args):
     redis_resp = redis_conn.info()
     print(f"Test redis, info: {redis_resp}")
 
+    redis_keys = redis_conn.keys()
+    print(f"Test redis, keys: {redis_keys}")
+
     return data
 
 
