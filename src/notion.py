@@ -70,7 +70,7 @@ class NotionAgent:
             page_content = extractPageBlocks(page_id)
 
             extracted_pages[page_id] = {
-                "User": page["properties"]["User"]["title"]["text"]["content"],
+                "name": page["properties"]["Name"]["title"]["text"]["content"],
                 "to": page["properties"]["To"]["rich_text"][0]["text"]["content"],
                 # pdt timezone
                 "created_at": page["properties"]["Created at"]["date"]["start"],
@@ -95,7 +95,7 @@ class NotionAgent:
         tweet_url = f"https://twitter.com/{tweet['screen_name']}/status/{tweet['tweet_id']}"
 
         properties = {
-            "User": {
+            "Name": {
                 "title": [
                     {
                         "text": {
