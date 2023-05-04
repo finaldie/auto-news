@@ -204,6 +204,7 @@ class NotionAgent:
         tweet: the extracted tweet from TwitterAgent
         """
         properties, blocks = self._createDatabaseItem_TwitterInbox(list_names, tweet)
+        print(f"notion twitter inbox: database_id: {database_id}, properties: {properties}, blocks: {blocks}")
 
         # Add the new page to the database
         new_page = self.api.pages.create(

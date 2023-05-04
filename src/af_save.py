@@ -59,6 +59,8 @@ def tweets_dedup(args, tweets):
     redis_url = os.getenv("BOT_REDIS_URL")
     redis_conn = utils.redis_conn(redis_url)
 
+    print(f"Redis keys: {redis_conn.keys()}")
+
     tweets_deduped = {}
 
     for list_name, data in tweets.items():
@@ -70,7 +72,7 @@ def tweets_dedup(args, tweets):
             key = data_model.NOTION_INBOX_ITEM_ID.format("twitter", list_name, tweet_id)
 
             if utils.redis_get(redis_conn, key):
-                print("Duplicated tweet found, key: {key}")
+                print(f"Duplicated tweet found, key: {key}")
             else:
                 # mark as visited
                 utils.redis_set(redis_conn, key, "true")
@@ -90,6 +92,8 @@ def push_to_inbox(args, data):
     print("#####################################################")
 
     targets = args.targets.split(",")
+
+    print(f"input data: {data}")
 
     for target in targets:
         print(f"Pushing data to target: {target} ...")
