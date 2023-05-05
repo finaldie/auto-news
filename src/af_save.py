@@ -202,9 +202,10 @@ def tweets_category_and_rank(args, data):
                 ranked_tweet["__categories"] = []
                 ranked_tweet["__rate"] = 0.75
             else:
-                ranked_tweet["__topics"] = [(x["topic"], x["score"]) for x in category_and_rank["topics"]]
-                ranked_tweet["__categories"] = [(x["category"], x["score"]) for x in category_and_rank["topics"]]
+                ranked_tweet["__topics"] = [(x["topic"], x.get("score") or 1) for x in category_and_rank["topics"]]
+                ranked_tweet["__categories"] = [(x["category"], x.get("score") or 1) for x in category_and_rank["topics"]]
                 ranked_tweet["__rate"] = category_and_rank["overall_score"]
+                ranked_tweet["__feedback"] = category_and_rank.get("feedback") or ""
 
             ranked_list.append(ranked_tweet)
 
@@ -214,7 +215,7 @@ def tweets_category_and_rank(args, data):
 
 def _get_topk_items(items: list, k):
     """
-    topics: [(name, score), ...]
+    items: [(name, score), ...]
     """
     tops = sorted(items, key=itemgetter(1), reverse=True)
     return tops[:k]

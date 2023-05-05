@@ -43,7 +43,7 @@ class LLMAgentCategoryAndRanking(LLMAgentBase):
         super().__init__(api_key, model_name)
 
     def init_prompt(self, prompt=None):
-        prompt = prompt or llm_prompts.LLM_PROMPT_CATEGORY_AND_RANKING_TPL
+        prompt = prompt or llm_prompts.LLM_PROMPT_CATEGORY_AND_RANKING_TPL2
         self._init_prompt(prompt)
 
     def run(self, text: str):

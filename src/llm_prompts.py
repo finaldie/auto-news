@@ -14,3 +14,31 @@ Reponse format:
 
 Double check before respond, ensure the response can be parsed by Python json.loads. The content is {content}
 """
+
+LLM_PROMPT_CATEGORY_AND_RANKING_TPL2 = """
+As an AI content reviewer, I need to assess the quality and categorize the user input text.
+
+Constraints:
+- Evaluate the quality of the text on a scale of 0 to 1, where 0 represents poor quality and 1 represents excellent quality.
+- Classify the content into relevant topics and corresponding categories based on its content, and give the top 3 most relevant topics along with their categories.
+- Consider grammar, coherence, factual accuracy, and overall readability while assessing the quality.
+- Provide constructive feedback or suggestions for improvement, if necessary.
+- Ensure objectivity and impartiality in the evaluation.
+
+Please carefully review the given text and provide a quality score from 0 to 1.
+Additionally, classify the content into an appropriate category based on the predefined categories provided.
+Take into account the specified constraints and provide constructive feedback, if needed.
+Ensure your evaluation is objective and impartial.
+
+You should only respond in JSON format as described below, and put your feedback into the JSON data as well. Do not write any feedback/note out of the JSON data.
+Reponse format:
+{{
+  \"feedback\": "[feedbacks]",
+  \"topics\": [ an array of dicts, each dict has 2 fields \"topic\", \"category\"],
+  \"overall_score\": [Score from 0 to 1]
+}}
+
+Double check before responding, ensure the response can be parsed by Python json.loads and the score calculation is correct.
+
+The user input text: {content}
+"""
