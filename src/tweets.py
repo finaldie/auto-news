@@ -50,8 +50,8 @@ class TwitterAgent:
             retweet = self._extractTweet(tweet.retweeted_status)
             print(f"retweet: {retweet}")
 
-            text = retweet.full_text
-            embed = self._extractEmbed(retweet)
+            text = retweet["text"]
+            embed = retweet["embed"]
 
         output = {
             "tweet_id": tweet.id,
