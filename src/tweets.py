@@ -41,13 +41,15 @@ class TwitterAgent:
         return tweet_embed
 
     def _extractTweet(self, tweet, pull_reply=True):
-        # print(f"extractTweet: {tweet}")
+        print(f"extractTweet: {tweet}")
         text = tweet.full_text
         embed = self._extractEmbed(tweet)
 
         retweet = None
         if tweet._json.get("retweeted_status"):
             retweet = self._extractTweet(tweet.retweeted_status)
+            print(f"retweet: {retweet}")
+
             text = retweet.full_text
             embed = self._extractEmbed(retweet)
 
