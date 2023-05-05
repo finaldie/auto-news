@@ -145,9 +145,9 @@ class NotionAgent:
             },
         }
 
-        block_content = f"{tweet['name']}: "
+        block_content = f"{tweet['name']}"
         if tweet["retweeted"]:
-            block_content += " Retweeted"
+            block_content += " (Retweeted)"
 
         block_content += f": {tweet['text']}"
 
