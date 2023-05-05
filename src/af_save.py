@@ -77,7 +77,7 @@ def tweets_dedup(args, tweets):
                 print(f"Duplicated tweet found, key: {key}")
 
                 # TODO: Remove it after debugging
-                tweets_list.append(tweet)
+                # tweets_list.append(tweet)
             else:
                 # mark as visited
                 utils.redis_set(redis_conn, key, "true")
