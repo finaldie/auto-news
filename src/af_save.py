@@ -171,16 +171,20 @@ def tweets_category_and_rank(args, data):
             ranking_key = data_model.NOTION_RANKING_ITEM_ID.format(
                     "twitter", list_name, tweet["tweet_id"])
 
-            llm_ranking_resp = utils.redis_get(
-                    redis_conn,
-                    ranking_key,
-                    expire_time=redis_key_expire_time)
+            llm_ranking_resp = utils.redis_get(redis_conn, ranking_key)
 
             category_and_rank_str = None
 
             if not llm_ranking_resp:
                 print("Not found category_and_rank_str in cache, fallback to llm_agent to rank")
                 category_and_rank_str = llm_agent.run(text)
+
+                print(f"Cache llm response for {redis_key_expire_time}s, key: {ranking_key}")
+                utils.redis_set(
+                        redis_conn,
+                        ranking_key,
+                        category_and_rank_str,
+                        expire_time=redis_key_expire_time)
 
             else:
                 print("Found category_and_rank_str from cache")
