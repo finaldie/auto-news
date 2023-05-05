@@ -52,13 +52,13 @@ def redis_set(conn, key: str, val: str, expire_time=0):
     """
     try:
         if expire_time <= 0:
-            conn.set(key, val)
+            conn.setnx(key, val)
         else:
-            conn.setex(key, expire_time, val)
+            conn.setex(key, int(expire_time), val)
 
         return True
     except Exception as e:
-        print(f"[ERROR]: Failed to get key {key} and val {val}: {e}")
+        print(f"[ERROR]: Failed to set key {key} and val {val}: {e}")
         return False
 
 

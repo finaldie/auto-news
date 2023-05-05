@@ -184,7 +184,7 @@ def tweets_category_and_rank(args, data):
                         redis_conn,
                         ranking_key,
                         category_and_rank_str,
-                        expire_time=redis_key_expire_time)
+                        expire_time=int(redis_key_expire_time))
 
             else:
                 print("Found category_and_rank_str from cache")
