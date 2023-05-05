@@ -1,5 +1,6 @@
 import json
 import pytz
+import time
 
 import tweepy
 
@@ -116,7 +117,7 @@ class TwitterAgent:
             "recent_count": recent_count,
         }
 
-    def pull(self):
+    def pull(self, pulling_interval_sec=0):
         output = {}
 
         for source_name, source in self.lists.items():
@@ -130,8 +131,13 @@ class TwitterAgent:
                     continue
 
                 print(f"Pulling tweets from source {source_name}, user screen_name: {screen_name}")
+                if pulling_interval_sec > 0:
+                    time.sleep(pulling_interval_sec)
 
-                tweets = self.api.user_timeline(screen_name=screen_name, count=recent_count, tweet_mode='extended')
+                tweets = self.api.user_timeline(
+                        screen_name=screen_name,
+                        count=recent_count,
+                        tweet_mode='extended')
 
                 if len(tweets) == 0:
                     continue

@@ -1,15 +1,7 @@
-import random
 import argparse
-import sys
 import os
-
-import time
-import math
-from collections import defaultdict
 from datetime import date, timedelta, datetime
 
-import requests
-import json
 from dotenv import load_dotenv
 
 from tweets import TwitterAgent
@@ -29,6 +21,10 @@ parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
                     default="twitter")
+parser.add_argument("--pulling-count", help="pulling count",
+                    default=10)
+parser.add_argument("--pulling-interval", help="pulling interval (s)",
+                    default=0.1)
 
 
 def pull_twitter(args):
@@ -47,10 +43,10 @@ def pull_twitter(args):
 
     agent = TwitterAgent(api_key, api_key_secret, access_token, access_token_secret)
 
-    agent.subscribe("Famous", screen_names_famous.split(","), 2)
-    agent.subscribe("AI", screen_names_ai.split(","), 2)
+    agent.subscribe("Famous", screen_names_famous.split(","), args.pulling_count)
+    agent.subscribe("AI", screen_names_ai.split(","), args.pulling_count)
 
-    data = agent.pull()
+    data = agent.pull(pulling_interval_sec=args.pulling_interval)
     print(f"Pulled from twitter: {data}")
 
     return data
@@ -80,7 +76,7 @@ def run(args):
             data = pull_twitter(args)
             save_twitter(args, data)
 
-    
+
 if __name__ == "__main__":
     args = parser.parse_args()
     load_dotenv()

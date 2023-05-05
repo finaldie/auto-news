@@ -1,19 +1,9 @@
-import random
 import argparse
-import sys
 import os
 import copy
-
-import time
-import math
-from collections import defaultdict
 from datetime import date, timedelta, datetime
 
-import requests
-import json
-
 from dotenv import load_dotenv
-from tweets import TwitterAgent
 import utils
 import data_model
 from notion import NotionAgent
