@@ -53,3 +53,21 @@ def redis_set(conn, key: str, val: str):
     except Exception as e:
         print(f"[ERROR]: Failed to get key {key} and val {val}: {e}")
         return False
+
+
+def fix_json_str(data):
+    res = data.replace("\\n", "\n")
+    res = data.replace("\t", "")
+    return res
+
+
+def fix_and_parse_json(data):
+    fixed = fix_json_str(data)
+    res = None
+
+    try:
+        res = json.loads(fixed)
+        return res
+    except Exception as e:
+        print(f"[ERROR]: cannot parse json string: {data}, error: {e}")
+        return res

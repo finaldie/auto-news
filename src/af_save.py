@@ -48,7 +48,7 @@ def retrieve_twitter(args):
     return data
 
 
-def tweets_dedup(args, tweets):
+def tweets_dedup(args, tweets, target="inbox"):
     print("#####################################################")
     print("# Tweets Dedup                                      #")
     print("#####################################################")
@@ -66,21 +66,40 @@ def tweets_dedup(args, tweets):
         for tweet in data:
             tweet_id = tweet["tweet_id"]
 
-            key = data_model.NOTION_INBOX_ITEM_ID.format("twitter", list_name, tweet_id)
+            key_tpl = ""
+            if target == "inbox":
+                key_tpl = data_model.NOTION_INBOX_ITEM_ID
+            elif target == "toread":
+                key_tpl = data_model.NOTION_TOREAD_ITEM_ID
+
+            key = key_tpl.format("twitter", list_name, tweet_id)
 
             if utils.redis_get(redis_conn, key):
-                print(f"Duplicated tweet found, key: {key}")
-
-                # TODO: Remove it after debugging
-                # tweets_list.append(tweet)
+                print(f"Duplicated tweet found, key: {key}, skip")
             else:
-                # mark as visited
-                utils.redis_set(redis_conn, key, "true")
-
                 tweets_list.append(tweet)
 
     print(f"tweets_deduped: {tweets_deduped}")
     return tweets_deduped
+
+
+def tweet_mark_visited(args, list_name, tweet, target="inbox"):
+    redis_url = os.getenv("BOT_REDIS_URL")
+    redis_conn = utils.redis_conn(redis_url)
+
+    tweet_id = tweet["tweet_id"]
+
+    key_tpl = ""
+    if target == "inbox":
+        key_tpl = data_model.NOTION_INBOX_ITEM_ID
+    elif target == "toread":
+        key_tpl = data_model.NOTION_TOREAD_ITEM_ID
+
+    key = key_tpl.format("twitter", list_name, tweet_id)
+
+    # mark as visited
+    utils.redis_set(redis_conn, key, "true")
+    print(f"Mark tweet as visited, key: {key}")
 
 
 def push_to_inbox(args, data):
@@ -111,6 +130,8 @@ def push_to_inbox(args, data):
 
                     print("Insert one tweet into inbox")
 
+                    tweet_mark_visited(args, list_name, tweet, target="inbox")
+
         else:
             print(f"[ERROR]: Unknown target {target}, skip")
 
@@ -130,18 +151,30 @@ def tweets_category_and_rank(args, data):
         ranked_list = ranked.setdefault(list_name, [])
 
         for tweet in tweets:
+            # Assemble tweet content
             text = ""
             if tweet["reply_text"]:
                 text += f"{tweet['reply_to_name']}: {tweet['reply_text']}"
             text += f"{tweet['name']}: {tweet['text']}"
 
-            category_and_rank = llm_agent.run(text)
-            print(f"Category and Rank: text: {text}, rank_resp: {category_and_rank}")
+            # Let LLM to category and rank
+            category_and_rank_str = llm_agent.run(text)
+            print(f"Category and Rank: text: {text}, rank_resp: {category_and_rank_str}")
 
+            category_and_rank = utils.fix_and_parse_json(category_and_rank_str)
+
+            # Parse LLM response and assemble category and rank
             ranked_tweet = copy.deepcopy(tweet)
-            ranked_tweet["__topics"] = [(x["topic"], x["score"]) for x in category_and_rank["topics"]]
-            ranked_tweet["__categories"] = [(x["category"], x["score"]) for x in category_and_rank["topics"]]
-            ranked_tweet["__rate"] = category_and_rank["overall_score"]
+
+            if not category_and_rank:
+                print(f"[ERROR] Cannot parse json string, assign default rating 0.75")
+                ranked_tweet["__topics"] = []
+                ranked_tweet["__categories"] = []
+                ranked_tweet["__rate"] = 0.75
+            else:
+                ranked_tweet["__topics"] = [(x["topic"], x["score"]) for x in category_and_rank["topics"]]
+                ranked_tweet["__categories"] = [(x["category"], x["score"]) for x in category_and_rank["topics"]]
+                ranked_tweet["__rate"] = category_and_rank["overall_score"]
 
             ranked_list.append(ranked_tweet)
 
@@ -201,6 +234,8 @@ def push_to_read(args, data):
 
                     print("Insert one tweet into ToRead database")
 
+                    tweet_mark_visited(args, list_name, ranked_tweet, target="toread")
+
         else:
             print(f"[ERROR]: Unknown target {target}, skip")
 
@@ -214,10 +249,13 @@ def run(args):
 
         # Notes: For twitter we don't need summary step
         if source == "twitter":
+            # Dedup and push to inbox
             data = retrieve_twitter(args)
-            data_deduped = tweets_dedup(args, data)
+            data_deduped = tweets_dedup(args, data, target="inbox")
             push_to_inbox(args, data_deduped)
 
+            # Dedup and push to ToRead
+            data_deduped = tweets_dedup(args, data, target="toread")
             data_ranked = tweets_category_and_rank(args, data_deduped)
             push_to_read(args, data_ranked)
 

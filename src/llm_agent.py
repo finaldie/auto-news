@@ -37,11 +37,6 @@ class LLMAgentBase:
         self.llm = llm
         self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
 
-    def parse_response_json(self, resp):
-        res = resp.replace("\\n", "\n")
-        res = resp.replace("\t", "")
-        return res
-
 
 class LLMAgentCategoryAndRanking(LLMAgentBase):
     def __init__(self, api_key="", model_name="gpt-3.5-turbo"):
@@ -65,11 +60,7 @@ class LLMAgentCategoryAndRanking(LLMAgentBase):
         """
         response = self.llmchain.run(text)
 
-        # fix the response json format
-        response_json = self.parse_response_json(response)
-
-        # return the json object
-        return json.loads(response_json)
+        return response
 
 
 class LLMAgentSummary(LLMAgentBase):
