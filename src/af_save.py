@@ -2,6 +2,7 @@ import argparse
 import os
 import copy
 from datetime import date, timedelta, datetime
+from operator import itemgetter
 
 from dotenv import load_dotenv
 import utils
@@ -25,6 +26,10 @@ parser.add_argument("--sources", help="sources to pull, comma separated",
                     default="twitter")
 parser.add_argument("--targets", help="targets to push, comma separated",
                     default="notion")
+parser.add_argument("--topics-top-k", help="pick top-k topics to push",
+                    default=3)
+parser.add_argument("--categories-top-k", help="pick top-k categories to push",
+                    default=3)
 
 
 def retrieve_twitter(args):
@@ -134,14 +139,22 @@ def tweets_category_and_rank(args, data):
             print(f"Category and Rank: text: {text}, rank_resp: {category_and_rank}")
 
             ranked_tweet = copy.deepcopy(tweet)
-            ranked_tweet["__topics"] = [x["topic"] for x in category_and_rank["topics"]]
-            ranked_tweet["__categories"] = [x["category"] for x in category_and_rank["topics"]]
+            ranked_tweet["__topics"] = [(x["topic"], x["score"]) for x in category_and_rank["topics"]]
+            ranked_tweet["__categories"] = [(x["category"], x["score"]) for x in category_and_rank["topics"]]
             ranked_tweet["__rate"] = category_and_rank["overall_score"]
 
             ranked_list.append(ranked_tweet)
 
     print(f"Ranked tweets: {ranked}")
     return ranked
+
+
+def _get_topk_items(items: list, k):
+    """
+    topics: [(name, score), ...]
+    """
+    tops = sorted(items, key=itemgetter(1), reverse=True)
+    return tops[:k]
 
 
 def push_to_read(args, data):
@@ -169,14 +182,22 @@ def push_to_read(args, data):
 
             for list_name, tweets in data.items():
                 for ranked_tweet in tweets:
-                    topics = ranked_tweet["__topics"]
-                    categories = ranked_tweet["__categories"]
+                    # topics: [(name, score), ...]
+                    topics = _get_topk_items(ranked_tweet["__topics"], args.topics_top_k)
+                    print(f"Original topics: {ranked_tweet['__topics']}, top-k: {topics}")
+                    topics_topk = [x[0] for x in topics]
+
+                    # categories: [(name, score), ...]
+                    categories = _get_topk_items(ranked_tweet["__categories"], args.categories_top_k)
+                    print(f"Original categories: {ranked_tweet['__categories']}, top-k: {categories}")
+                    categories_topk = [x[0] for x in categories]
+
                     # The __rate is [0, 1], scale to [0, 100]
                     rate = ranked_tweet["__rate"] * 100
 
                     notion_agent.createDatabaseItem_ToRead(
                         database_id, [list_name], ranked_tweet,
-                        topics, categories, rate)
+                        topics_topk, categories_topk, rate)
 
                     print("Insert one tweet into ToRead database")
 
