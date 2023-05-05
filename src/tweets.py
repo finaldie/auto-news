@@ -132,6 +132,7 @@ class TwitterAgent:
 
                 print(f"Pulling tweets from source {source_name}, user screen_name: {screen_name}")
                 if pulling_interval_sec > 0:
+                    print(f"Sleeping {pulling_interval_sec} seconds")
                     time.sleep(pulling_interval_sec)
 
                 tweets = self.api.user_timeline(
