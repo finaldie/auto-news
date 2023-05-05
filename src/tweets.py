@@ -46,7 +46,7 @@ class TwitterAgent:
         embed = self._extractEmbed(tweet)
 
         retweet = None
-        if tweet.retweeted_status:
+        if tweet._json.get("retweeted_status"):
             retweet = self._extractTweet(tweet.retweeted_status)
             text = retweet.full_text
             embed = self._extractEmbed(retweet)
