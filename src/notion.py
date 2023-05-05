@@ -251,7 +251,7 @@ class NotionAgent:
             "multi_select": categories_list,
         }})
 
-        properties.update({"Rate": {
+        properties.update({"Rating": {
             "number": rate_number
         }})
 
