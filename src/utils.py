@@ -46,9 +46,16 @@ def redis_get(conn, key: str):
     return data
 
 
-def redis_set(conn, key: str, val: str):
+def redis_set(conn, key: str, val: str, expire_time=0):
+    """
+    expire_time: the key will be expired after expire_time seconds
+    """
     try:
-        conn.set(key, val)
+        if expire_time <= 0:
+            conn.set(key, val)
+        else:
+            conn.setex(key, expire_time, val)
+
         return True
     except Exception as e:
         print(f"[ERROR]: Failed to get key {key} and val {val}: {e}")

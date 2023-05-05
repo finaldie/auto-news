@@ -126,12 +126,15 @@ def push_to_inbox(args, data):
 
             for list_name, tweets in data.items():
                 for tweet in tweets:
-                    notion_agent.createDatabaseItem_TwitterInbox(
-                        database_id, [list_name], tweet)
+                    try:
+                        notion_agent.createDatabaseItem_TwitterInbox(
+                            database_id, [list_name], tweet)
 
-                    print("Insert one tweet into inbox")
+                        print("Insert one tweet into inbox")
 
-                    tweet_mark_visited(args, list_name, tweet, target="inbox")
+                        tweet_mark_visited(args, list_name, tweet, target="inbox")
+                    except Exception as e:
+                        print(f"[ERROR]: Failed to push tweet to notion, skip it: {e}")
 
         else:
             print(f"[ERROR]: Unknown target {target}, skip")
@@ -145,6 +148,10 @@ def tweets_category_and_rank(args, data):
     llm_agent = LLMAgentCategoryAndRanking()
     llm_agent.init_prompt()
     llm_agent.init_llm()
+
+    redis_url = os.getenv("BOT_REDIS_URL")
+    redis_key_expire_time = os.getenv("BOT_REDIS_KEY_EXPIRE_TIME", 604800)
+    redis_conn = utils.redis_conn(redis_url)
 
     ranked = {}
 
@@ -160,9 +167,26 @@ def tweets_category_and_rank(args, data):
 
             # Let LLM to category and rank
             st = time.time()
-            category_and_rank_str = llm_agent.run(text)
-            print(f"Used {time.time() - st:.3f}s, Category and Rank: text: {text}, rank_resp: {category_and_rank_str}")
 
+            ranking_key = data_model.NOTION_RANKING_ITEM_ID.format(
+                    "twitter", list_name, tweet["tweet_id"])
+
+            llm_ranking_resp = utils.redis_get(
+                    redis_conn,
+                    ranking_key,
+                    expire_time=redis_key_expire_time)
+
+            category_and_rank_str = None
+
+            if not llm_ranking_resp:
+                print("Not found category_and_rank_str in cache, fallback to llm_agent to rank")
+                category_and_rank_str = llm_agent.run(text)
+
+            else:
+                print("Found category_and_rank_str from cache")
+                category_and_rank_str = llm_ranking_resp
+
+            print(f"Used {time.time() - st:.3f}s, Category and Rank: text: {text}, rank_resp: {category_and_rank_str}")
             category_and_rank = utils.fix_and_parse_json(category_and_rank_str)
 
             # Parse LLM response and assemble category and rank
@@ -192,6 +216,33 @@ def _get_topk_items(items: list, k):
     return tops[:k]
 
 
+def _push_to_read_notion(
+        args, notion_agent, database_id, list_name, ranked_tweet):
+    # topics: [(name, score), ...]
+    topics = _get_topk_items(ranked_tweet["__topics"], args.topics_top_k)
+    print(f"Original topics: {ranked_tweet['__topics']}, top-k: {topics}")
+
+    # Notes: notion doesn't accept comma in the selection type
+    # fix it first
+    topics_topk = [x[0].replace(",", " ") for x in topics]
+
+    # categories: [(name, score), ...]
+    categories = _get_topk_items(ranked_tweet["__categories"], args.categories_top_k)
+    print(f"Original categories: {ranked_tweet['__categories']}, top-k: {categories}")
+    categories_topk = [x[0].replace(",", " ") for x in categories]
+
+    # The __rate is [0, 1], scale to [0, 100]
+    rate = ranked_tweet["__rate"] * 100
+
+    notion_agent.createDatabaseItem_ToRead(
+        database_id, [list_name], ranked_tweet,
+        topics_topk, categories_topk, rate)
+
+    print("Insert one tweet into ToRead database")
+
+    tweet_mark_visited(args, list_name, ranked_tweet, target="toread")
+
+
 def push_to_read(args, data):
     """
     data: {list_name1: [ranked_tweet1, ranked_tweet2, ...],
@@ -217,27 +268,16 @@ def push_to_read(args, data):
 
             for list_name, tweets in data.items():
                 for ranked_tweet in tweets:
-                    # topics: [(name, score), ...]
-                    topics = _get_topk_items(ranked_tweet["__topics"], args.topics_top_k)
-                    print(f"Original topics: {ranked_tweet['__topics']}, top-k: {topics}")
-                    topics_topk = [x[0] for x in topics]
+                    try:
+                        _push_to_read_notion(
+                                args,
+                                notion_agent,
+                                database_id,
+                                list_name,
+                                ranked_tweet)
 
-                    # categories: [(name, score), ...]
-                    categories = _get_topk_items(ranked_tweet["__categories"], args.categories_top_k)
-                    print(f"Original categories: {ranked_tweet['__categories']}, top-k: {categories}")
-                    categories_topk = [x[0] for x in categories]
-
-                    # The __rate is [0, 1], scale to [0, 100]
-                    rate = ranked_tweet["__rate"] * 100
-
-                    notion_agent.createDatabaseItem_ToRead(
-                        database_id, [list_name], ranked_tweet,
-                        topics_topk, categories_topk, rate)
-
-                    print("Insert one tweet into ToRead database")
-
-                    tweet_mark_visited(args, list_name, ranked_tweet, target="toread")
-
+                    except Exception as e:
+                        print(f"[ERROR]: Push to notion failed, skip: {e}")
         else:
             print(f"[ERROR]: Unknown target {target}, skip")
 
