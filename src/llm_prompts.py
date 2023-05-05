@@ -12,5 +12,5 @@ Reponse format:
   \"overall_score\": 0.9
 }}
 
-Ensure the response can be parsed by Python json.loads. The content is {content}
+Double check before respond, ensure the response can be parsed by Python json.loads. The content is {content}
 """
