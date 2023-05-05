@@ -94,6 +94,10 @@ class NotionAgent:
         source_list_names = [{"name": ln} for ln in list_names]
         tweet_url = f"https://twitter.com/{tweet['screen_name']}/status/{tweet['tweet_id']}"
 
+        preview_content = tweet['text']
+        if tweet["retweeted"]:
+            preview_content = f"Retweeted: {preview_content}"
+
         properties = {
             "Name": {
                 "title": [
@@ -126,7 +130,7 @@ class NotionAgent:
                 "rich_text": [
                     {
                         "text": {
-                            "content": tweet['text'],
+                            "content": preview_content,
                             "link": {
                                 "url": tweet_url,
                             }
@@ -141,7 +145,12 @@ class NotionAgent:
             },
         }
 
-        block_content = f"{tweet['name']}: {tweet['text']}"
+        block_content = f"{tweet['name']}: "
+        if tweet["retweeted"]:
+            block_content += " Retweeted"
+
+        block_content += f": {tweet['text']}"
+
         blocks = [
             {
                 "object": "block",

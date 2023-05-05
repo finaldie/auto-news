@@ -32,7 +32,7 @@ class TwitterAgent:
             and tweet._json["entities"]["media"][-1].get("expanded_url")):
             tweet_embed = tweet._json["entities"]["media"][-1]["expanded_url"]
 
-        # if not found, fallback to 'urls' field
+        # if not found, fallback to 'urls' field (extract the last one)
         if (not tweet_embed
             and tweet._json["entities"].get("urls")
             and tweet._json["entities"]["urls"][-1]["expanded_url"]):
@@ -42,6 +42,14 @@ class TwitterAgent:
 
     def _extractTweet(self, tweet, pull_reply=True):
         # print(f"extractTweet: {tweet}")
+        text = tweet.full_text
+        embed = self._extractEmbed(tweet)
+
+        retweet = None
+        if tweet.retweeted_status:
+            retweet = self._extractTweet(tweet.retweeted_status)
+            text = retweet.full_text
+            embed = self._extractEmbed(retweet)
 
         output = {
             "tweet_id": tweet.id,
@@ -52,9 +60,10 @@ class TwitterAgent:
             "created_at_utc": tweet.created_at.isoformat(),
             "created_at_pdt": tweet.created_at.astimezone(pytz.timezone('America/Los_Angeles')).isoformat(),
 
-            "text": tweet.text,
-            "embed": self._extractEmbed(tweet),
+            "text": text,
+            "embed": embed,
             "url": f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}",
+            "retweeted": True if retweet else False,
 
             "reply_to_screen_name": tweet.in_reply_to_screen_name,
             "reply_to_user_id": tweet.in_reply_to_user_id,
@@ -120,7 +129,7 @@ class TwitterAgent:
 
                 print(f"Pulling tweets from source {source_name}, user screen_name: {screen_name}")
 
-                tweets = self.api.user_timeline(screen_name=screen_name, count=recent_count)
+                tweets = self.api.user_timeline(screen_name=screen_name, count=recent_count, tweet_mode='extended')
 
                 if len(tweets) == 0:
                     continue
