@@ -1,6 +1,7 @@
 import argparse
 import os
 import copy
+import time
 from datetime import date, timedelta, datetime
 from operator import itemgetter
 
@@ -158,8 +159,9 @@ def tweets_category_and_rank(args, data):
             text += f"{tweet['name']}: {tweet['text']}"
 
             # Let LLM to category and rank
+            st = time.time()
             category_and_rank_str = llm_agent.run(text)
-            print(f"Category and Rank: text: {text}, rank_resp: {category_and_rank_str}")
+            print(f"Used {time.time() - st:.3f}s, Category and Rank: text: {text}, rank_resp: {category_and_rank_str}")
 
             category_and_rank = utils.fix_and_parse_json(category_and_rank_str)
 
