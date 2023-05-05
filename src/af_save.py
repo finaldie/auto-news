@@ -80,7 +80,7 @@ def tweets_dedup(args, tweets, target="inbox"):
             else:
                 tweets_list.append(tweet)
 
-    print(f"tweets_deduped: {tweets_deduped}")
+    print(f"tweets_deduped {len(tweets_deduped)}: {tweets_deduped}")
     return tweets_deduped
 
 
