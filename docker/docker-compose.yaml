@@ -118,6 +118,9 @@ services:
       - bot_network
     expose:
       - 6379
+    volumes:
+      # Persist data in host
+      - ${REDIS_PROJ_DIR}/data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s

@@ -12,7 +12,11 @@ include $(topdir)/install.env
 
 docker-network:
 	@echo "creating docker network for bot..."
+ifeq ($(shell docker network ls -f name=$(BOT_NETWORK_NAME) -q | wc -l), 0)
 	docker network create $(BOT_NETWORK_NAME)
+else
+	@echo "docker network $(BOT_NETWORK_NAME) already exist, skip"
+endif
 
 prepare-env:
 	@echo "**************************************************************"
@@ -47,7 +51,7 @@ deploy: deploy-airflow deploy-env
 init:
 	cd docker && make init topdir=$(topdir)
 
-start:
+start: docker-network
 	cd docker && make start topdir=$(topdir)
 
 stop:
@@ -58,6 +62,7 @@ logs:
 
 clean:
 	docker system prune -f
+	docker volume prune
 
 push_dags:
 	cd docker && make push_dags topdir=$(topdir)

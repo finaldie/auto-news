@@ -21,6 +21,11 @@ deploy-airflow: deploy-code
 	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs plugins run data
 	@echo "Airflow deployment finished"
 
+deploy-redis:
+	@echo "Assembling redis ..."
+	mkdir -p $(REDIS_PROJ_DIR)/data
+	@echo "Redis deployment finished"
+
 post-deploy:
 
 init-airflow:
@@ -30,7 +35,7 @@ init-airflow:
 build:
 	docker compose build
 
-deploy: deploy-airflow post-deploy
+deploy: deploy-airflow deploy-redis post-deploy
 
 
 init: init-airflow push_dags
