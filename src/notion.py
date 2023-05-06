@@ -95,7 +95,7 @@ class NotionAgent:
             print(f"result: page id: {page['id']}")
 
             page_id = page["id"]
-            page_content, _ = extractPageBlocks(page_id)
+            page_content, _ = self.extractPageBlocks(page_id)
 
             extracted_pages[page_id] = {
                 "name": page["properties"]["Name"]["title"]["text"]["content"],
@@ -306,7 +306,7 @@ class NotionAgent:
 
         return new_page
 
-    def createComment(block_metadata, pattern: str, comment_text: str):
+    def createComment(self, block_metadata, pattern: str, comment_text: str):
         for block_id, metadata in block_metadata:
             text = metadata["text"]
 
@@ -331,4 +331,4 @@ class NotionAgent:
                 comment=comment_range
             )
 
-            print(f"Created a new comment")
+            print(f"Created a new comment, pattern: {pattern}, comment: {comment_text}")
