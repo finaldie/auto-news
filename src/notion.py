@@ -1,5 +1,6 @@
 import json
 import os
+import traceback
 from datetime import datetime
 
 from notion_client import Client
@@ -303,11 +304,12 @@ class NotionAgent:
 
         except Exception as e:
             print(f"[ERROR] Failed to add comment: {e}")
+            traceback.print_exc()
 
         return new_page
 
     def createComment(self, block_metadata, pattern: str, comment_text: str):
-        for block_id, metadata in block_metadata:
+        for block_id, metadata in block_metadata.items():
             text = metadata["text"]
 
             if text.find(pattern) == -1:
@@ -331,4 +333,4 @@ class NotionAgent:
                 comment=comment_range
             )
 
-            print(f"Created a new comment, pattern: {pattern}, comment: {comment_text}")
+            print(f"Created a new comment, pattern: {pattern}, comment: {comment_text}, new_comment object: {new_comment}")
