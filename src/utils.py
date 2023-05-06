@@ -69,10 +69,13 @@ def fix_json_str(data):
 
 
 def fix_and_parse_json(data):
-    fixed = fix_json_str(data)
     res = None
 
     try:
+        if isinstance(data, bytes):
+            data = data.decode("utf-8")
+
+        fixed = fix_json_str(data)
         res = json.loads(fixed)
         return res
     except Exception as e:
