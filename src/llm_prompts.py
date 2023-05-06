@@ -26,8 +26,9 @@ Constraints:
 - Ensure objectivity and impartiality in the evaluation.
 
 Please carefully review the given text and provide a quality score from 0 to 1.
-Additionally, classify the content into an appropriate category based on the predefined categories provided.
+Additionally, classify the content into relevant categories based on its content.
 Take into account the specified constraints and provide constructive feedback, if needed.
+Consider the presence of prescient, insightful, in-depth, philosophical expressions, etc. as factors in determining the quality score.
 Ensure your evaluation is objective and impartial.
 
 You should only respond in JSON format as described below, and put your feedback into the JSON data as well. Do not write any feedback/note/explanation out of the JSON data.
