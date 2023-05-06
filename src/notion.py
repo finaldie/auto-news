@@ -63,6 +63,14 @@ class NotionAgent:
                 content += text
                 metadata[block_id]["text"] = text
 
+            elif block["type"] == "heading_2":
+                text = self._extractRichText(block["heading_2"]["rich_text"])
+                content += text
+                metadata[block_id]["text"] = text
+
+            else:
+                print(f"Unsupported block type: {block['type']}, block: {block}")
+
         return content, metadata
 
     def queryDatabase_TwitterInbox(self, database_id, created_time=None):
