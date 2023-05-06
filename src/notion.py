@@ -24,6 +24,17 @@ class NotionAgent:
             "database_id": database_id,
         }
 
+    def _extractRichText(self, data):
+        content = ""
+
+        for rich_text in data:
+            text = rich_text["plain_text"]
+            print(f"Block text: {text}")
+
+            content += text
+
+        return content
+
     def extractPageBlocks(self, page_id, ignore_embed=True):
         content = ""
         metadata = {}
@@ -39,16 +50,18 @@ class NotionAgent:
             print(f"Read block type: {block['type']}, block: {block}")
 
             if block["type"] == "paragraph":
-                for rich_text in block["paragraph"]["rich_text"]:
-                    text = rich_text["plain_text"]
-                    print(f"Block text: {text}")
-
-                    content += text
-                    metadata[block_id]["text"] = content
+                text = self._extractRichText(block["paragraph"]["rich_text"])
+                content += text
+                metadata[block_id]["text"] = text
 
             elif block["type"] == "embed":
                 if ignore_embed:
                     continue
+
+            elif block["type"] == "bulleted_list_item":
+                text = self._extractRichText(block["bulleted_list_item"]["rich_text"])
+                content += text
+                metadata[block_id]["text"] = text
 
         return content, metadata
 
