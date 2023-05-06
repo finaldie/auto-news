@@ -4,6 +4,7 @@ import copy
 import time
 from datetime import date, timedelta, datetime
 from operator import itemgetter
+from collections import Counter
 
 from dotenv import load_dotenv
 import utils
@@ -199,7 +200,7 @@ def tweets_category_and_rank(args, data):
             ranked_tweet = copy.deepcopy(tweet)
 
             if not category_and_rank:
-                print(f"[ERROR] Cannot parse json string, assign default rating -0.01")
+                print("[ERROR] Cannot parse json string, assign default rating -0.01")
                 ranked_tweet["__topics"] = []
                 ranked_tweet["__categories"] = []
                 ranked_tweet["__rate"] = -0.01
@@ -289,6 +290,42 @@ def push_to_read(args, data):
             print(f"[ERROR]: Unknown target {target}, skip")
 
 
+def printStats(source, data, inbox_data_deduped, rank_data_deduped):
+    print("#####################################################")
+    print(f"# Stats of {source}")
+    print("#####################################################")
+
+    for list_name, items in data.items():
+        print(f"{list_name}: Raw pulling data count: {len(items)}")
+
+    for list_name, items in inbox_data_deduped.items():
+        print(f"{list_name}: Deduped inbox data count: {len(items)}")
+
+    rank_stats = {}
+    for list_name, items in rank_data_deduped.items():
+        print(f"{list_name}: Deduped rank data count: {len(items)}")
+        rank_stats[list_name] = Counter()
+
+        for ranked_tweet in items:
+            rating = ranked_tweet["__rate"]
+
+            if rating < 0.5:
+                rank_stats[list_name]["below_0.5"] += 1
+            elif rating < 0.6:
+                rank_stats[list_name]["below_0.6"] += 1
+            elif rating < 0.7:
+                rank_stats[list_name]["below_0.7"] += 1
+            elif rating < 0.8:
+                rank_stats[list_name]["below_0.8"] += 1
+            elif rating < 0.9:
+                rank_stats[list_name]["below_0.9"] += 1
+            elif rating <= 1:
+                rank_stats[list_name]["below_1"] += 1
+
+        for key, count in rank_stats[list_name].items():
+            print(f"{list_name} - {key}: {count}")
+
+
 def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
@@ -304,9 +341,11 @@ def run(args):
             push_to_inbox(args, data_deduped)
 
             # Dedup and push to ToRead
-            data_deduped = tweets_dedup(args, data, target="toread")
-            data_ranked = tweets_category_and_rank(args, data_deduped)
+            rank_data_deduped = tweets_dedup(args, data, target="toread")
+            data_ranked = tweets_category_and_rank(args, rank_data_deduped)
             push_to_read(args, data_ranked)
+
+            printStats(data, data_deduped, rank_data_deduped)
 
 
 if __name__ == "__main__":
