@@ -320,13 +320,12 @@ class NotionAgent:
         # Try to add comments for user and reply_user
         try:
             page_id = new_page["id"]
-            _, block_metadata = self.extractPageBlocks(page_id)
 
             print(f"Add user description as comment: {tweet['name']}, desc: {tweet['user_desc']}")
-            self.createComment(block_metadata, tweet["name"], tweet["user_desc"])
+            self.createPageComment(page_id, tweet["name"], tweet["user_desc"])
 
             if tweet["reply_to_name"]:
-                self.createComment(block_metadata, tweet["reply_to_name"], tweet["reply_user_desc"])
+                self.createPageComment(page_id, tweet["reply_to_name"], tweet["reply_user_desc"])
 
         except Exception as e:
             print(f"[ERROR] Failed to add comment: {e}")
@@ -334,29 +333,15 @@ class NotionAgent:
 
         return new_page
 
-    def createComment(self, block_metadata, pattern: str, comment_text: str):
-        for block_id, metadata in block_metadata.items():
-            text = metadata["text"]
+    def createPageComment(self, page_id, pattern: str, comment_text: str):
+        new_comment = self.api.comments.create(
+            parent={"page_id": page_id},
+            rich_text=[{
+                "type": "text",
+                "text": {
+                    "content": f"{pattern}: {comment_text}"
+                }
+            }]
+        )
 
-            if text.find(pattern) == -1:
-                continue
-
-            start = text.find(pattern)
-            comment_range = {
-                "start": start,
-                "end": start + len(pattern),
-            }
-
-            new_comment = self.api.comments.create(
-                block_id=block_id,
-                text=[{
-                    "type": "text",
-                    "text": {
-                        "content": comment_text
-                    }
-                }],
-                visible_to="default",
-                comment=comment_range
-            )
-
-            print(f"Created a new comment, pattern: {pattern}, comment: {comment_text}, new_comment object: {new_comment}")
+        print(f"Created a new comment, pattern: {pattern}, comment: {comment_text}, new_comment object: {new_comment}")
