@@ -324,7 +324,7 @@ class NotionAgent:
             print(f"Add user description as comment: {tweet['name']}, desc: {tweet['user_desc']}")
             self.createPageComment(page_id, tweet["name"], tweet["user_desc"])
 
-            if tweet["reply_to_name"]:
+            if tweet["reply_to_name"] and tweet["name"] != tweet["reply_to_name"]:
                 self.createPageComment(page_id, tweet["reply_to_name"], tweet["reply_user_desc"])
 
         except Exception as e:
