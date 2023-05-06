@@ -26,24 +26,31 @@ class NotionAgent:
 
     def extractPageBlocks(self, page_id, ignore_embed=True):
         content = ""
+        metadata = {}
 
         childs = self.api.blocks.children.list(block_id=page_id).get("results")
         # print(f"n: {len(childs)}, childs: {childs}")
 
         # only extrace paragraph (ignore embeded content)
-        for page in childs:
-            print(f"Read page type: {page['type']}, page: {page}")
+        for block in childs:
+            block_id = block["id"]
+            metadata[block_id] = {}
 
-            if page["type"] == "paragraph":
-                text = page["paragraph"]["rich_text"][0]["plain_text"]
-                content += text
+            print(f"Read block type: {block['type']}, block: {block}")
 
-                print(f"Text: {text}")
+            if block["type"] == "paragraph":
+                for rich_text in block["paragraph"]["rich_text"]:
+                    text = rich_text["plain_text"]
+                    print(f"Block text: {text}")
+
+                    content += text
+                    metadata[block_id]["text"] = content
+
             elif page["type"] == "embed":
                 if ignore_embed:
                     continue
 
-        return content
+        return content, metadata
 
     def queryDatabase_TwitterInbox(self, database_id, created_time=None):
         query_data = {
@@ -65,9 +72,9 @@ class NotionAgent:
         extracted_pages = {}
         for page in pages:
             print(f"result: page id: {page['id']}")
-    
+
             page_id = page["id"]
-            page_content = extractPageBlocks(page_id)
+            page_content, _ = extractPageBlocks(page_id)
 
             extracted_pages[page_id] = {
                 "name": page["properties"]["Name"]["title"]["text"]["content"],
@@ -108,7 +115,7 @@ class NotionAgent:
                     }
                 ]
             },
-        
+
             "To": {
                 "rich_text": [
                     {
@@ -118,7 +125,7 @@ class NotionAgent:
                     }
                 ]
             },
-            
+
             "Created at": {
                 "date": {
                     "start": tweet['created_at_pdt'],
@@ -192,7 +199,7 @@ class NotionAgent:
                     ]
                 }
             })
-    
+
             # assemble embeding content if it's in the replied content
             if tweet['reply_embed']:
                 blocks.append({
@@ -201,7 +208,7 @@ class NotionAgent:
                         "url": tweet['reply_embed']
                     }
                 })
-    
+
             # print(f"reply_tweet.url: {tweet['reply_embed']}")
 
         return properties, blocks
@@ -223,13 +230,12 @@ class NotionAgent:
 
         return new_page
 
-
     def createDatabaseItem_ToRead(self, database_id, list_names: list, tweet, topics: list, categories: list, rate_number):
         properties, blocks = self._createDatabaseItem_TwitterBase(list_names, tweet)
 
         # assemble topics
         topics_list = [{"name": t} for t in topics]
-    
+
         # assemble category (multi-select)
         categories_list = [{"name": c} for c in categories]
 
@@ -263,4 +269,45 @@ class NotionAgent:
                 properties=properties,
                 children=blocks)
 
+        # Try to add comments for user and reply_user
+        try:
+            page_id = new_page["id"]
+            _, block_metadata = self.extractPageBlocks(page_id)
+
+            print(f"Add user description as comment: {tweet['name']}, desc: {tweet['user_desc']}")
+            self.createComment(block_metadata, tweet["name"], tweet["user_desc"])
+
+            if tweet["reply_to_name"]:
+                self.createComment(block_metadata, tweet["reply_to_name"], tweet["reply_user_desc"])
+
+        except Exception as e:
+            print(f"[ERROR] Failed to add comment: {e}")
+
         return new_page
+
+    def createComment(block_metadata, pattern: str, comment_text: str):
+        for block_id, metadata in block_metadata:
+            text = metadata["text"]
+
+            if text.find(pattern) == -1:
+                continue
+
+            start = text.find(pattern)
+            comment_range = {
+                "start": start,
+                "end": start + len(pattern),
+            }
+
+            new_comment = self.api.comments.create(
+                block_id=block_id,
+                text=[{
+                    "type": "text",
+                    "text": {
+                        "content": comment_text
+                    }
+                }],
+                visible_to="default",
+                comment=comment_range
+            )
+
+            print(f"Created a new comment")

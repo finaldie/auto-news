@@ -60,6 +60,7 @@ class TwitterAgent:
             "name": tweet.user.name,
             "screen_name": tweet.user.screen_name,
             "user_id": tweet.user.id,
+            "user_desc": tweet.user.description,
             "created_at_utc": tweet.created_at.isoformat(),
             "created_at_pdt": tweet.created_at.astimezone(pytz.timezone('America/Los_Angeles')).isoformat(),
 
@@ -96,6 +97,7 @@ class TwitterAgent:
             output["reply_tweet_id"] = reply_tweet.id
             output["reply_to_name"] = reply_name
             output["reply_to_screen_name"] = reply_screen_name
+            output["reply_user_desc"] = reply_tweet.user.description
             output["reply_embed"] = self._extractEmbed(reply_tweet)
             output["reply_text"] = reply_tweet.full_text
             output["reply_url"] = f"https://twitter.com/{reply_screen_name}/status/{reply_tweet.id}"
