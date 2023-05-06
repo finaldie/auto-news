@@ -46,7 +46,7 @@ class NotionAgent:
                     content += text
                     metadata[block_id]["text"] = content
 
-            elif page["type"] == "embed":
+            elif block["type"] == "embed":
                 if ignore_embed:
                     continue
 
