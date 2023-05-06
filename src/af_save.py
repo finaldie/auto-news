@@ -191,16 +191,18 @@ def tweets_category_and_rank(args, data):
                 category_and_rank_str = llm_ranking_resp
 
             print(f"Used {time.time() - st:.3f}s, Category and Rank: text: {text}, rank_resp: {category_and_rank_str}")
+
             category_and_rank = utils.fix_and_parse_json(category_and_rank_str)
+            print(f"LLM ranked result (json parsed): {category_and_rank}")
 
             # Parse LLM response and assemble category and rank
             ranked_tweet = copy.deepcopy(tweet)
 
             if not category_and_rank:
-                print(f"[ERROR] Cannot parse json string, assign default rating 0.75")
+                print(f"[ERROR] Cannot parse json string, assign default rating -0.01")
                 ranked_tweet["__topics"] = []
                 ranked_tweet["__categories"] = []
-                ranked_tweet["__rate"] = 0.75
+                ranked_tweet["__rate"] = -0.01
             else:
                 ranked_tweet["__topics"] = [(x["topic"], x.get("score") or 1) for x in category_and_rank["topics"]]
                 ranked_tweet["__categories"] = [(x["category"], x.get("score") or 1) for x in category_and_rank["topics"]]
