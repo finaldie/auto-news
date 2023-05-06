@@ -30,7 +30,7 @@ Additionally, classify the content into an appropriate category based on the pre
 Take into account the specified constraints and provide constructive feedback, if needed.
 Ensure your evaluation is objective and impartial.
 
-You should only respond in JSON format as described below, and put your feedback into the JSON data as well. Do not write any feedback/note out of the JSON data.
+You should only respond in JSON format as described below, and put your feedback into the JSON data as well. Do not write any feedback/note/explanation out of the JSON data.
 Reponse format:
 {{
   \"feedback\": "[feedbacks]",

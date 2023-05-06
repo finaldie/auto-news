@@ -27,15 +27,17 @@ class LLMAgentBase:
         print(f"Initialized prompt: {prompt_tpl}")
         self.prompt_tpl = prompt_tpl
 
-    def init_llm(self):
+    def init_llm(self, model_name="gpt-3.5-turbo", temperature=0):
         llm = ChatOpenAI(
             # model_name="text-davinci-003"
-            model_name="gpt-3.5-turbo",
+            model_name=model_name,
             # temperature dictates how whacky the output should be
-            temperature=0.3)
+            # for fixed response format task, set temperature = 0
+            temperature=temperature)
 
         self.llm = llm
         self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
+        print(f"LLM chain initalized, model_name: {model_name}, temperature: {temperature}")
 
 
 class LLMAgentCategoryAndRanking(LLMAgentBase):
