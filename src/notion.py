@@ -26,17 +26,46 @@ class NotionAgent:
         }
 
     def _extractRichText(self, data):
+        """
+        The rich_text is a data type and can be used for many blocks,
+        e.g. paragraph, bulleted_list_item, headings, etc
+
+        @param data - the rich_text array from one block
+        @return the extracted content
+        """
         content = ""
 
         for rich_text in data:
             text = rich_text["plain_text"]
-            print(f"Block text: {text}")
+            print(f"Block's rich_text: {text}")
 
             content += text
 
         return content
 
-    def _extractTableRow(self, table_row):
+    def _extractBlockParagraph(self, block):
+        """
+        block: notion block object (paragraph type)
+        """
+        return self._extractRichText(block["paragraph"]["rich_text"])
+
+    def _extractBulletedListItems(self, block):
+        """
+        block: notion block object (bulleted_list_item type)
+        """
+        return self._extractRichText(block["bulleted_list_item"]["rich_text"])
+
+    def _extractHeading_2(self, block):
+        """
+        block: notion block object (heading_2 type)
+        """
+        return self._extractRichText(block["heading_2"]["rich_text"])
+
+    def _extractTableRow(self, block):
+        """
+        block: notion block object (table_row type)
+        """
+        table_row = block["table_row"]
         cells = table_row["cells"]
         content = ""
 
@@ -51,54 +80,102 @@ class NotionAgent:
 
         return content
 
-    def extractPageBlocks(self, page_id, ignore_embed=True):
+    def _extractBlock(self, block):
+        """
+        block: notion block object
+
+        @return a simplified block_data only contain id, type and text
+        """
+        block_id = block["id"]
+        block_data = {
+            "id": block_id,
+            "type": block["type"],
+            "text": "",
+        }
+
+        print(f"Read block type: {block['type']}, block: {block}")
+
+        text = ""
+
+        if block["type"] == "paragraph":
+            text = self._extractBlockParagraph(block)
+
+        elif block["type"] == "bulleted_list_item":
+            text = self._extractBulletedListItems(block)
+
+        elif block["type"] == "heading_2":
+            text = self._extractHeading_2(block)
+
+        elif block["type"] == "table":
+            # depth forward in the child blocks
+            pros, blocks = self.extractPage(block_id)
+            text = self._concatBlocksText(blocks)
+
+        elif block["type"] == "table_row":
+            text = self._extractTableRow(block)
+
+            # Easier for human reading
+            text += "\n"
+
+        else:
+            print(f"Unsupported block type: {block['type']}, block: {block}")
+
+        block_data["text"] = text
+        return block_data
+
+
+    def _extractPageProps(self, page):
+        """
+        cherry pick props from notion page object
+        """
+        return {
+            "id": page["id"],
+            "created_time": page["created_time"],
+            "last_edited_time": page["last_edited_time"],
+            "url": page["url"],
+
+            "properties": page["properties"],
+        }
+
+    def _concatBlocksText(self, blocks):
+        """
+        blocks: Converted internal blocks dict (not notion block
+                object). format: <block_id, block_data>
+
+        """
         content = ""
-        metadata = {}
 
-        childs = self.api.blocks.children.list(block_id=page_id).get("results")
-        # print(f"n: {len(childs)}, childs: {childs}")
+        for block_id, block_data in blocks.items():
+            text = block_data["text"]
 
-        # only extrace paragraph (ignore embeded content)
-        for block in childs:
-            block_id = block["id"]
-            metadata[block_id] = {}
+            content += text
 
-            print(f"Read block type: {block['type']}, block: {block}")
+        return content
 
-            if block["type"] == "paragraph":
-                text = self._extractRichText(block["paragraph"]["rich_text"])
-                content += text
-                metadata[block_id]["text"] = text
+    def extractPage(
+            self,
+            page_id,
+            extract_blocks=True
+    ):
+        properties = {}
 
-            elif block["type"] == "embed":
-                if ignore_embed:
-                    continue
+        # block_id -> block data
+        blocks = {}
 
-            elif block["type"] == "bulleted_list_item":
-                text = self._extractRichText(block["bulleted_list_item"]["rich_text"])
-                content += text
-                metadata[block_id]["text"] = text
+        page = self.api.pages.retrieve(page_id=page_id)
+        properties = self._extractPageProps(page)
 
-            elif block["type"] == "heading_2":
-                text = self._extractRichText(block["heading_2"]["rich_text"])
-                content += text
-                metadata[block_id]["text"] = text
+        if extract_blocks:
+            childs = self.api.blocks.children.list(block_id=page_id).get("results")
+            # print(f"n: {len(childs)}, childs: {childs}")
 
-            elif block["type"] == "table":
-                # depth forward in the child blocks
-                text, _ = self.extractPageBlocks(block_id)
-                content += text
-                metadata[block_id]["text"] = text
+            for block in childs:
+                block_data = self._extractBlock(block)
 
-            elif block["type"] == "table_row":
-                text = self._extractTableRow(block["table_row"])
-                content += text + "\n"
-                metadata[block_id]["text"] = text
+                block_id = block["id"]
+                blocks[block_id] = block_data
 
-            else:
-                print(f"Unsupported block type: {block['type']}, block: {block}")
-
-        return content, metadata
+        return properties, blocks
 
     def queryDatabase_TwitterInbox(self, database_id, created_time=None):
         query_data = {
@@ -122,7 +199,8 @@ class NotionAgent:
             print(f"result: page id: {page['id']}")
 
             page_id = page["id"]
-            page_content, _ = self.extractPageBlocks(page_id)
+            props, blocks = self.extractPage(page_id)
+            page_content = self._concatBlocksText(blocks)
 
             extracted_pages[page_id] = {
                 "name": page["properties"]["Name"]["title"]["text"]["content"],
