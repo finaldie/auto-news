@@ -36,6 +36,21 @@ class NotionAgent:
 
         return content
 
+    def _extractTableRow(self, table_row):
+        cells = table_row["cells"]
+        content = ""
+
+        for cell in cells:
+            # Like rich_text, one cell may contact with
+            # multiple cell pieces
+            for cell_data in cell:
+                content += cell_data["plain_text"]
+                print(f"cell data: {cell_data['plain_text']}")
+
+            content += ","
+
+        return content
+
     def extractPageBlocks(self, page_id, ignore_embed=True):
         content = ""
         metadata = {}
@@ -67,6 +82,17 @@ class NotionAgent:
             elif block["type"] == "heading_2":
                 text = self._extractRichText(block["heading_2"]["rich_text"])
                 content += text
+                metadata[block_id]["text"] = text
+
+            elif block["type"] == "table":
+                # depth forward in the child blocks
+                text, _ = self.extractPageBlocks(block_id)
+                content += text
+                metadata[block_id]["text"] = text
+
+            elif block["type"] == "table_row":
+                text = self._extractTableRow(block["table_row"])
+                content += text + "\n"
                 metadata[block_id]["text"] = text
 
             else:
