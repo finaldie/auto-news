@@ -37,7 +37,7 @@ class NotionAgent:
             plain_text = rich_text["plain_text"]
 
             text = f"{prefix}{plain_text}{suffix}"
-            print(f"Block's rich_text: {text}")
+            # print(f"Block's rich_text: {text}")
 
             content += text
 
@@ -113,7 +113,7 @@ class NotionAgent:
             # multiple cell pieces
             for cell_data in cell:
                 content += cell_data["plain_text"]
-                print(f"cell data: {cell_data['plain_text']}")
+                # print(f"cell data: {cell_data['plain_text']}")
 
             content += ","
 
@@ -132,7 +132,7 @@ class NotionAgent:
             "text": "",
         }
 
-        print(f"Read block type: {block['type']}, block: {block}")
+        # print(f"Read block type: {block['type']}, block: {block}")
 
         text = ""
 
