@@ -266,7 +266,10 @@ class NotionAgent:
                 }
             })
 
+        print(f"Query article inbox, query: {query_data}")
+
         pages = self.api.databases.query(**query_data).get("results")
+        print(f"Queried pages: {pages}")
 
         extracted_pages = {}
         for page in pages:
@@ -276,20 +279,22 @@ class NotionAgent:
             props, blocks = self.extractPage(page_id)
             page_content = self._concatBlocksText(blocks)
 
+            print(f"Extracting one page: {page}, props: {props}")
+
             extracted_pages[page_id] = {
                 "id": page_id,
 
                 # article title
-                "title": page["properties"]["Name"]["title"]["text"]["content"],
+                "title": props["properties"]["Name"]["title"]["text"]["content"],
                 # pdt timezone
-                "created_at": page["properties"]["Created at"]["date"]["start"],
+                "created_at": props["properties"]["Created at"]["date"]["start"],
                 # utc timezone (notion auto-created)
-                "created_time": page["created_time"],
+                "created_time": props["created_time"],
 
                 # utc timezone (notion auto-created)
-                "last_edited_time": page["last_edited_time"],
-                "notion_url": page["url"],
-                "source_url": page["properties"]["URL"]["url"],
+                "last_edited_time": props["last_edited_time"],
+                "notion_url": props["url"],
+                "source_url": props["properties"]["URL"]["url"],
                 "source": "Article",
 
                 "content": page_content,
