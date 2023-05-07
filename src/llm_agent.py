@@ -65,7 +65,7 @@ class LLMAgentCategoryAndRanking(LLMAgentBase):
 
 
 class LLMAgentSummary(LLMAgentBase):
-    def __init__(self, api_key, model_name):
+    def __init__(self, api_key="", model_name="gpt-3.5-turbo"):
         super().__init__(api_key, model_name)
 
     def init_prompt(self, prompt=None):
