@@ -345,7 +345,7 @@ def run(args):
             data_ranked = tweets_category_and_rank(args, rank_data_deduped)
             push_to_read(args, data_ranked)
 
-            printStats(data, data_deduped, rank_data_deduped)
+            printStats(source, data, data_deduped, rank_data_deduped)
 
 
 if __name__ == "__main__":
