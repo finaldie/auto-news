@@ -75,7 +75,8 @@ class LLMAgentSummary(LLMAgentBase):
             self,
             model_name="gpt-3.5-turbo",
             temperature=0,
-            chain_type="map_reduce"
+            chain_type="map_reduce",
+            verbose=False
     ):
         llm = ChatOpenAI(
             # model_name="text-davinci-003"
@@ -88,7 +89,7 @@ class LLMAgentSummary(LLMAgentBase):
         self.llmchain = load_summarize_chain(
             self.llm,
             chain_type=chain_type,
-            verbose=True)
+            verbose=verbose)
 
         print(f"LLM chain initalized, model_name: {model_name}, temperature: {temperature}, chain_type: {chain_type}")
 
