@@ -1,4 +1,3 @@
-import json
 import pytz
 import time
 
@@ -82,6 +81,8 @@ class TwitterAgent:
 
         if pull_reply and tweet.in_reply_to_status_id:
             print(f"pulling reply tweet id: {tweet.in_reply_to_status_id}")
+            output["reply_url"] = f"https://twitter.com/{tweet.in_reply_to_screen_name}/status/{tweet.in_reply_to_status_id}"
+
             reply_tweet = None
 
             try:
@@ -100,7 +101,6 @@ class TwitterAgent:
             output["reply_user_desc"] = reply_tweet.user.description
             output["reply_embed"] = self._extractEmbed(reply_tweet)
             output["reply_text"] = reply_tweet.full_text
-            output["reply_url"] = f"https://twitter.com/{reply_screen_name}/status/{reply_tweet.id}"
 
         return output
 
@@ -138,9 +138,9 @@ class TwitterAgent:
                     time.sleep(pulling_interval_sec)
 
                 tweets = self.api.user_timeline(
-                        screen_name=screen_name,
-                        count=recent_count,
-                        tweet_mode='extended')
+                    screen_name=screen_name,
+                    count=recent_count,
+                    tweet_mode='extended')
 
                 if len(tweets) == 0:
                     continue

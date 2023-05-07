@@ -10,9 +10,6 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python import BranchPythonOperator
 from airflow.utils.dates import days_ago
 
-import subprocess
-import json
-
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 default_args = {
@@ -68,26 +65,25 @@ with DAG(
     t3 = BashOperator(
         task_id='pull',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_pull.py '
-            '--start {{ ds }} '
-            '--prefix=./run '
-            '--run-id={{ run_id }} '
-            '--job-id={{ ti.job_id }} '
-            '--data-folder="data" '
-            '--sources={{ dag_run.conf.setdefault("sources", "twitter") }} ',
+        '--start {{ ds }} '
+        '--prefix=./run '
+        '--run-id={{ run_id }} '
+        '--job-id={{ ti.job_id }} '
+        '--data-folder="data" '
+        '--sources={{ dag_run.conf.setdefault("sources", "twitter,article") }} ',
     )
 
     t4 = BashOperator(
         task_id='save',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_save.py '
-            '--start {{ ds }} '
-            '--prefix=./run '
-            '--run-id={{ run_id }} '
-            '--job-id={{ ti.job_id }} '
-            '--data-folder="data" '
-            '--sources={{ dag_run.conf.setdefault("sources", "twitter") }} '
-            '--targets={{ dag_run.conf.setdefault("targets", "notion") }} ',
+        '--start {{ ds }} '
+        '--prefix=./run '
+        '--run-id={{ run_id }} '
+        '--job-id={{ ti.job_id }} '
+        '--data-folder="data" '
+        '--sources={{ dag_run.conf.setdefault("sources", "twitter") }} '
+        '--targets={{ dag_run.conf.setdefault("targets", "notion") }} ',
     )
-    
 
     t5 = BashOperator(
         task_id='finish',

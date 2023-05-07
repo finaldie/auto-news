@@ -418,6 +418,23 @@ class NotionAgent:
                 })
 
             # print(f"reply_tweet.url: {tweet['reply_embed']}")
+        elif tweet['reply_deleted']:
+            blocks.append({
+                "object": "block",
+                "type": "quote",
+                "quote": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": f"Reply-to: @{tweet['reply_to_screen_name']}: Tweet has been deleted",
+                                "link": tweet["reply_url"],
+                            },
+                            "href": tweet["reply_url"],
+                        }
+                    ]
+                }
+            })
 
         return properties, blocks
 
@@ -491,13 +508,20 @@ class NotionAgent:
 
         return properties, blocks
 
-    def createDatabaseItem_TwitterInbox(self, database_id, list_names, tweet):
+    def createDatabaseItem_TwitterInbox(
+        self,
+        database_id,
+        list_names,
+        tweet
+    ):
         """
         Create a page under a database
         database_id: the target notion database id
         tweet: the extracted tweet from TwitterAgent
         """
-        properties, blocks = self._createDatabaseItem_TwitterBase(list_names, tweet)
+        properties, blocks = self._createDatabaseItem_TwitterBase(
+            list_names, tweet)
+
         print(f"notion twitter inbox: database_id: {database_id}, properties: {properties}, blocks: {blocks}")
 
         # Add the new page to the database
@@ -520,7 +544,8 @@ class NotionAgent:
         """
         Create toread database item, source twitter
         """
-        properties, blocks = self._createDatabaseItem_TwitterBase(list_names, tweet)
+        properties, blocks = self._createDatabaseItem_TwitterBase(
+            list_names, tweet)
 
         # assemble topics
         topics_list = [{"name": t} for t in topics]
