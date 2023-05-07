@@ -9,9 +9,9 @@ import utils
 import data_model
 
 
-class AgentArticle:
+class OperatorArticle:
     """
-    An agent to handle:
+    An Operator to handle:
     - pulling data from source
     - save to local json
     - restore from local json

@@ -5,10 +5,8 @@ from datetime import date, timedelta, datetime
 from dotenv import load_dotenv
 
 from tweets import TwitterAgent
-from notion import NotionAgent
-from agent_article import AgentArticle
+from ops_article import OperatorArticle
 import utils
-import data_model
 
 
 parser = argparse.ArgumentParser()
@@ -75,7 +73,7 @@ def save_twitter(args, data):
     utils.save_data_json(full_path, data)
 
 
-def pull_article(args, agent):
+def pull_article(args, op):
     """
     Pull from inbox - articles
     """
@@ -85,16 +83,16 @@ def pull_article(args, agent):
     print(f"environment: {os.environ}")
 
     database_id = os.getenv("NOTION_DATABASE_ID_ARTICLE_INBOX")
-    data = agent.pull(database_id)
+    data = op.pull(database_id)
 
     return data
 
 
-def save_article(args, agent, data):
+def save_article(args, op, data):
     print("######################################################")
     print("# Save Articles to json file")
     print("######################################################")
-    agent.save2json(args.data_folder, args.run_id, data)
+    op.save2json(args.data_folder, args.run_id, data)
 
 
 def run(args):
@@ -108,9 +106,9 @@ def run(args):
             save_twitter(args, data)
 
         elif source == "article":
-            agent = AgentArticle()
-            data = pull_article(args, agent)
-            save_article(args, agent, data)
+            op = OperatorArticle()
+            data = pull_article(args, op)
+            save_article(args, op, data)
 
 
 if __name__ == "__main__":
