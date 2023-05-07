@@ -453,9 +453,9 @@ class NotionAgent:
                             "type": "text",
                             "text": {
                                 "content": f"Reply-to: {tweet['reply_to_name']}: {tweet['reply_text']}",
-                                "link": tweet["reply_url"],
+                                # "link": tweet["reply_url"],
                             },
-                            "href": tweet["reply_url"],
+                            # "href": tweet["reply_url"],
                         }
                     ]
                 }
