@@ -24,6 +24,9 @@ class OperatorArticle:
     """
 
     def pull(self, database_id):
+        print("#####################################################")
+        print("# Pulling Articles")
+        print("#####################################################")
         notion_api_key = os.getenv("NOTION_TOKEN")
         notion_agent = NotionAgent(notion_api_key)
 
@@ -34,6 +37,9 @@ class OperatorArticle:
         redis_key = created_time_tpl.format("article", "default")
 
         last_created_time = utils.redis_get(redis_conn, redis_key)
+        last_created_time = utils.bytes2str(last_created_time)
+        print(f"Get last_created_time from redis: {last_created_time}")
+
         if not last_created_time:
             last_created_time = (datetime.now() - timedelta(days=1)).isoformat()
 
@@ -134,10 +140,7 @@ class OperatorArticle:
 
             else:
                 print("Found llm summary from cache, decoding (utf-8) ...")
-                if isinstance(llm_summary_resp, bytes):
-                    llm_summary_resp = llm_summary_resp.decode("utf-8")
-
-                summary = llm_summary_resp
+                summary = utils.bytes2str(llm_summary_resp)
 
             # assemble summary into page
             summarized_page = copy.deepcopy(page)
@@ -197,7 +200,7 @@ class OperatorArticle:
 
             else:
                 print("Found category_and_rank_str from cache")
-                category_and_rank_str = llm_ranking_resp
+                category_and_rank_str = utils.bytes2str(llm_ranking_resp)
 
             print(f"Used {time.time() - st:.3f}s, Category and Rank: text: {text}, rank_resp: {category_and_rank_str}")
 
@@ -282,7 +285,7 @@ class OperatorArticle:
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
 
-    def markVisited(self, page_id):
+    def markVisited(self, page_id: str):
         redis_url = os.getenv("BOT_REDIS_URL")
         redis_conn = utils.redis_conn(redis_url)
 
@@ -291,7 +294,7 @@ class OperatorArticle:
         toread_key = toread_key_tpl.format("article", "default", page_id)
         utils.redis_set(redis_conn, toread_key, "true")
 
-    def updateCreatedTime(self, last_created_time):
+    def updateCreatedTime(self, last_created_time: str):
         redis_url = os.getenv("BOT_REDIS_URL")
         redis_conn = utils.redis_conn(redis_url)
 
@@ -300,6 +303,9 @@ class OperatorArticle:
         redis_key = created_time_tpl.format("article", "default")
 
         curr_created_time = utils.redis_get(redis_conn, redis_key)
+        curr_created_time = utils.bytes2str(curr_created_time)
+        print("Updating created time: curr_created_time: {curr_created_time}")
+
         if not curr_created_time:
             utils.redis_set(
                 redis_conn,

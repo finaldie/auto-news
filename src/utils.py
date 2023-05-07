@@ -65,6 +65,16 @@ def redis_set(conn, key: str, val: str, expire_time=0, overwrite=False):
         return False
 
 
+def bytes2str(data):
+    """
+    If input data is bytes type, then convert it to str
+    """
+    if isinstance(data, bytes):
+        data = data.decode("utf-8")
+
+    return data
+
+
 def fix_json_str(data):
     res = data.replace("\\n", "\n")
     res = data.replace("\t", "")
@@ -75,9 +85,7 @@ def fix_and_parse_json(data):
     res = None
 
     try:
-        if isinstance(data, bytes):
-            data = data.decode("utf-8")
-
+        data = bytes2str(data)
         fixed = fix_json_str(data)
         res = json.loads(fixed)
         return res
