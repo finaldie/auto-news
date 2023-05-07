@@ -46,13 +46,16 @@ def redis_get(conn, key: str):
     return data
 
 
-def redis_set(conn, key: str, val: str, expire_time=0):
+def redis_set(conn, key: str, val: str, expire_time=0, overwrite=False):
     """
     expire_time: the key will be expired after expire_time seconds
     """
     try:
         if expire_time <= 0:
-            conn.setnx(key, val)
+            if overwrite:
+                conn.set(key, val)
+            else:
+                conn.setnx(key, val)
         else:
             conn.setex(key, int(expire_time), val)
 

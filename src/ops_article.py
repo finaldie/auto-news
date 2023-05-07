@@ -268,4 +268,4 @@ class OperatorArticle:
         created_time_tpl = data_model.NOTION_INBOX_CREATED_TIME_KEY
         redis_key = created_time_tpl.format("article", "default")
 
-        utils.redis_set(redis_conn, redis_key, last_created_time)
+        utils.redis_set(redis_conn, redis_key, last_created_time, overwrite=True)
