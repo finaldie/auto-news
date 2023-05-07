@@ -133,7 +133,10 @@ class OperatorArticle:
                     expire_time=int(redis_key_expire_time))
 
             else:
-                print("Found llm summary from cache")
+                print("Found llm summary from cache, decoding (utf-8) ...")
+                if isinstance(llm_summary_resp, bytes):
+                    llm_summary_resp = llm_summary_resp.decode("utf-8")
+
                 summary = llm_summary_resp
 
             # assemble summary into page
@@ -264,8 +267,8 @@ class OperatorArticle:
                         notion_agent.createDatabaseItem_ToRead_Article(
                             database_id,
                             ranked_page,
-                            topics,
-                            categories,
+                            topics_topk,
+                            categories_topk,
                             rating)
 
                         created_time = ranked_page["created_time"]
