@@ -6,6 +6,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains.mapreduce import MapReduceChain
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
+from langchain.chains.summarize import load_summarize_chain
 
 import llm_prompts
 
@@ -69,5 +70,31 @@ class LLMAgentSummary(LLMAgentBase):
     def __init__(self, api_key, model_name):
         super().__init__(api_key, model_name)
 
+    def init_prompt(self, prompt=None):
+        self.user_prompt = prompt
+
+    def init_llm(
+            self,
+            model_name="gpt-3.5-turbo",
+            temperature=0,
+            chain_type="map_reduce"
+    ):
+        llm = ChatOpenAI(
+            # model_name="text-davinci-003"
+            model_name=model_name,
+            # temperature dictates how whacky the output should be
+            # for fixed response format task, set temperature = 0
+            temperature=temperature)
+
+        self.llm = llm
+        self.llmchain = load_summarize_chain(
+                self.llm, chain_type=chain_type)
+
+        print(f"LLM chain initalized, model_name: {model_name}, temperature: {temperature}, chain_type: {chain_type}")
+
     def run(self, text: str):
-        return True
+        text_splitter = CharacterTextSplitter(chunk_size=512)
+        docs = text_splitter.create_documents([text])
+
+        summary_resp = self.llmchain.run(docs)
+        return summary_resp

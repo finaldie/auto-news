@@ -1,5 +1,3 @@
-import json
-import os
 import traceback
 from datetime import datetime
 
@@ -123,7 +121,6 @@ class NotionAgent:
         block_data["text"] = text
         return block_data
 
-
     def _extractPageProps(self, page):
         """
         cherry pick props from notion page object
@@ -177,9 +174,15 @@ class NotionAgent:
 
         return properties, blocks
 
-    def queryDatabase_TwitterInbox(self, database_id, created_time=None):
+    def queryDatabaseInbox_Twitter(self, database_id, created_time=None):
         query_data = {
             "database_id": database_id,
+            "sorts": [
+                {
+                    "property": "Created time",
+                    "direction": "ascending",
+                },
+            ],
         }
 
         # filter by created_time
@@ -211,6 +214,74 @@ class NotionAgent:
                 "preview": page["properties"]["Preview"]["rich_text"][0]["text"]["content"],
                 "notion_url": page["url"],
                 "source": "Twitter",
+
+                "content": page_content,
+            }
+
+        return extracted_pages
+
+    def queryDatabaseInbox_Article(
+        self,
+        database_id,
+        filter_last_edited_time=None,
+        filter_created_time=None
+    ):
+        query_data = {
+            "database_id": database_id,
+
+            "sorts": [
+                {
+                    "property": "Created time",
+                    "direction": "ascending",
+                },
+            ],
+
+            "filter": {
+                "and": [],
+            },
+        }
+
+        if filter_last_edited_time:
+            query_data["filter"]["and"].append({
+                "property": "Last edited time",
+                "date": {
+                    "on_or_after": filter_last_edited_time,
+                }
+            })
+
+        if filter_created_time:
+            query_data["filter"]["and"].append({
+                "property": "Created time",
+                "date": {
+                    "on_or_after": filter_created_time,
+                }
+            })
+
+        pages = self.api.databases.query(**query_data).get("results")
+
+        extracted_pages = {}
+        for page in pages:
+            print(f"result: page id: {page['id']}")
+
+            page_id = page["id"]
+            props, blocks = self.extractPage(page_id)
+            page_content = self._concatBlocksText(blocks)
+
+            extracted_pages[page_id] = {
+                "id": page_id,
+
+                # article title
+                "title": page["properties"]["Name"]["title"]["text"]["content"],
+                # pdt timezone
+                "created_at": page["properties"]["Created at"]["date"]["start"],
+                # utc timezone (notion auto-created)
+                "created_time": page["created_time"],
+
+                # utc timezone (notion auto-created)
+                "last_edited_time": page["last_edited_time"],
+                "notion_url": page["url"],
+                "source_url": page["properties"]["URL"]["url"],
+                "source": "Article",
 
                 "content": page_content,
             }
@@ -339,6 +410,76 @@ class NotionAgent:
 
         return properties, blocks
 
+    def _createDatabaseItem_ArticleBase(self, ranked_page):
+        """
+        Create page properties and blocks
+        """
+        content = ranked_page["content"]
+        preview_content = content[:100]
+
+        properties = {
+            "Name": {
+                "title": [
+                    {
+                        "text": {
+                            "content": f"{ranked_page['title']}"
+                        }
+                    }
+                ]
+            },
+
+            "Created at": {
+                "date": {
+                    "start": ranked_page['created_at'],
+                    # "time_zone": "America/Los_Angeles",
+                }
+            },
+
+            "Preview": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": preview_content,
+                            "link": {
+                                "url": ranked_page["source_url"],
+                            }
+                        },
+                        "href": ranked_page["source_url"],
+                    },
+                ]
+            },
+        }
+
+        # put summary content
+        block_content = f"{content}"
+
+        blocks = [
+            {
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": block_content
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+
+        # append embeded content (quote the orginal notion url)
+        blocks.append({
+            "type": "embed",
+            "embed": {
+                "url": ranked_page['notion_url']
+            }
+        })
+
+        return properties, blocks
+
     def createDatabaseItem_TwitterInbox(self, database_id, list_names, tweet):
         """
         Create a page under a database
@@ -350,9 +491,9 @@ class NotionAgent:
 
         # Add the new page to the database
         new_page = self.api.pages.create(
-                parent={"database_id": database_id},
-                properties=properties,
-                children=blocks)
+            parent={"database_id": database_id},
+            properties=properties,
+            children=blocks)
 
         return new_page
 
@@ -391,9 +532,9 @@ class NotionAgent:
 
         # Add the new page to the database
         new_page = self.api.pages.create(
-                parent={"database_id": database_id},
-                properties=properties,
-                children=blocks)
+            parent={"database_id": database_id},
+            properties=properties,
+            children=blocks)
 
         # Try to add comments for user and reply_user
         try:
@@ -408,6 +549,54 @@ class NotionAgent:
         except Exception as e:
             print(f"[ERROR] Failed to add comment: {e}")
             traceback.print_exc()
+
+        return new_page
+
+    def createDatabaseItem_ToRead_Article(
+            self,
+            database_id,
+            ranked_page,
+            topics: list,
+            categories: list,
+            rate_number
+    ):
+        properties, blocks = self._createDatabaseItem_ArticleBase(ranked_page)
+
+        # assemble topics
+        topics_list = [{"name": t} for t in topics]
+
+        # assemble category (multi-select)
+        categories_list = [{"name": c} for c in categories]
+
+        properties.update({"Source": {
+            "rich_text": [
+                {
+                    "text": {
+                        "content": "Article"
+                    }
+                }
+            ]
+        }})
+
+        properties.update({"Topic": {
+            "multi_select": topics_list,
+        }})
+
+        properties.update({"Category": {
+            "multi_select": categories_list,
+        }})
+
+        properties.update({"Rating": {
+            "number": rate_number
+        }})
+
+        print(f"notion ToRead: database_id: {database_id}, properties: {properties}, blocks: {blocks}")
+
+        # Add the new page to the database
+        new_page = self.api.pages.create(
+            parent={"database_id": database_id},
+            properties=properties,
+            children=blocks)
 
         return new_page
 

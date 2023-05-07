@@ -5,7 +5,10 @@ from datetime import date, timedelta, datetime
 from dotenv import load_dotenv
 
 from tweets import TwitterAgent
+from notion import NotionAgent
+from agent_article import AgentArticle
 import utils
+import data_model
 
 
 parser = argparse.ArgumentParser()
@@ -20,7 +23,7 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default="twitter")
+                    default="twitter,article")
 parser.add_argument("--pulling-count", help="pulling count",
                     default=5)
 parser.add_argument("--pulling-interval", help="pulling interval (s)",
@@ -28,6 +31,9 @@ parser.add_argument("--pulling-interval", help="pulling interval (s)",
 
 
 def pull_twitter(args):
+    print("######################################################")
+    print("# Pull from Twitter")
+    print("######################################################")
     print(f"environment: {os.environ}")
 
     screen_names_famous = os.getenv("TWITTER_LIST_FAMOUS", "")
@@ -56,6 +62,9 @@ def save_twitter(args, data):
     """
     Save the middle result (json) to data folder
     """
+    print("######################################################")
+    print("# Save Twitter data to json")
+    print("######################################################")
     workdir = os.getenv("WORKDIR")
 
     filename = "twitter.json"
@@ -64,6 +73,28 @@ def save_twitter(args, data):
 
     print(f"Save data to {full_path}, data: {data}")
     utils.save_data_json(full_path, data)
+
+
+def pull_article(args, agent):
+    """
+    Pull from inbox - articles
+    """
+    print("######################################################")
+    print("# Pull from Inbox - Articles")
+    print("######################################################")
+    print(f"environment: {os.environ}")
+
+    database_id = os.getenv("NOTION_DATABASE_ID_ARTICLE_INBOX")
+    data = agent.pull(database_id)
+
+    return data
+
+
+def save_article(args, agent, data):
+    print("######################################################")
+    print("# Save Articles to json file")
+    print("######################################################")
+    agent.save2json(args.data_folder, args.run_id, data)
 
 
 def run(args):
@@ -75,6 +106,11 @@ def run(args):
         if source == "twitter":
             data = pull_twitter(args)
             save_twitter(args, data)
+
+        elif source == "article":
+            agent = AgentArticle()
+            data = pull_article(args, agent)
+            save_article(args, agent, data)
 
 
 if __name__ == "__main__":

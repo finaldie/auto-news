@@ -12,6 +12,8 @@ import data_model
 from notion import NotionAgent
 from llm_agent import LLMAgentCategoryAndRanking
 
+from agent_article import AgentArticle
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--prefix", help="runtime prefix path",
@@ -25,7 +27,7 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default="twitter")
+                    default="twitter,article")
 parser.add_argument("--targets", help="targets to push, comma separated",
                     default="notion")
 parser.add_argument("--topics-top-k", help="pick top-k topics to push",
@@ -329,6 +331,21 @@ def printStats(source, data, inbox_data_deduped, rank_data_deduped, data_ranked)
             print(f"{list_name} - {key}: {count}")
 
 
+def process_article(args):
+    print("#####################################################")
+    print("# Process Article")
+    print("#####################################################")
+    agent = AgentArticle()
+
+    data = agent.readFromJson(args.data_folder, args.run_id)
+    data_deduped = agent.dedup(data, target="toread")
+    data_summarized = agent.summarize(data_deduped)
+    data_ranked = agent.rank(data_summarized)
+
+    targets = args.targets.split(",")
+    agent.push(data_ranked, targets)
+
+
 def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
@@ -349,6 +366,9 @@ def run(args):
             push_to_read(args, data_ranked)
 
             printStats(source, data, data_deduped, rank_data_deduped, data_ranked)
+
+        elif source == "article":
+            process_article(args)
 
 
 if __name__ == "__main__":
