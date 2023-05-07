@@ -303,12 +303,17 @@ class OperatorArticle:
                 redis_key,
                 last_created_time,
                 overwrite=True)
-        else:
-            cur = datetime.fromisoformat(curr_created_time)
 
-            if last_created_time > cur:
+            print(f"Last created time has not been set yet, set to {last_created_time}")
+        else:
+            curr = datetime.fromisoformat(curr_created_time)
+            last = datetime.fromisoformat(last_created_time)
+
+            if last > curr:
                 utils.redis_set(
                     redis_conn,
                     redis_key,
                     last_created_time,
                     overwrite=True)
+
+            print(f"Update Last created time curr: {curr_created_time}, set to {last_created_time}")
