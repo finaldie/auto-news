@@ -13,4 +13,7 @@ pinecone-client
 mysql-connector-python
 redis
 
+youtube-transcript-api
+pytube
+
 # chromadb
