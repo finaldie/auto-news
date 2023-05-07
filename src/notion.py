@@ -512,10 +512,15 @@ class NotionAgent:
 
     def _createDatabaseItem_ArticleBase(self, ranked_page):
         """
-        Create page properties and blocks
+        Create page properties and blocks, will put the summary
+        instead of orignal content
+
+        Special fields:
+        - content    The original content (Could be very huge), notes that each block has 2000 chars limitation
+        - __summary  The summary content
         """
-        content = ranked_page["content"]
-        preview_content = content[:100]
+        summary = ranked_page["__summary"]
+        preview_content = summary[:100]
 
         properties = {
             "Name": {
@@ -551,7 +556,7 @@ class NotionAgent:
         }
 
         # put summary content
-        block_content = f"{content}"
+        block_content = f"{summary}"
 
         blocks = [
             {
