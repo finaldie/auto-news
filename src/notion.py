@@ -168,7 +168,7 @@ class NotionAgent:
         elif block["type"] == "quote":
             text = self._extractQuote(block)
 
-        elif block["code"] == "code":
+        elif block["type"] == "code":
             text = self._extractCode(block)
 
         else:
