@@ -312,15 +312,15 @@ def printStats(source, data, inbox_data_deduped, rank_data_deduped, data_ranked)
         for ranked_tweet in items:
             rating = ranked_tweet["__rate"]
 
-            if rating < 0.5:
+            if rating <= 0.5:
                 rank_stats[list_name]["below_0.5"] += 1
-            elif rating < 0.6:
+            elif rating <= 0.6:
                 rank_stats[list_name]["below_0.6"] += 1
-            elif rating < 0.7:
+            elif rating <= 0.7:
                 rank_stats[list_name]["below_0.7"] += 1
-            elif rating < 0.8:
+            elif rating <= 0.8:
                 rank_stats[list_name]["below_0.8"] += 1
-            elif rating < 0.9:
+            elif rating <= 0.9:
                 rank_stats[list_name]["below_0.9"] += 1
             elif rating <= 1:
                 rank_stats[list_name]["below_1"] += 1
