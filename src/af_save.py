@@ -290,7 +290,7 @@ def push_to_read(args, data):
             print(f"[ERROR]: Unknown target {target}, skip")
 
 
-def printStats(source, data, inbox_data_deduped, rank_data_deduped):
+def printStats(source, data, inbox_data_deduped, rank_data_deduped, data_ranked):
     print("#####################################################")
     print(f"# Stats of {source}")
     print("#####################################################")
@@ -301,9 +301,12 @@ def printStats(source, data, inbox_data_deduped, rank_data_deduped):
     for list_name, items in inbox_data_deduped.items():
         print(f"{list_name}: Deduped inbox data count: {len(items)}")
 
-    rank_stats = {}
     for list_name, items in rank_data_deduped.items():
         print(f"{list_name}: Deduped rank data count: {len(items)}")
+
+    rank_stats = {}
+    for list_name, items in data_ranked.items():
+        print(f"{list_name}: Ranked data count: {len(items)}")
         rank_stats[list_name] = Counter()
 
         for ranked_tweet in items:
@@ -345,7 +348,7 @@ def run(args):
             data_ranked = tweets_category_and_rank(args, rank_data_deduped)
             push_to_read(args, data_ranked)
 
-            printStats(source, data, data_deduped, rank_data_deduped)
+            printStats(source, data, data_deduped, rank_data_deduped, data_ranked)
 
 
 if __name__ == "__main__":
