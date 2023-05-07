@@ -113,7 +113,7 @@ class OperatorArticle:
                 utils.redis_set(
                     redis_conn,
                     summary_key,
-                    llm_summary_resp,
+                    summary,
                     expire_time=int(redis_key_expire_time))
 
             else:
@@ -141,8 +141,8 @@ class OperatorArticle:
         redis_conn = utils.redis_conn(redis_url)
         redis_key_expire_time = os.getenv("BOT_REDIS_KEY_EXPIRE_TIME", 604800)
 
-        # page_id -> ranked_page
-        ranked = {}
+        # array of ranged pages
+        ranked = []
 
         for page in pages:
             page_id = page["id"]
