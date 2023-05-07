@@ -520,7 +520,7 @@ class NotionAgent:
         - __summary  The summary content
         """
         summary = ranked_page["__summary"]
-        preview_content = summary[:100]
+        preview_content = summary[:100] + "..."
 
         properties = {
             "Name": {
@@ -575,11 +575,12 @@ class NotionAgent:
             }
         ]
 
-        # append embeded content (quote the orginal notion url)
+        # append orginal notion url
         blocks.append({
-            "type": "embed",
-            "embed": {
-                "url": ranked_page['notion_url']
+            "type": "link_to_page",
+            "link_to_page": {
+                "type": "page_id",
+                "page_id": ranked_page['id']
             }
         })
 
