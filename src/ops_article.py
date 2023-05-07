@@ -2,6 +2,7 @@ import os
 import time
 import copy
 import traceback
+from operator import itemgetter
 from datetime import timedelta, datetime
 
 from notion import NotionAgent
@@ -219,11 +220,20 @@ class OperatorArticle:
         print(f"Ranked pages: {ranked}")
         return ranked
 
-    def push(self, ranked_data, targets):
+    def _get_top_items(self, items: list, k):
+        """
+        items: [(name, score), ...]
+        """
+        tops = sorted(items, key=itemgetter(1), reverse=True)
+        return tops[:k]
+
+    def push(self, ranked_data, targets, topk=3):
         print("#####################################################")
         print("# Push Articles")
         print("#####################################################")
         print(f"Number of pages: {len(ranked_data)}")
+        print(f"Targets: {targets}")
+        print(f"Top-K: {topk}")
         print(f"input data: {ranked_data}")
 
         for target in targets:
@@ -237,11 +247,18 @@ class OperatorArticle:
 
                 for ranked_page in ranked_data:
                     try:
+                        page_id = ranked_page["id"]
                         title = ranked_page["title"]
                         print(f"Pushing page, title: {title}")
 
                         topics = ranked_page["__topics"]
+                        topics_topk = self._get_top_items(topics, topk)
+                        topics_topk = [x[0].replace(",", " ") for x in topics_topk]
+
                         categories = ranked_page["__categories"]
+                        categories_topk = self._get_top_items(categories, topk)
+                        categories_topk = [x[0].replace(",", " ") for x in categories_topk]
+
                         rating = ranked_page["__rate"]
 
                         notion_agent.createDatabaseItem_ToRead_Article(
@@ -252,7 +269,8 @@ class OperatorArticle:
                             rating)
 
                         created_time = ranked_page["created_time"]
-                        self.markVisited(created_time)
+                        self.markVisited(page_id)
+                        self.updateCreatedTime(created_time)
 
                     except Exception as e:
                         print(f"[ERROR]: Push to notion failed, skip: {e}")
@@ -261,11 +279,36 @@ class OperatorArticle:
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
 
-    def markVisited(self, last_created_time):
+    def markVisited(self, page_id):
         redis_url = os.getenv("BOT_REDIS_URL")
         redis_conn = utils.redis_conn(redis_url)
 
+        # Mark toread item as visited
+        toread_key_tpl = data_model.NOTION_TOREAD_ITEM_ID
+        toread_key = toread_key_tpl.format("article", "default", page_id)
+        utils.redis_set(redis_conn, toread_key, "true")
+
+    def updateCreatedTime(self, last_created_time):
+        redis_url = os.getenv("BOT_REDIS_URL")
+        redis_conn = utils.redis_conn(redis_url)
+
+        # Update the latest created time
         created_time_tpl = data_model.NOTION_INBOX_CREATED_TIME_KEY
         redis_key = created_time_tpl.format("article", "default")
 
-        utils.redis_set(redis_conn, redis_key, last_created_time, overwrite=True)
+        curr_created_time = utils.redis_get(redis_conn, redis_key)
+        if not curr_created_time:
+            utils.redis_set(
+                redis_conn,
+                redis_key,
+                last_created_time,
+                overwrite=True)
+        else:
+            cur = datetime.fromisoformat(curr_created_time)
+
+            if last_created_time > cur:
+                utils.redis_set(
+                    redis_conn,
+                    redis_key,
+                    last_created_time,
+                    overwrite=True)
