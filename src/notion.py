@@ -1,3 +1,5 @@
+import sys
+import time
 import traceback
 from datetime import datetime
 
@@ -208,15 +210,32 @@ class NotionAgent:
     def extractPage(
             self,
             page_id,
-            extract_blocks=True
+            extract_blocks=True,
+            retrieval_retry=3,
     ):
         properties = {}
 
         # block_id -> block data
         blocks = {}
 
-        page = self.api.pages.retrieve(page_id=page_id)
-        properties = self._extractPageProps(page)
+        page = None
+        trying_cnt = 0
+        retry_sleep_time = 5  # 5 seconds
+
+        while trying_cnt < retrieval_retry:
+            trying_cnt += 1
+
+            try:
+                print(f"Retrieving {trying_cnt}/{retrieval_retry}, page id: {page_id}")
+                page = self.api.pages.retrieve(page_id=page_id)
+                properties = self._extractPageProps(page)
+            except Exception as e:
+                print(f"Retry {trying_cnt}/{retrieval_retry}, sleep for {retry_sleep_time}s, error: {e}")
+                time.sleep(retry_sleep_time)
+
+        if not page:
+            print(f"[ERROR] After {trying_cnt} retries (max {retrieval_retry}), still cannot fetch the page {page_id}, exit...")
+            sys.exit(1)
 
         if extract_blocks:
             childs = self.api.blocks.children.list(block_id=page_id).get("results")
