@@ -1,6 +1,7 @@
 import os
 import time
 import copy
+import traceback
 from datetime import timedelta, datetime
 
 from notion import NotionAgent
@@ -65,6 +66,11 @@ class OperatorArticle:
         return data
 
     def dedup(self, extractedPages, target="inbox"):
+        print("#####################################################")
+        print("# Dedup Articles")
+        print("#####################################################")
+        print(f"Number of pages: {len(extractedPages)}")
+
         redis_url = os.getenv("BOT_REDIS_URL")
         redis_conn = utils.redis_conn(redis_url)
 
@@ -75,6 +81,9 @@ class OperatorArticle:
         deduped_pages = []
 
         for page_id, page in extractedPages.items():
+            title = page["title"]
+            print(f"Dedupping page, title: {title}")
+
             redis_page_key = redis_page_tpl.format("article", "default", page_id)
 
             if utils.redis_get(redis_conn, redis_page_key):
@@ -85,6 +94,10 @@ class OperatorArticle:
         return deduped_pages
 
     def summarize(self, pages):
+        print("#####################################################")
+        print("# Summarize Articles")
+        print("#####################################################")
+        print(f"Number of pages: {len(pages)}")
         llm_agent = LLMAgentSummary()
         llm_agent.init_prompt()
         llm_agent.init_llm()
@@ -96,8 +109,10 @@ class OperatorArticle:
         summarized_pages = []
 
         for page in pages:
+            title = page["title"]
             page_id = page["id"]
             content = page["content"]
+            print(f"Summarying page, title: {title}")
 
             st = time.time()
 
@@ -133,6 +148,11 @@ class OperatorArticle:
         """
         Rank page summary (not the entire content)
         """
+        print("#####################################################")
+        print("# Rank Articles")
+        print("#####################################################")
+        print(f"Number of pages: {len(pages)}")
+
         llm_agent = LLMAgentCategoryAndRanking()
         llm_agent.init_prompt()
         llm_agent.init_llm()
@@ -145,8 +165,10 @@ class OperatorArticle:
         ranked = []
 
         for page in pages:
+            title = page["title"]
             page_id = page["id"]
             text = page["__summary"]
+            print(f"Ranking page, title: {title}")
 
             # Let LLM to category and rank
             st = time.time()
@@ -198,6 +220,10 @@ class OperatorArticle:
         return ranked
 
     def push(self, ranked_data, targets):
+        print("#####################################################")
+        print("# Push Articles")
+        print("#####################################################")
+        print(f"Number of pages: {len(ranked_data)}")
         print(f"input data: {ranked_data}")
 
         for target in targets:
@@ -211,6 +237,9 @@ class OperatorArticle:
 
                 for ranked_page in ranked_data:
                     try:
+                        title = ranked_page["title"]
+                        print(f"Pushing page, title: {title}")
+
                         topics = ranked_page["__topics"]
                         categories = ranked_page["__categories"]
                         rating = ranked_page["__rate"]
@@ -227,6 +256,8 @@ class OperatorArticle:
 
                     except Exception as e:
                         print(f"[ERROR]: Push to notion failed, skip: {e}")
+                        traceback.print_exc()
+
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
 

@@ -511,7 +511,7 @@ class NotionAgent:
 
             "Created at": {
                 "date": {
-                    "start": ranked_page['created_at'],
+                    "start": ranked_page['created_time'],
                     # "time_zone": "America/Los_Angeles",
                 }
             },
