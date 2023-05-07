@@ -47,6 +47,12 @@ class NotionAgent:
         """
         return self._extractRichText(block["paragraph"]["rich_text"])
 
+    def _extractQuote(self, block):
+        """
+        block: notion block object (quote type)
+        """
+        return self._extractRichText(block["quote"]["rich_text"])
+
     def _extractBulletedListItems(self, block):
         """
         block: notion block object (bulleted_list_item type)
@@ -114,6 +120,9 @@ class NotionAgent:
 
             # Easier for human reading
             text += "\n"
+
+        elif block["type"] == "quote":
+            text = self._extractQuote(block)
 
         else:
             print(f"Unsupported block type: {block['type']}, block: {block}")
@@ -384,14 +393,16 @@ class NotionAgent:
         if tweet['reply_text']:
             blocks.append({
                 "object": "block",
-                "type": "paragraph",
-                "paragraph": {
+                "type": "quote",
+                "quote": {
                     "rich_text": [
                         {
                             "type": "text",
                             "text": {
-                                "content": f"Reply-to: {tweet['reply_to_name']}: {tweet['reply_text']}"
-                            }
+                                "content": f"Reply-to: {tweet['reply_to_name']}: {tweet['reply_text']}",
+                                "link": tweet["reply_url"],
+                            },
+                            "href": tweet["reply_url"],
                         }
                     ]
                 }
@@ -497,7 +508,18 @@ class NotionAgent:
 
         return new_page
 
-    def createDatabaseItem_ToRead(self, database_id, list_names: list, tweet, topics: list, categories: list, rate_number):
+    def createDatabaseItem_ToRead(
+        self,
+        database_id,
+        list_names: list,
+        tweet,
+        topics: list,
+        categories: list,
+        rate_number
+    ):
+        """
+        Create toread database item, source twitter
+        """
         properties, blocks = self._createDatabaseItem_TwitterBase(list_names, tweet)
 
         # assemble topics
@@ -541,10 +563,16 @@ class NotionAgent:
             page_id = new_page["id"]
 
             print(f"Add user description as comment: {tweet['name']}, desc: {tweet['user_desc']}")
-            self.createPageComment(page_id, tweet["name"], tweet["user_desc"])
+            self.createPageComment(
+                page_id,
+                tweet["name"],
+                tweet["user_desc"])
 
             if tweet["reply_to_name"] and tweet["name"] != tweet["reply_to_name"]:
-                self.createPageComment(page_id, tweet["reply_to_name"], tweet["reply_user_desc"])
+                self.createPageComment(
+                    page_id,
+                    tweet["reply_to_name"],
+                    tweet["reply_user_desc"])
 
         except Exception as e:
             print(f"[ERROR] Failed to add comment: {e}")

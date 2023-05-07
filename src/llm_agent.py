@@ -1,12 +1,10 @@
-import json
-import os
-
 from langchain import LLMChain
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains.mapreduce import MapReduceChain
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.summarize import load_summarize_chain
+from langchain.document_loaders import YoutubeLoader
 
 import llm_prompts
 
@@ -88,7 +86,9 @@ class LLMAgentSummary(LLMAgentBase):
 
         self.llm = llm
         self.llmchain = load_summarize_chain(
-                self.llm, chain_type=chain_type)
+            self.llm,
+            chain_type=chain_type,
+            verbose=True)
 
         print(f"LLM chain initalized, model_name: {model_name}, temperature: {temperature}, chain_type: {chain_type}")
 
