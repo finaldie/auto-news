@@ -285,9 +285,7 @@ class NotionAgent:
                 "id": page_id,
 
                 # article title
-                "title": props["properties"]["Name"]["title"]["text"]["content"],
-                # pdt timezone
-                "created_at": props["properties"]["Created at"]["date"]["start"],
+                "title": props["properties"]["Name"]["title"][0]["plain_text"],
                 # utc timezone (notion auto-created)
                 "created_time": props["created_time"],
 
@@ -296,6 +294,9 @@ class NotionAgent:
                 "notion_url": props["url"],
                 "source_url": props["properties"]["URL"]["url"],
                 "source": "Article",
+
+                "props": props,
+                "blocks": blocks,
 
                 "content": page_content,
             }
