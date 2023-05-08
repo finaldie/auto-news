@@ -684,7 +684,9 @@ class NotionAgent:
                 "video": {
                     "type": "external",
                     "external": {
-                        "url": ranked_page["source_url"],
+                        # Notes: if source_url is empty, fallback to
+                        # notion page title (it could be the url)
+                        "url": ranked_page["source_url"] or ranked_page["title"],
                     },
                 }
             },

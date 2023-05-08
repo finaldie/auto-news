@@ -88,8 +88,11 @@ class OperatorYoutube(OperatorBase):
         # - video url
         # Pull transcipt and merge it
         for page_id, page in extracted_pages.items():
-            source_url = page["source_url"]
             title = page["title"]
+
+            # Notes: some app (e.g. From iOS) will only fill the title
+            # with the url link, it wont fill other fields
+            source_url = page["source_url"] or title
             print(f"Pulling youtube transcript, title: {title}, page_id: {page_id}, source_url: {source_url}")
 
             transcript, metadata = self._load_youtube_transcript(source_url)
