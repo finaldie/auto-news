@@ -105,8 +105,8 @@ class OperatorArticle:
         return deduped_pages
 
     def _load_web(self, url):
-        loader = LLMWebLoader(url)
-        docs = loader.load()
+        loader = LLMWebLoader()
+        docs = loader.load(url)
 
         content = ""
         for doc in docs:
