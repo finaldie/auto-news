@@ -29,7 +29,21 @@ class OperatorYoutube(OperatorBase):
     """
     def _load_youtube_transcript(self, url):
         loader = LLMYoutubeLoader()
-        docs = loader.load(url)
+        langs = ["en", "zh-Hans", "zh-Hant"]
+        print(f"Loading Youtube transcript, supported language list: {langs}")
+
+        docs = []
+
+        for lang in langs:
+            print(f"Loading Youtube transcript with language {lang} ...")
+            docs = loader.load(url, language=lang)
+
+            if len(docs) > 0:
+                print("Found transcript for language {lang}, number of docs returned: {len(docs)}")
+                break
+
+        if not docs:
+            print(f"[ERROR] Transcipt not found for language list: {langs}")
 
         content = ""
         metadata = {}

@@ -1,3 +1,5 @@
+import traceback
+
 from langchain import LLMChain
 from langchain.text_splitter import (
     CharacterTextSplitter,
@@ -24,12 +26,31 @@ class LLMWebLoader:
 
 
 class LLMYoutubeLoader:
-    def load(self, url: str) -> list:
+    def load(
+        self,
+        url: str,
+        language: str = "en",
+        continue_on_failure: bool = False,
+    ) -> list:
         if not url:
             return []
 
-        loader = YoutubeLoader.from_youtube_url(url, add_video_info=True)
-        docs = loader.load()
+        docs = []
+
+        try:
+            loader = YoutubeLoader.from_youtube_url(
+                url,
+                add_video_info=True,
+                language=language,
+                continue_on_failure=continue_on_failure
+            )
+
+            docs = loader.load()
+
+        except Exception as e:
+            print(f"[ERROR] LLMYoutubeLoader load transcript failed: {e}")
+            traceback.print_exc()
+
         return docs
 
 
