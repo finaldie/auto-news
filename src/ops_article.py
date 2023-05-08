@@ -138,15 +138,6 @@ class OperatorArticle:
             print(f"Summarying page, title: {title}")
             print(f"Page content ({len(content)} chars): {content}")
 
-            if not content:
-                print(f"page content is empty, fallback to load web page via WebBaseLoader")
-                content = self._load_web(source_url)
-                print(f"Page content ({len(content)} chars): {content}")
-
-                if not content:
-                    print(f"[ERROR] Empty Web page loaded via WebBaseLoader, skip it")
-                    continue
-
             st = time.time()
 
             summary_key = data_model.NOTION_SUMMARY_ITEM_ID.format(
@@ -155,6 +146,17 @@ class OperatorArticle:
             llm_summary_resp = utils.redis_get(redis_conn, summary_key)
 
             if not llm_summary_resp:
+                # Double check the content, if empty, load it from
+                # the source url
+                if not content:
+                    print(f"page content is empty, fallback to load web page via WebBaseLoader")
+                    content = self._load_web(source_url)
+                    print(f"Page content ({len(content)} chars): {content}")
+
+                    if not content:
+                        print(f"[ERROR] Empty Web page loaded via WebBaseLoader, skip it")
+                        continue
+
                 summary = llm_agent.run(content)
 
                 print(f"Cache llm response for {redis_key_expire_time}s, key: {summary_key}, summary: {summary}")
