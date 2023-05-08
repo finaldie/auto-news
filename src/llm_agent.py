@@ -5,8 +5,29 @@ from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.summarize import load_summarize_chain
 from langchain.document_loaders import YoutubeLoader
+from langchain.document_loaders import WebBaseLoader
 
 import llm_prompts
+
+
+class LLMWebLoader:
+    def load(self, url: str) -> list:
+        if not url:
+            return []
+
+        loader = WebBaseLoader(url)
+        docs = loader.load()
+        return docs
+
+
+class LLMYoutubeLoader:
+    def load(self, url: str) -> list:
+        if not url:
+            return []
+
+        loader = YoutubeLoader.from_youtube_url(url, add_video_info=True)
+        docs = loader.load()
+        return docs
 
 
 class LLMAgentBase:
@@ -94,10 +115,15 @@ class LLMAgentSummary(LLMAgentBase):
         print(f"LLM chain initalized, model_name: {model_name}, temperature: {temperature}, chain_type: {chain_type}")
 
     def run(self, text: str):
+        print(f"[LLM] input text: {text}")
+
+        if not text:
+            print("[LLM] Empty input text, return empty summary")
+            return ""
+
         text_splitter = CharacterTextSplitter(chunk_size=512)
         docs = text_splitter.create_documents([text])
-        print(f"[LLM] input text: {text}")
-        print(f"[LLM] number of docs: {len(docs)}")
+        print(f"[LLM] number of splitted docs: {len(docs)}")
 
         summary_resp = self.llmchain.run(docs)
         return summary_resp

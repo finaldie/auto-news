@@ -6,7 +6,11 @@ from operator import itemgetter
 from datetime import timedelta, datetime
 
 from notion import NotionAgent
-from llm_agent import LLMAgentCategoryAndRanking, LLMAgentSummary
+from llm_agent import (
+    LLMAgentCategoryAndRanking,
+    LLMAgentSummary,
+    LLMWebLoader
+)
 import utils
 import data_model
 
@@ -100,6 +104,17 @@ class OperatorArticle:
 
         return deduped_pages
 
+    def _load_web(self, url):
+        loader = LLMWebLoader(url)
+        docs = loader.load()
+
+        content = ""
+        for doc in docs:
+            content += doc.page_content
+            content += "\n"
+
+        return content
+
     def summarize(self, pages):
         print("#####################################################")
         print("# Summarize Articles")
@@ -119,7 +134,17 @@ class OperatorArticle:
             title = page["title"]
             page_id = page["id"]
             content = page["content"]
+            source_url = page["source_url"]
             print(f"Summarying page, title: {title}")
+            print(f"Page content ({len(content)} chars): {content}")
+
+            if not content:
+                print(f"page content is empty, fallback to load web page via WebBaseLoader")
+                content = self._load_web(source_url)
+
+                if not content:
+                    print(f"[ERROR] Empty Web page loaded via WebBaseLoader, skip it")
+                    continue
 
             st = time.time()
 
