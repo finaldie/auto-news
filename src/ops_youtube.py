@@ -39,7 +39,7 @@ class OperatorYoutube(OperatorBase):
             docs = loader.load(url, language=lang)
 
             if len(docs) > 0:
-                print("Found transcript for language {lang}, number of docs returned: {len(docs)}")
+                print(f"Found transcript for language {lang}, number of docs returned: {len(docs)}")
                 break
 
         if not docs:
@@ -89,7 +89,8 @@ class OperatorYoutube(OperatorBase):
         # Pull transcipt and merge it
         for page_id, page in extracted_pages.items():
             source_url = page["source_url"]
-            print(f"Pulling youtube transcript, page_id: {page_id}, source_url: {source_url}")
+            title = page["title"]
+            print(f"Pulling youtube transcript, title: {}, page_id: {page_id}, source_url: {source_url}")
 
             transcript, metadata = self._load_youtube_transcript(source_url)
 
