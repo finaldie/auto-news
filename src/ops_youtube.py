@@ -31,11 +31,16 @@ class OperatorYoutube(OperatorBase):
         docs = loader.load(url)
 
         content = ""
+        metadata = {}
+
         for doc in docs:
             content += doc.page_content
             content += "\n"
 
-        return content
+            # Notes: metadata is the same for all the docs
+            metadata = doc.metadata
+
+        return content, metadata
 
     def pull(self, database_id):
         print("#####################################################")
@@ -71,9 +76,18 @@ class OperatorYoutube(OperatorBase):
             source_url = page["source_url"]
             print(f"Pulling youtube transcript, page_id: {page_id}, source_url: {source_url}")
 
-            transcript = self._load_youtube_transcript(source_url)
+            transcript, metadata = self._load_youtube_transcript(source_url)
 
             page["__transcript"] = transcript
+
+            page["__description"] = metadata.setdefault("description", "")
+            page["__thumbnail_url"] = metadata.setdefault("thumbnail_url", "")
+            page["__publish_date"] = metadata.setdefault("publish_date", "")
+            page["__author"] = metadata.setdefault("author", "")
+            page["__view_count"] = metadata.setdefault("view_count", 0)
+
+            # unit: second
+            page["__length"] = metadata.setdefault("length", 0)
 
         return extracted_pages
 

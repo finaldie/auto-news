@@ -648,10 +648,8 @@ class NotionAgent:
             },
         }
 
-        # put summary content
-        block_content = f"{summary}"
-
         blocks = [
+            # put summary content
             {
                 "object": "block",
                 "type": "paragraph",
@@ -660,24 +658,25 @@ class NotionAgent:
                         {
                             "type": "text",
                             "text": {
-                                "content": block_content
+                                "content": summary,
                             }
                         }
                     ]
                 }
-            }
-        ]
+            },
 
-        # append external video
-        blocks.append({
-            "type": "video",
-            "video": {
-                "type": "external",
-                "external": {
-                    "url": ranked_page["source_url"],
-                },
-            }
-        })
+            # append external video
+            {
+                "object": "block",
+                "type": "video",
+                "video": {
+                    "type": "external",
+                    "external": {
+                        "url": ranked_page["source_url"],
+                    },
+                }
+            },
+        ]
 
         return properties, blocks
 
@@ -763,14 +762,12 @@ class NotionAgent:
             print(f"Add user description as comment: {tweet['name']}, desc: {tweet['user_desc']}")
             self.createPageComment(
                 page_id,
-                tweet["name"],
-                tweet["user_desc"])
+                f"{tweet['name']}: {tweet['user_desc']}")
 
             if tweet["reply_to_name"] and tweet["name"] != tweet["reply_to_name"]:
                 self.createPageComment(
                     page_id,
-                    tweet["reply_to_name"],
-                    tweet["reply_user_desc"])
+                    f"{tweet['reply_to_name']}: {tweet['reply_user_desc']}")
 
         except Exception as e:
             print(f"[ERROR] Failed to add comment: {e}")
@@ -858,7 +855,7 @@ class NotionAgent:
         properties, blocks = self._createDatabaseItem_YoutubeBase(ranked_page)
 
         # Common fields for article, youtube, etc
-        return self._postprocess_ToRead(
+        new_page = self._postprocess_ToRead(
             properties,
             blocks,
             database_id,
@@ -868,15 +865,41 @@ class NotionAgent:
             rate_number
         )
 
-    def createPageComment(self, page_id, pattern: str, comment_text: str):
+        # Add video metadata as a comment
+        video_metadata = f"""
+        author: {ranked_page['__author']}
+        description: {ranked_page['__description']}
+        publishing_date: {ranked_page['__publish_date']}
+        duration (minutes): {ranked_page['__length'] / 60}
+        view_count: {ranked_page['__view_count']}
+        """
+
+        try:
+            page_id = new_page["id"]
+
+            print("Add video metadata as comment")
+            self.createPageComment(page_id, video_metadata)
+
+        except Exception as e:
+            print(f"[ERROR] Failed to add comment: {e}")
+            traceback.print_exc()
+
+        return new_page
+
+    def createPageComment(
+        self,
+        page_id,
+        comment_text: str
+    ):
         new_comment = self.api.comments.create(
             parent={"page_id": page_id},
             rich_text=[{
                 "type": "text",
                 "text": {
-                    "content": f"{pattern}: {comment_text}"
+                    "content": f"{comment_text}"
                 }
             }]
         )
 
-        print(f"Created a new comment, pattern: {pattern}, comment: {comment_text}, new_comment object: {new_comment}")
+        print(f"Created a new comment: {comment_text}, new_comment object: {new_comment}")
+        return new_comment
