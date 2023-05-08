@@ -96,6 +96,8 @@ class LLMAgentSummary(LLMAgentBase):
     def run(self, text: str):
         text_splitter = CharacterTextSplitter(chunk_size=512)
         docs = text_splitter.create_documents([text])
+        print(f"[LLM] input text: {text}")
+        print(f"[LLM] number of docs: {len(docs)}")
 
         summary_resp = self.llmchain.run(docs)
         return summary_resp
