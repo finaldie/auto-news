@@ -63,6 +63,10 @@ class OperatorYoutube(OperatorBase):
         if not last_created_time:
             last_created_time = (datetime.now() - timedelta(days=1)).isoformat()
 
+        # TODO: Temporary set to 1yr ago, to pull up all the videos
+        #       Remove it after one round
+        last_created_time = (datetime.now() - timedelta(days=365)).isoformat()
+
         # The api will return the pages and sort by "created time" asc
         # format dict(<page_id, page>)
         extracted_pages = notion_agent.queryDatabaseInbox_Youtube(
