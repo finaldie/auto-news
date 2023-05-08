@@ -230,6 +230,7 @@ class NotionAgent:
                 print(f"Retrieving {trying_cnt}/{retrieval_retry}, page id: {page_id}")
                 page = self.api.pages.retrieve(page_id=page_id)
                 properties = self._extractPageProps(page)
+                break
 
             except Exception as e:
                 print(f"Retry {trying_cnt}/{retrieval_retry}, sleep for {retry_sleep_time}s, error: {e}")
