@@ -48,6 +48,7 @@ class OperatorArticle:
             last_created_time = (datetime.now() - timedelta(days=1)).isoformat()
 
         # The api will return the pages and sort by "created time" asc
+        # format dict(<page_id, page>)
         extracted_pages = notion_agent.queryDatabaseInbox_Article(
             database_id,
             filter_created_time=last_created_time)
@@ -149,12 +150,12 @@ class OperatorArticle:
                 # Double check the content, if empty, load it from
                 # the source url
                 if not content:
-                    print(f"page content is empty, fallback to load web page via WebBaseLoader")
+                    print("page content is empty, fallback to load web page via WebBaseLoader")
                     content = self._load_web(source_url)
                     print(f"Page content ({len(content)} chars): {content}")
 
                     if not content:
-                        print(f"[ERROR] Empty Web page loaded via WebBaseLoader, skip it")
+                        print("[ERROR] Empty Web page loaded via WebBaseLoader, skip it")
                         continue
 
                 summary = llm_agent.run(content)
