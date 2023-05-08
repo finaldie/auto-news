@@ -353,7 +353,7 @@ def process_youtube(args):
     print("#####################################################")
     op = OperatorYoutube()
 
-    data = op.readFromJson(args.data_folder, args.run_id)
+    data = op.readFromJson(args.data_folder, args.run_id, "youtube.json")
     data_deduped = op.dedup(data, target="toread")
     data_summarized = op.summarize(data_deduped)
     data_ranked = op.rank(data_summarized)

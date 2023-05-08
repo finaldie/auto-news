@@ -101,7 +101,7 @@ def pull_youtube(args, op):
     Pull from inbox - youtube
     """
     print("######################################################")
-    print("# Pull from Inbox - Articles")
+    print("# Pull from Inbox - Youtube")
     print("######################################################")
     print(f"environment: {os.environ}")
 
@@ -114,7 +114,7 @@ def save_youtube(args, op, data):
     print("######################################################")
     print("# Save Youtube transcripts to json file")
     print("######################################################")
-    op.save2json(args.data_folder, args.run_id, data)
+    op.save2json(args.data_folder, args.run_id, "youtube.json", data)
 
 
 def run(args):

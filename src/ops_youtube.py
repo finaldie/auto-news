@@ -301,8 +301,9 @@ class OperatorYoutube(OperatorBase):
                             categories_topk,
                             rating)
 
-                        created_time = ranked_page["created_time"]
                         self.markVisited(page_id, source="youtube", list_name="default")
+
+                        created_time = ranked_page["created_time"]
                         self.updateCreatedTime(created_time, source="youtube", list_name="default")
 
                     except Exception as e:

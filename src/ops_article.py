@@ -303,8 +303,9 @@ class OperatorArticle:
                             categories_topk,
                             rating)
 
-                        created_time = ranked_page["created_time"]
                         self.markVisited(page_id)
+
+                        created_time = ranked_page["created_time"]
                         self.updateCreatedTime(created_time)
 
                     except Exception as e:

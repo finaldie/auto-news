@@ -11,26 +11,30 @@ class OperatorBase:
     def pull(self):
         return None
 
-    def save2json(self, data_folder, run_id, data):
+    def save2json(
+        self,
+        data_folder,
+        run_id,
+        filename,
+        data
+    ):
         workdir = os.getenv("WORKDIR")
 
-        filename = "article.json"
         data_path = f"{workdir}/{data_folder}/{run_id}"
         full_path = utils.gen_filename(data_path, filename)
 
         print(f"Save data to {full_path}, data: {data}")
         utils.save_data_json(full_path, data)
 
-    def readFromJson(self, data_folder, run_id):
+    def readFromJson(self, data_folder, run_id, filename):
         workdir = os.getenv("WORKDIR")
 
-        filename = "article.json"
         data_path = f"{workdir}/{data_folder}/{run_id}"
         full_path = utils.gen_filename(data_path, filename)
 
         data = utils.read_data_json(full_path)
 
-        print(f"Retrieve article data from {full_path}, data: {data}")
+        print(f"Retrieve data from {full_path}, data: {data}")
         return data
 
     def dedup(self, data, target):
