@@ -96,6 +96,7 @@ class OperatorYoutube(OperatorBase):
 
             page["__transcript"] = transcript
 
+            page["__title"] = metadata.setdefault("title", "")
             page["__description"] = metadata.setdefault("description", "")
             page["__thumbnail_url"] = metadata.setdefault("thumbnail_url", "")
             page["__publish_date"] = ""

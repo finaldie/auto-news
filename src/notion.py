@@ -622,12 +622,17 @@ class NotionAgent:
 
         created_time_pdt = utils.convertUTC2PDT_str(ranked_page["created_time"])
 
+        # For title, some apps may create the notion page title with
+        # the URL directly, not the title, here we use extracted title
+        # first, if empty, fallback to the notion page title
+        title = ranked_page["__title"] or ranked_page['title']
+
         properties = {
             "Name": {
                 "title": [
                     {
                         "text": {
-                            "content": f"{ranked_page['title']}"
+                            "content": title
                         }
                     }
                 ]
