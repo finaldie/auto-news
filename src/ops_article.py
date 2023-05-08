@@ -131,7 +131,7 @@ class OperatorArticle:
             if not llm_summary_resp:
                 summary = llm_agent.run(content)
 
-                print(f"Cache llm response for {redis_key_expire_time}s, key: {summary_key}")
+                print(f"Cache llm response for {redis_key_expire_time}s, key: {summary_key}, summary: {summary}")
                 utils.redis_set(
                     redis_conn,
                     summary_key,
