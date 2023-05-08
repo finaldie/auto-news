@@ -619,6 +619,7 @@ class NotionAgent:
         """
         summary = ranked_page["__summary"]
         preview_content = summary[:100] + "..."
+        print(f"[notion] push page, summary: {summary}, preview: {preview_content}")
 
         created_time_pdt = utils.convertUTC2PDT_str(ranked_page["created_time"])
 
