@@ -1,5 +1,8 @@
 from langchain import LLMChain
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import (
+    CharacterTextSplitter,
+    RecursiveCharacterTextSplitter
+)
 from langchain.chains.mapreduce import MapReduceChain
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
@@ -93,11 +96,11 @@ class LLMAgentSummary(LLMAgentBase):
         self.user_prompt = prompt
 
     def init_llm(
-            self,
-            model_name="gpt-3.5-turbo",
-            temperature=0,
-            chain_type="map_reduce",
-            verbose=False
+        self,
+        model_name="gpt-3.5-turbo",
+        temperature=0,
+        chain_type="map_reduce",
+        verbose=False
     ):
         llm = ChatOpenAI(
             # model_name="text-davinci-003"
@@ -114,14 +117,23 @@ class LLMAgentSummary(LLMAgentBase):
 
         print(f"LLM chain initalized, model_name: {model_name}, temperature: {temperature}, chain_type: {chain_type}")
 
-    def run(self, text: str):
-        print(f"[LLM] input text: {text}")
+    def run(
+        self,
+        text: str,
+        chunk_size=1024,
+        chunk_overlap=0,
+    ):
+        print(f"[LLM] input text ({len(text)} chars): {text}")
 
         if not text:
             print("[LLM] Empty input text, return empty summary")
             return ""
 
-        text_splitter = CharacterTextSplitter(chunk_size=512)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap
+        )
+
         docs = text_splitter.create_documents([text])
         print(f"[LLM] number of splitted docs: {len(docs)}")
 

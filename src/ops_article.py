@@ -141,6 +141,7 @@ class OperatorArticle:
             if not content:
                 print(f"page content is empty, fallback to load web page via WebBaseLoader")
                 content = self._load_web(source_url)
+                print(f"Page content ({len(content)} chars): {content}")
 
                 if not content:
                     print(f"[ERROR] Empty Web page loaded via WebBaseLoader, skip it")
