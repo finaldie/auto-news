@@ -631,6 +631,9 @@ class NotionAgent:
         # notion page title (it could be the url)
         source_url = ranked_page["source_url"] or ranked_page["title"]
 
+        # Dirty fix to get rid of the unnecessary url parameters
+        source_url = source_url.replace("&feature=share", "")
+
         print(f"[notion] push page, title: {title}, summary: {summary}, preview: {preview_content}, source_url: {source_url}")
 
         properties = {
