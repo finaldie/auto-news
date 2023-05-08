@@ -4,6 +4,7 @@ import copy
 import traceback
 from datetime import timedelta, datetime
 
+import pytz
 from notion import NotionAgent
 from llm_agent import (
     LLMAgentCategoryAndRanking,
@@ -82,7 +83,13 @@ class OperatorYoutube(OperatorBase):
 
             page["__description"] = metadata.setdefault("description", "")
             page["__thumbnail_url"] = metadata.setdefault("thumbnail_url", "")
-            page["__publish_date"] = metadata.setdefault("publish_date", "")
+            page["__publish_date"] = ""
+            if metadata.get("publish_date"):
+                # Notes: pd is datetime object
+                pd = metadata["publish_date"]
+                pd_pdt = pd.astimezone(pytz.timezone('America/Los_Angeles'))
+                page["__publish_date"] = pd_pdt.isoformat()
+
             page["__author"] = metadata.setdefault("author", "")
             page["__view_count"] = metadata.setdefault("view_count", 0)
 

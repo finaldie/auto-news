@@ -1,9 +1,9 @@
 import time
 import traceback
-from datetime import datetime
 
 from notion_client import Client
-import pytz
+
+import utils
 
 
 class NotionAgent:
@@ -184,10 +184,12 @@ class NotionAgent:
         """
         return {
             "id": page["id"],
+
+            # below two time are utc time
             "created_time": page["created_time"],
             "last_edited_time": page["last_edited_time"],
-            "url": page["url"],
 
+            "url": page["url"],
             "properties": page["properties"],
         }
 
@@ -539,6 +541,8 @@ class NotionAgent:
         summary = ranked_page["__summary"]
         preview_content = summary[:100] + "..."
 
+        created_time_pdt = utils.convertUTC2PDT_str(ranked_page["created_time"])
+
         properties = {
             "Name": {
                 "title": [
@@ -552,7 +556,7 @@ class NotionAgent:
 
             "Created at": {
                 "date": {
-                    "start": ranked_page['created_time'],
+                    "start": created_time_pdt.isoformat(),
                     # "time_zone": "America/Los_Angeles",
                 }
             },
@@ -615,6 +619,8 @@ class NotionAgent:
         summary = ranked_page["__summary"]
         preview_content = summary[:100] + "..."
 
+        created_time_pdt = utils.convertUTC2PDT_str(ranked_page["created_time"])
+
         properties = {
             "Name": {
                 "title": [
@@ -628,7 +634,7 @@ class NotionAgent:
 
             "Created at": {
                 "date": {
-                    "start": ranked_page['created_time'],
+                    "start": created_time_pdt.isoformat(),
                     # "time_zone": "America/Los_Angeles",
                 }
             },

@@ -4,6 +4,7 @@ from datetime import datetime
 from operator import itemgetter
 
 import redis
+import pytz
 
 
 def gen_filename(data_folder, filename):
@@ -109,6 +110,12 @@ def parseDataFromIsoFormat(dt: str):
     @return datetime object
     """
     return datetime.fromisoformat(dt.replace('Z', '+00:00'))
+
+
+def convertUTC2PDT_str(utc_time: str):
+    dt_utc = parseDataFromIsoFormat(utc_time)
+    dt_pdt = dt_utc.astimezone(pytz.timezone('America/Los_Angeles'))
+    return dt_pdt
 
 
 def get_top_items(items: list, k=3):
