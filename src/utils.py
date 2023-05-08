@@ -1,5 +1,6 @@
 import os
 import json
+from datetime import datetime
 
 import redis
 
@@ -92,3 +93,18 @@ def fix_and_parse_json(data):
     except Exception as e:
         print(f"[ERROR]: cannot parse json string: {data}, error: {e}")
         return res
+
+
+def parseDataFromIsoFormat(dt: str):
+    """
+    Input date string: 2023-05-07T08:32:00+00:00, 2023-05-07T08:32:00.000Z
+
+    Start from Python 3.11, the datetime.fromisoformat() will handle
+    it correctly, before 3.11, if date string contains 'Z', need to
+    replace it before handling
+
+    Here, we simply replace Z with +00:00
+
+    @return datetime object
+    """
+    return datetime.fromisoformat(dt.replace('Z', '+00:00'))

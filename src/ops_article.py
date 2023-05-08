@@ -323,6 +323,7 @@ class OperatorArticle:
         utils.redis_set(redis_conn, toread_key, "true")
 
     def updateCreatedTime(self, last_created_time: str):
+        print(f"[updateCreatedTime] last_created_time: {last_created_time}")
         redis_url = os.getenv("BOT_REDIS_URL")
         redis_conn = utils.redis_conn(redis_url)
 
@@ -343,8 +344,8 @@ class OperatorArticle:
 
             print(f"Last created time has not been set yet, set to {last_created_time}")
         else:
-            curr = datetime.fromisoformat(curr_created_time)
-            last = datetime.fromisoformat(last_created_time)
+            curr = utils.parseDataFromIsoFormat(curr_created_time)
+            last = utils.parseDataFromIsoFormat(last_created_time)
 
             if last > curr:
                 utils.redis_set(
