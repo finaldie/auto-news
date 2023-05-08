@@ -877,7 +877,7 @@ class NotionAgent:
         author: {ranked_page['__author']}
         description: {ranked_page['__description']}
         publishing_date: {ranked_page['__publish_date']}
-        duration (minutes): {ranked_page['__length'] / 60}
+        duration: {ranked_page['__length'] / 60:.2f} minutes
         view_count: {ranked_page['__view_count']}
         """
 
