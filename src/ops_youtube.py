@@ -90,7 +90,7 @@ class OperatorYoutube(OperatorBase):
         for page_id, page in extracted_pages.items():
             source_url = page["source_url"]
             title = page["title"]
-            print(f"Pulling youtube transcript, title: {}, page_id: {page_id}, source_url: {source_url}")
+            print(f"Pulling youtube transcript, title: {title}, page_id: {page_id}, source_url: {source_url}")
 
             transcript, metadata = self._load_youtube_transcript(source_url)
 
