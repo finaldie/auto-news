@@ -297,7 +297,7 @@ class OperatorYoutube(OperatorBase):
                 for ranked_page in ranked_data:
                     try:
                         page_id = ranked_page["id"]
-                        title = ranked_page["title"]
+                        title = ranked_page.get("__title") or ranked_page["title"]
                         print(f"Pushing page, title: {title}")
 
                         topics = ranked_page["__topics"]
