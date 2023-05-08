@@ -1,4 +1,3 @@
-import sys
 import time
 import traceback
 from datetime import datetime
@@ -229,13 +228,14 @@ class NotionAgent:
                 print(f"Retrieving {trying_cnt}/{retrieval_retry}, page id: {page_id}")
                 page = self.api.pages.retrieve(page_id=page_id)
                 properties = self._extractPageProps(page)
+
             except Exception as e:
                 print(f"Retry {trying_cnt}/{retrieval_retry}, sleep for {retry_sleep_time}s, error: {e}")
                 time.sleep(retry_sleep_time)
 
         if not page:
             print(f"[ERROR] After {trying_cnt} retries (max {retrieval_retry}), still cannot fetch the page {page_id}, exit...")
-            sys.exit(1)
+            return properties, blocks
 
         if extract_blocks:
             childs = self.api.blocks.children.list(block_id=page_id).get("results")
@@ -366,6 +366,23 @@ class NotionAgent:
 
                 "content": page_content,
             }
+
+        return extracted_pages
+
+    def queryDatabaseInbox_Youtube(
+        self,
+        database_id,
+        filter_last_edited_time=None,
+        filter_created_time=None
+    ):
+        extracted_pages = self.queryDatabaseInbox_Article(
+            database_id,
+            filter_last_edited_time=filter_last_edited_time,
+            filter_created_time=filter_created_time)
+
+        # Fix fields such as 'source'
+        for page_id, page in extracted_pages.items():
+            page["source"] = "Youtube"
 
         return extracted_pages
 
@@ -586,6 +603,84 @@ class NotionAgent:
 
         return properties, blocks
 
+    def _createDatabaseItem_YoutubeBase(self, ranked_page):
+        """
+        Create page properties and blocks, will put the summary first
+        Follow by the video
+
+        Special fields:
+        - content    The original content (Could be very huge), notes that each block has 2000 chars limitation
+        - __summary  The summary content
+        """
+        summary = ranked_page["__summary"]
+        preview_content = summary[:100] + "..."
+
+        properties = {
+            "Name": {
+                "title": [
+                    {
+                        "text": {
+                            "content": f"{ranked_page['title']}"
+                        }
+                    }
+                ]
+            },
+
+            "Created at": {
+                "date": {
+                    "start": ranked_page['created_time'],
+                    # "time_zone": "America/Los_Angeles",
+                }
+            },
+
+            "Preview": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": preview_content,
+                            "link": {
+                                "url": ranked_page["source_url"],
+                            }
+                        },
+                        "href": ranked_page["source_url"],
+                    },
+                ]
+            },
+        }
+
+        # put summary content
+        block_content = f"{summary}"
+
+        blocks = [
+            {
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": block_content
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+
+        # append external video
+        blocks.append({
+            "type": "video",
+            "video": {
+                "type": "external",
+                "external": {
+                    "url": ranked_page["source_url"],
+                },
+            }
+        })
+
+        return properties, blocks
+
     def createDatabaseItem_TwitterInbox(
         self,
         database_id,
@@ -683,16 +778,16 @@ class NotionAgent:
 
         return new_page
 
-    def createDatabaseItem_ToRead_Article(
-            self,
-            database_id,
-            ranked_page,
-            topics: list,
-            categories: list,
-            rate_number
+    def _postprocess_ToRead(
+        self,
+        properties,
+        blocks,
+        database_id,
+        ranked_page,
+        topics: list,
+        categories: list,
+        rate_number
     ):
-        properties, blocks = self._createDatabaseItem_ArticleBase(ranked_page)
-
         # assemble topics
         topics_list = [{"name": t} for t in topics]
 
@@ -703,7 +798,7 @@ class NotionAgent:
             "rich_text": [
                 {
                     "text": {
-                        "content": "Article"
+                        "content": ranked_page["source"],
                     }
                 }
             ]
@@ -730,6 +825,48 @@ class NotionAgent:
             children=blocks)
 
         return new_page
+
+    def createDatabaseItem_ToRead_Article(
+        self,
+        database_id,
+        ranked_page,
+        topics: list,
+        categories: list,
+        rate_number
+    ):
+        properties, blocks = self._createDatabaseItem_ArticleBase(ranked_page)
+
+        # Common fields for article, youtube, etc
+        return self._postprocess_ToRead(
+            properties,
+            blocks,
+            database_id,
+            ranked_page,
+            topics,
+            categories,
+            rate_number
+        )
+
+    def createDatabaseItem_ToRead_Youtube(
+        self,
+        database_id,
+        ranked_page,
+        topics: list,
+        categories: list,
+        rate_number
+    ):
+        properties, blocks = self._createDatabaseItem_YoutubeBase(ranked_page)
+
+        # Common fields for article, youtube, etc
+        return self._postprocess_ToRead(
+            properties,
+            blocks,
+            database_id,
+            ranked_page,
+            topics,
+            categories,
+            rate_number
+        )
 
     def createPageComment(self, page_id, pattern: str, comment_text: str):
         new_comment = self.api.comments.create(

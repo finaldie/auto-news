@@ -1,0 +1,292 @@
+import os
+import time
+import copy
+import traceback
+from datetime import timedelta, datetime
+
+from notion import NotionAgent
+from llm_agent import (
+    LLMAgentCategoryAndRanking,
+    LLMAgentSummary,
+    LLMYoutubeLoader
+)
+import utils
+import data_model
+from ops_base import OperatorBase
+
+
+class OperatorYoutube(OperatorBase):
+    """
+    An Operator to handle:
+    - pulling data from source
+    - save to local json
+    - restore from local json
+    - dedup
+    - summarization
+    - ranking
+    - publish
+    """
+    def _load_youtube_transcript(self, url):
+        loader = LLMYoutubeLoader()
+        docs = loader.load(url)
+
+        content = ""
+        for doc in docs:
+            content += doc.page_content
+            content += "\n"
+
+        return content
+
+    def pull(self, database_id):
+        print("#####################################################")
+        print("# Pulling Youtube video transcripts")
+        print("#####################################################")
+        notion_api_key = os.getenv("NOTION_TOKEN")
+        notion_agent = NotionAgent(notion_api_key)
+
+        redis_url = os.getenv("BOT_REDIS_URL")
+        redis_conn = utils.redis_conn(redis_url)
+
+        created_time_tpl = data_model.NOTION_INBOX_CREATED_TIME_KEY
+        redis_key = created_time_tpl.format("youtube", "default")
+
+        last_created_time = utils.redis_get(redis_conn, redis_key)
+        last_created_time = utils.bytes2str(last_created_time)
+        print(f"Get last_created_time from redis: {last_created_time}")
+
+        if not last_created_time:
+            last_created_time = (datetime.now() - timedelta(days=1)).isoformat()
+
+        # The api will return the pages and sort by "created time" asc
+        # format dict(<page_id, page>)
+        extracted_pages = notion_agent.queryDatabaseInbox_Youtube(
+            database_id,
+            filter_created_time=last_created_time)
+
+        # The extracted pages contains
+        # - title
+        # - video url
+        # Pull transcipt and merge it
+        for page_id, page in extracted_pages.items():
+            source_url = page["source_url"]
+            print(f"Pulling youtube transcript, page_id: {page_id}, source_url: {source_url}")
+
+            transcript = self._load_youtube_transcript(source_url)
+
+            page["__transcript"] = transcript
+
+        return extracted_pages
+
+    def dedup(self, extractedPages, target="inbox"):
+        print("#####################################################")
+        print("# Dedup Youtube pages")
+        print("#####################################################")
+        print(f"Number of pages: {len(extractedPages)}")
+
+        redis_url = os.getenv("BOT_REDIS_URL")
+        redis_conn = utils.redis_conn(redis_url)
+
+        redis_page_tpl = data_model.NOTION_INBOX_ITEM_ID
+        if target == "toread":
+            redis_page_tpl = data_model.NOTION_TOREAD_ITEM_ID
+
+        deduped_pages = []
+
+        for page_id, page in extractedPages.items():
+            title = page["title"]
+            print(f"Dedupping page, title: {title}")
+
+            redis_page_key = redis_page_tpl.format("youtube", "default", page_id)
+
+            if utils.redis_get(redis_conn, redis_page_key):
+                print(f"Duplicated youtube found, skip. key: {redis_page_key}")
+            else:
+                deduped_pages.append(page)
+
+        return deduped_pages
+
+    def summarize(self, pages):
+        print("#####################################################")
+        print("# Summarize Youtube transcripts")
+        print("#####################################################")
+        print(f"Number of pages: {len(pages)}")
+        llm_agent = LLMAgentSummary()
+        llm_agent.init_prompt()
+        llm_agent.init_llm()
+
+        redis_url = os.getenv("BOT_REDIS_URL")
+        redis_conn = utils.redis_conn(redis_url)
+        redis_key_expire_time = os.getenv("BOT_REDIS_KEY_EXPIRE_TIME", 604800)
+
+        summarized_pages = []
+
+        for page in pages:
+            title = page["title"]
+            page_id = page["id"]
+            content = page["__transcript"]
+            source_url = page["source_url"]
+            print(f"Summarying page, title: {title}, source_url: {source_url}")
+            print(f"Page content ({len(content)} chars): {content}")
+
+            st = time.time()
+
+            summary_key = data_model.NOTION_SUMMARY_ITEM_ID.format(
+                "youtube", "default", page_id)
+
+            llm_summary_resp = utils.redis_get(redis_conn, summary_key)
+
+            if not llm_summary_resp:
+                # Double check the content, if empty, load it from
+                # the source url
+                if not content:
+                    print(f"[ERROR] Empty Youtube transcript loaded via WebBaseLoader, title: {title}, source_url: {source_url}, skip it")
+                    continue
+
+                summary = llm_agent.run(content)
+
+                print(f"Cache llm response for {redis_key_expire_time}s, key: {summary_key}, summary: {summary}")
+                utils.redis_set(
+                    redis_conn,
+                    summary_key,
+                    summary,
+                    expire_time=int(redis_key_expire_time))
+
+            else:
+                print("Found llm summary from cache, decoding (utf-8) ...")
+                summary = utils.bytes2str(llm_summary_resp)
+
+            # assemble summary into page
+            summarized_page = copy.deepcopy(page)
+            summarized_page["__summary"] = summary
+
+            print(f"Used {time.time() - st:.3f}s, Summarized page_id: {page_id}, summary: {summary}")
+            summarized_pages.append(summarized_page)
+
+        return summarized_pages
+
+    def rank(self, pages):
+        """
+        Rank page summary (not the entire content)
+        """
+        print("#####################################################")
+        print("# Rank Youtubes")
+        print("#####################################################")
+        print(f"Number of pages: {len(pages)}")
+
+        llm_agent = LLMAgentCategoryAndRanking()
+        llm_agent.init_prompt()
+        llm_agent.init_llm()
+
+        redis_url = os.getenv("BOT_REDIS_URL")
+        redis_conn = utils.redis_conn(redis_url)
+        redis_key_expire_time = os.getenv("BOT_REDIS_KEY_EXPIRE_TIME", 604800)
+
+        # array of ranged pages
+        ranked = []
+
+        for page in pages:
+            title = page["title"]
+            page_id = page["id"]
+            text = page["__summary"]
+            print(f"Ranking page, title: {title}")
+
+            # Let LLM to category and rank
+            st = time.time()
+
+            ranking_key = data_model.NOTION_RANKING_ITEM_ID.format(
+                "youtube", "default", page_id)
+
+            llm_ranking_resp = utils.redis_get(redis_conn, ranking_key)
+
+            category_and_rank_str = None
+
+            if not llm_ranking_resp:
+                print("Not found category_and_rank_str in cache, fallback to llm_agent to rank")
+                category_and_rank_str = llm_agent.run(text)
+
+                print(f"Cache llm response for {redis_key_expire_time}s, key: {ranking_key}")
+                utils.redis_set(
+                    redis_conn,
+                    ranking_key,
+                    category_and_rank_str,
+                    expire_time=int(redis_key_expire_time))
+
+            else:
+                print("Found category_and_rank_str from cache")
+                category_and_rank_str = utils.bytes2str(llm_ranking_resp)
+
+            print(f"Used {time.time() - st:.3f}s, Category and Rank: text: {text}, rank_resp: {category_and_rank_str}")
+
+            category_and_rank = utils.fix_and_parse_json(category_and_rank_str)
+            print(f"LLM ranked result (json parsed): {category_and_rank}")
+
+            # Parse LLM response and assemble category and rank
+            ranked_page = copy.deepcopy(page)
+
+            if not category_and_rank:
+                print("[ERROR] Cannot parse json string, assign default rating -0.01")
+                ranked_page["__topics"] = []
+                ranked_page["__categories"] = []
+                ranked_page["__rate"] = -0.01
+            else:
+                ranked_page["__topics"] = [(x["topic"], x.get("score") or 1) for x in category_and_rank["topics"]]
+                ranked_page["__categories"] = [(x["category"], x.get("score") or 1) for x in category_and_rank["topics"]]
+                ranked_page["__rate"] = category_and_rank["overall_score"]
+                ranked_page["__feedback"] = category_and_rank.get("feedback") or ""
+
+            ranked.append(ranked_page)
+
+        print(f"Ranked pages: {ranked}")
+        return ranked
+
+    def push(self, ranked_data, targets, topk=3):
+        print("#####################################################")
+        print("# Push Youtubes")
+        print("#####################################################")
+        print(f"Number of pages: {len(ranked_data)}")
+        print(f"Targets: {targets}")
+        print(f"Top-K: {topk}")
+        print(f"input data: {ranked_data}")
+
+        for target in targets:
+            print(f"Pushing data to target: {target} ...")
+
+            if target == "notion":
+                notion_api_key = os.getenv("NOTION_TOKEN")
+                notion_agent = NotionAgent(notion_api_key)
+
+                database_id = os.getenv("NOTION_DATABASE_ID_TOREAD")
+
+                for ranked_page in ranked_data:
+                    try:
+                        page_id = ranked_page["id"]
+                        title = ranked_page["title"]
+                        print(f"Pushing page, title: {title}")
+
+                        topics = ranked_page["__topics"]
+                        topics_topk = utils.get_top_items(topics, topk)
+                        topics_topk = [x[0].replace(",", " ") for x in topics_topk]
+
+                        categories = ranked_page["__categories"]
+                        categories_topk = utils.get_top_items(categories, topk)
+                        categories_topk = [x[0].replace(",", " ") for x in categories_topk]
+
+                        rating = ranked_page["__rate"]
+
+                        notion_agent.createDatabaseItem_ToRead_Youtube(
+                            database_id,
+                            ranked_page,
+                            topics_topk,
+                            categories_topk,
+                            rating)
+
+                        created_time = ranked_page["created_time"]
+                        self.markVisited(page_id, source="youtube", list_name="default")
+                        self.updateCreatedTime(created_time, source="youtube", list_name="default")
+
+                    except Exception as e:
+                        print(f"[ERROR]: Push to notion failed, skip: {e}")
+                        traceback.print_exc()
+
+            else:
+                print(f"[ERROR]: Unknown target {target}, skip")

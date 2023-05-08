@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from tweets import TwitterAgent
 from ops_article import OperatorArticle
+from ops_youtube import OperatorYoutube
 import utils
 
 
@@ -21,7 +22,7 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default="twitter,article")
+                    default="twitter,article,youtube")
 parser.add_argument("--pulling-count", help="pulling count",
                     default=5)
 parser.add_argument("--pulling-interval", help="pulling interval (s)",
@@ -95,6 +96,27 @@ def save_article(args, op, data):
     op.save2json(args.data_folder, args.run_id, data)
 
 
+def pull_youtube(args, op):
+    """
+    Pull from inbox - youtube
+    """
+    print("######################################################")
+    print("# Pull from Inbox - Articles")
+    print("######################################################")
+    print(f"environment: {os.environ}")
+
+    database_id = os.getenv("NOTION_DATABASE_ID_YOUTUBE_INBOX")
+    data = op.pull(database_id)
+    return data
+
+
+def save_youtube(args, op, data):
+    print("######################################################")
+    print("# Save Youtube transcripts to json file")
+    print("######################################################")
+    op.save2json(args.data_folder, args.run_id, data)
+
+
 def run(args):
     sources = args.sources.split(",")
 
@@ -109,6 +131,11 @@ def run(args):
             op = OperatorArticle()
             data = pull_article(args, op)
             save_article(args, op, data)
+
+        elif source == "youtube":
+            op = OperatorYoutube()
+            data = pull_youtube(args, op)
+            save_youtube(args, op, data)
 
 
 if __name__ == "__main__":

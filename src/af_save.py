@@ -13,6 +13,7 @@ from notion import NotionAgent
 from llm_agent import LLMAgentCategoryAndRanking
 
 from ops_article import OperatorArticle
+from ops_youtube import OperatorYoutube
 
 
 parser = argparse.ArgumentParser()
@@ -27,7 +28,7 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default="twitter")
+                    default="twitter,article,youtube")
 parser.add_argument("--targets", help="targets to push, comma separated",
                     default="notion")
 parser.add_argument("--topics-top-k", help="pick top-k topics to push",
@@ -172,7 +173,7 @@ def tweets_category_and_rank(args, data):
             st = time.time()
 
             ranking_key = data_model.NOTION_RANKING_ITEM_ID.format(
-                    "twitter", list_name, tweet["tweet_id"])
+                "twitter", list_name, tweet["tweet_id"])
 
             llm_ranking_resp = utils.redis_get(redis_conn, ranking_key)
 
@@ -184,10 +185,10 @@ def tweets_category_and_rank(args, data):
 
                 print(f"Cache llm response for {redis_key_expire_time}s, key: {ranking_key}")
                 utils.redis_set(
-                        redis_conn,
-                        ranking_key,
-                        category_and_rank_str,
-                        expire_time=int(redis_key_expire_time))
+                    redis_conn,
+                    ranking_key,
+                    category_and_rank_str,
+                    expire_time=int(redis_key_expire_time))
 
             else:
                 print("Found category_and_rank_str from cache")
@@ -280,11 +281,11 @@ def push_to_read(args, data):
                 for ranked_tweet in tweets:
                     try:
                         _push_to_read_notion(
-                                args,
-                                notion_agent,
-                                database_id,
-                                list_name,
-                                ranked_tweet)
+                            args,
+                            notion_agent,
+                            database_id,
+                            list_name,
+                            ranked_tweet)
 
                     except Exception as e:
                         print(f"[ERROR]: Push to notion failed, skip: {e}")
@@ -346,6 +347,21 @@ def process_article(args):
     op.push(data_ranked, targets)
 
 
+def process_youtube(args):
+    print("#####################################################")
+    print("# Process Youtube")
+    print("#####################################################")
+    op = OperatorYoutube()
+
+    data = op.readFromJson(args.data_folder, args.run_id)
+    data_deduped = op.dedup(data, target="toread")
+    data_summarized = op.summarize(data_deduped)
+    data_ranked = op.rank(data_summarized)
+
+    targets = args.targets.split(",")
+    op.push(data_ranked, targets)
+
+
 def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
@@ -369,6 +385,9 @@ def run(args):
 
         elif source == "article":
             process_article(args)
+
+        elif source == "youtube":
+            process_youtube(args)
 
 
 if __name__ == "__main__":

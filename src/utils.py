@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime
+from operator import itemgetter
 
 import redis
 
@@ -108,3 +109,11 @@ def parseDataFromIsoFormat(dt: str):
     @return datetime object
     """
     return datetime.fromisoformat(dt.replace('Z', '+00:00'))
+
+
+def get_top_items(items: list, k=3):
+    """
+    items: [(name, score), ...]
+    """
+    tops = sorted(items, key=itemgetter(1), reverse=True)
+    return tops[:k]

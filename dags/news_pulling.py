@@ -70,7 +70,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder="data" '
-        '--sources={{ dag_run.conf.setdefault("sources", "twitter,article") }} ',
+        '--sources={{ dag_run.conf.setdefault("sources", "twitter,article,youtube") }} ',
     )
 
     t4 = BashOperator(
@@ -81,7 +81,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder="data" '
-        '--sources={{ dag_run.conf.setdefault("sources", "twitter") }} '
+        '--sources={{ dag_run.conf.setdefault("sources", "twitter,article,youtube") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "notion") }} ',
     )
 
