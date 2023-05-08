@@ -619,7 +619,6 @@ class NotionAgent:
         """
         summary = ranked_page["__summary"]
         preview_content = summary[:100] + "..."
-        print(f"[notion] push page, summary: {summary}, preview: {preview_content}")
 
         created_time_pdt = utils.convertUTC2PDT_str(ranked_page["created_time"])
 
@@ -627,6 +626,12 @@ class NotionAgent:
         # the URL directly, not the title, here we use extracted title
         # first, if empty, fallback to the notion page title
         title = ranked_page["__title"] or ranked_page['title']
+
+        # Notes: if source_url is empty, fallback to
+        # notion page title (it could be the url)
+        source_url = ranked_page["source_url"] or ranked_page["title"]
+
+        print(f"[notion] push page, title: {title}, summary: {summary}, preview: {preview_content}, source_url: {source_url}")
 
         properties = {
             "Name": {
@@ -652,10 +657,10 @@ class NotionAgent:
                         "text": {
                             "content": preview_content,
                             "link": {
-                                "url": ranked_page["source_url"],
+                                "url": source_url,
                             }
                         },
-                        "href": ranked_page["source_url"],
+                        "href": source_url,
                     },
                 ]
             },
@@ -685,9 +690,7 @@ class NotionAgent:
                 "video": {
                     "type": "external",
                     "external": {
-                        # Notes: if source_url is empty, fallback to
-                        # notion page title (it could be the url)
-                        "url": ranked_page["source_url"] or ranked_page["title"],
+                        "url": source_url,
                     },
                 }
             },
