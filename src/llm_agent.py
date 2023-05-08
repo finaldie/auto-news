@@ -49,7 +49,7 @@ class LLMYoutubeLoader:
 
         except Exception as e:
             print(f"[ERROR] LLMYoutubeLoader load transcript failed: {e}")
-            traceback.print_exc()
+            # traceback.print_exc()
 
         return docs
 
