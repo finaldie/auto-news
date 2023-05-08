@@ -573,7 +573,7 @@ class NotionAgent:
         }
 
         # put summary content
-        block_content = f"{summary}"
+        block_content = f"Summary: {summary}"
 
         blocks = [
             {
@@ -658,7 +658,7 @@ class NotionAgent:
                         {
                             "type": "text",
                             "text": {
-                                "content": summary,
+                                "content": f"Summary: {summary}",
                             }
                         }
                     ]
