@@ -799,13 +799,9 @@ class NotionAgent:
         categories_list = [{"name": c} for c in categories]
 
         properties["Source"] = {
-            "rich_text": [
-                {
-                    "text": {
-                        "content": "Twitter"
-                    }
-                }
-            ]
+            "select": {
+                "name": "Twitter",
+            }
         }
 
         properties.update({"Topic": {
@@ -865,13 +861,9 @@ class NotionAgent:
         categories_list = [{"name": c} for c in categories]
 
         properties.update({"Source": {
-            "rich_text": [
-                {
-                    "text": {
-                        "content": ranked_page["source"],
-                    }
-                }
-            ]
+            "select": {
+                "name": ranked_page["source"],
+            }
         }})
 
         properties.update({"Topic": {
