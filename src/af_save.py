@@ -35,6 +35,8 @@ parser.add_argument("--topics-top-k", help="pick top-k topics to push",
                     default=3)
 parser.add_argument("--categories-top-k", help="pick top-k categories to push",
                     default=3)
+parser.add_argument("--dedup", help="whether dedup item",
+                    default=True)
 
 
 def retrieve_twitter(args):
@@ -349,12 +351,16 @@ def process_article(args):
 
 def process_youtube(args):
     print("#####################################################")
-    print("# Process Youtube")
+    print(f"# Process Youtube, dedup: {args.dedup}")
     print("#####################################################")
     op = OperatorYoutube()
 
     data = op.readFromJson(args.data_folder, args.run_id, "youtube.json")
-    data_deduped = op.dedup(data, target="toread")
+    data_deduped = data
+    need_dedup = utils.str2bool(args.dedup)
+    if need_dedup:
+        data_deduped = op.dedup(data, target="toread")
+
     data_summarized = op.summarize(data_deduped)
     data_ranked = op.rank(data_summarized)
 
