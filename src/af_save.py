@@ -360,6 +360,8 @@ def process_youtube(args):
     need_dedup = utils.str2bool(args.dedup)
     if need_dedup:
         data_deduped = op.dedup(data, target="toread")
+    else:
+        data_deduped = [x for x in data.values()]
 
     data_summarized = op.summarize(data_deduped)
     data_ranked = op.rank(data_summarized)
