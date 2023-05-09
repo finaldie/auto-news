@@ -141,27 +141,27 @@ def get_top_items(items: list, k=3):
     return tops[:k]
 
 
-def urlGet(url):
+def urlGet(url, timeout=3):
     if not url:
         return False, {}
 
     try:
-        resp = requests.get(url)
+        resp = requests.get(url, timeout=timeout)
         return True, resp
     except Exception as e:
         print(f"[ERROR] urlGet failed: {e}")
         return False, {}
 
 
-def urlHead(url, allow_redirects=True):
+def urlHead(url, timeout=3, allow_redirects=True):
     if not url:
         return False, {}
 
     try:
-        resp = requests.head(url, allow_redirects)
+        resp = requests.head(url, timeout=timeout, allow_redirects=allow_redirects)
         return True, resp
     except Exception as e:
-        print(f"[ERROR] urlGet failed: {e}")
+        print(f"[ERROR] urlHead failed: {e}")
         return False, {}
 
 
