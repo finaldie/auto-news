@@ -152,6 +152,9 @@ class LLMAgentSummary(LLMAgentBase):
             print("[LLM] Empty input text, return empty summary")
             return ""
 
+        tokens = self.llm.get_num_tokens(text)
+        print(f"[LLM] tokens needed: {tokens}")
+
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap
