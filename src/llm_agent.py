@@ -115,7 +115,7 @@ class LLMAgentSummary(LLMAgentBase):
 
     def init_prompt(self, map_prompt=None, combine_prompt=None):
         self.map_prompt = map_prompt
-        self.combine_prompt = combine_prompt or llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2
+        self.combine_prompt = combine_prompt or llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT
 
     def init_llm(
         self,
