@@ -15,6 +15,7 @@ Reponse format:
 Double check before respond, ensure the response can be parsed by Python json.loads. The content is {content}
 """
 
+
 LLM_PROMPT_CATEGORY_AND_RANKING_TPL2 = """
 As an AI content reviewer, I need to assess the quality and categorize the user input text.
 
@@ -42,4 +43,23 @@ Reponse format:
 Double check before responding, ensure the response can be parsed by Python json.loads and the score calculation is correct.
 
 The user input text: {content}
+"""
+
+
+LLM_PROMPT_SUMMARY_COMBINE_PROMPT = """
+Write a concise summary of the following text delimited by triple backquotes.
+Return your response in numbered list which covers the key points of the text and ensure that a 5 year old would understand.
+
+```{text}```
+NUMBERED LIST SUMMARY:
+"""
+
+
+# With translation
+LLM_PROMPT_SUMMARY_COMBINE_PROMPT2 = """
+Write a concise summary of the following text delimited by triple backquotes.
+Return your response in numbered list which covers the key points of the text and ensure that a 5 year old would understand.
+
+```{text}```
+NUMBERED LIST SUMMARY IN BOTH ENGLISH AND CHINESE, AFTER FINISHING ALL ENGLISH PART, THEN FOLLOW BY CHINESE PART:
 """

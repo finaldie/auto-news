@@ -113,8 +113,9 @@ class LLMAgentSummary(LLMAgentBase):
     def __init__(self, api_key="", model_name="gpt-3.5-turbo"):
         super().__init__(api_key, model_name)
 
-    def init_prompt(self, prompt=None):
-        self.user_prompt = prompt
+    def init_prompt(self, map_prompt=None, combine_prompt=None):
+        self.map_prompt = map_prompt
+        self.combine_prompt = combine_prompt or llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2
 
     def init_llm(
         self,
@@ -133,6 +134,7 @@ class LLMAgentSummary(LLMAgentBase):
         self.llm = llm
         self.llmchain = load_summarize_chain(
             self.llm,
+            combine_prompt=self.combine_prompt,
             chain_type=chain_type,
             verbose=verbose)
 
@@ -141,8 +143,8 @@ class LLMAgentSummary(LLMAgentBase):
     def run(
         self,
         text: str,
-        chunk_size=1024,
-        chunk_overlap=0,
+        chunk_size=2048,
+        chunk_overlap=256,
     ):
         print(f"[LLM] input text ({len(text)} chars): {text}")
 
