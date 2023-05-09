@@ -461,14 +461,7 @@ class NotionAgent:
                 "object": "block",
                 "type": "paragraph",
                 "paragraph": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "text": {
-                                "content": block_content
-                            }
-                        }
-                    ]
+                    "rich_text": self._createBlock_RichText(block_content)
                 }
             }
         ]
@@ -510,6 +503,7 @@ class NotionAgent:
                 })
 
             # print(f"reply_tweet.url: {tweet['reply_embed']}")
+
         elif tweet['reply_deleted']:
             blocks.append({
                 "object": "block",
@@ -519,7 +513,7 @@ class NotionAgent:
                         {
                             "type": "text",
                             "text": {
-                                "content": f"Reply-to: @{tweet['reply_to_screen_name']}: Tweet has been deleted",
+                                "content": f"Reply-to: @{tweet['reply_to_screen_name']}: Tweet has been deleted / hidden :(",
                                 "link": tweet["reply_url"],
                             },
                             "href": tweet["reply_url"],
@@ -586,20 +580,13 @@ class NotionAgent:
                 "object": "block",
                 "type": "paragraph",
                 "paragraph": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "text": {
-                                "content": block_content
-                            }
-                        }
-                    ]
+                    "rich_text": self._createBlock_RichText(block_content)
                 }
             }
         ]
 
         if summary_trans:
-            blocks.append(self._createToggleBlock(
+            blocks.append(self._createBlock_Toggle(
                 "Translation", summary_trans))
 
         # append orginal notion url
@@ -683,20 +670,13 @@ class NotionAgent:
                 "object": "block",
                 "type": "paragraph",
                 "paragraph": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "text": {
-                                "content": block_content,
-                            }
-                        }
-                    ]
+                    "rich_text": self._createBlock_RichText(block_content)
                 }
             },
         ]
 
         if summary_trans:
-            blocks.append(self._createToggleBlock(
+            blocks.append(self._createBlock_Toggle(
                 "Translation", summary_trans))
 
         blocks.append({
@@ -736,7 +716,42 @@ class NotionAgent:
 
         return new_page
 
-    def _createToggleBlock(self, title, content):
+    def _createBlock_RichText(self, text, chunk_size=1900):
+        """
+        Each rich text content must be <= 2000, use 1900 to be safer
+        """
+        arr = text.split("\n")
+        cur_size = 0
+        cur_text = []
+        rich_texts = []
+
+        for i in range(len(arr)):
+            new_size = cur_size + len(arr[i])
+
+            if new_size <= chunk_size:
+                cur_size += len(arr[i])
+                cur_text.append(arr[i])
+            else:
+                rich_texts.append({
+                    "text": {
+                        "content": "\n".join(cur_text)
+                    },
+                })
+
+                # reset to arr[i]
+                cur_text = [arr[i]]
+                cur_size = len(arr[i])
+
+        # append last
+        rich_texts.append({
+            "text": {
+                "content": "\n".join(cur_text)
+            },
+        })
+
+        return rich_texts
+
+    def _createBlock_Toggle(self, title, content):
         return {
             "type": "toggle",
 
@@ -744,6 +759,7 @@ class NotionAgent:
                 "rich_text": [{
                     "type": "text",
                     "text": {
+                        # This is usually very short
                         "content": title,
                     }
                 }],
@@ -752,12 +768,7 @@ class NotionAgent:
                 "children": [{
                     "type": "paragraph",
                     "paragraph": {
-                        "rich_text": [{
-                            "type": "text",
-                            "text": {
-                                "content": content,
-                            }
-                        }],
+                        "rich_text": self._createBlock_RichText(content)
                     }
                 }]
             }
