@@ -148,3 +148,24 @@ def urlUnshorten(url):
         url = resp.url
 
     return url
+
+
+def splitSummaryTranslation(text):
+    """
+    Split summary and its translation into two parts
+    Format:
+    ```
+    summary english
+
+    summary other language
+    ```
+    """
+    if not text:
+        return text, ""
+
+    res = text.split("\n")
+
+    summary = res[0]
+    translation = res[1] if len(res) >= 2 else ""
+
+    return summary, translation

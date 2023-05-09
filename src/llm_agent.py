@@ -115,7 +115,13 @@ class LLMAgentSummary(LLMAgentBase):
 
     def init_prompt(self, map_prompt=None, combine_prompt=None):
         self.map_prompt = map_prompt
-        self.combine_prompt = combine_prompt or llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT
+        self.combine_prompt = combine_prompt or llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2
+
+        self.combine_prompt_tpl = PromptTemplate(
+            template=self.combine_prompt,
+            input_variables=["text"])
+
+        print(f"[LLMAgentSummary] Initialized prompt: {self.combine_prompt_tpl}")
 
     def init_llm(
         self,
@@ -134,11 +140,11 @@ class LLMAgentSummary(LLMAgentBase):
         self.llm = llm
         self.llmchain = load_summarize_chain(
             self.llm,
-            combine_prompt=self.combine_prompt,
+            combine_prompt=self.combine_prompt_tpl,
             chain_type=chain_type,
             verbose=verbose)
 
-        print(f"LLM chain initalized, model_name: {model_name}, temperature: {temperature}, chain_type: {chain_type}")
+        print(f"[LLMAgentSummary] LLM chain initalized, model_name: {model_name}, temperature: {temperature}, chain_type: {chain_type}")
 
     def run(
         self,

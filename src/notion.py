@@ -578,7 +578,8 @@ class NotionAgent:
         }
 
         # put summary content
-        block_content = f"Summary:\n{summary}"
+        summary_en, summary_trans = utils.splitSummaryTranslation(summary)
+        block_content = f"Summary:\n{summary_en}"
 
         blocks = [
             {
@@ -596,6 +597,10 @@ class NotionAgent:
                 }
             }
         ]
+
+        if summary_trans:
+            blocks.append(self._createToggleBlock(
+                "Translation", summary_trans))
 
         # append orginal notion url
         blocks.append({
@@ -669,6 +674,9 @@ class NotionAgent:
             },
         }
 
+        summary_en, summary_trans = utils.splitSummaryTranslation(summary)
+        block_content = f"Summary:\n{summary_en}"
+
         blocks = [
             # put summary content
             {
@@ -679,25 +687,28 @@ class NotionAgent:
                         {
                             "type": "text",
                             "text": {
-                                "content": f"Summary:\n{summary}",
+                                "content": block_content,
                             }
                         }
                     ]
                 }
             },
-
-            # append external video
-            {
-                "object": "block",
-                "type": "video",
-                "video": {
-                    "type": "external",
-                    "external": {
-                        "url": source_url,
-                    },
-                }
-            },
         ]
+
+        if summary_trans:
+            blocks.append(self._createToggleBlock(
+                "Translation", summary_trans))
+
+        blocks.append({
+            "object": "block",
+            "type": "video",
+            "video": {
+                "type": "external",
+                "external": {
+                    "url": source_url,
+                },
+            }
+        })
 
         return properties, blocks
 
@@ -724,6 +735,33 @@ class NotionAgent:
             children=blocks)
 
         return new_page
+
+    def _createToggleBlock(self, title, content):
+        return {
+            "type": "toggle",
+
+            "toggle": {
+                "rich_text": [{
+                    "type": "text",
+                    "text": {
+                        "content": title,
+                    }
+                }],
+
+                "color": "default",
+                "children": [{
+                    "type": "paragraph",
+                    "paragraph": {
+                        "rich_text": [{
+                            "type": "text",
+                            "text": {
+                                "content": content,
+                            }
+                        }],
+                    }
+                }]
+            }
+        }
 
     def createDatabaseItem_ToRead(
         self,
