@@ -107,6 +107,8 @@ def pull_youtube(args, op):
 
     database_id = os.getenv("NOTION_DATABASE_ID_YOUTUBE_INBOX")
     data = op.pull(database_id)
+
+    print(f"Pulled {len(data.keys())} youtube videos")
     return data
 
 
