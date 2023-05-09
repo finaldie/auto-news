@@ -153,11 +153,24 @@ def urlGet(url):
         return False, {}
 
 
+def urlHead(url, allow_redirects=True):
+    if not url:
+        return False, {}
+
+    try:
+        resp = requests.head(url, allow_redirects)
+        return True, resp
+    except Exception as e:
+        print(f"[ERROR] urlGet failed: {e}")
+        return False, {}
+
+
 def urlUnshorten(url):
     if not url:
         return url
 
-    ok, resp = urlGet(url)
+    # Fetch the metadata only (without body)
+    ok, resp = urlHead(url, allow_redirects=True)
     if ok:
         url = resp.url
 
