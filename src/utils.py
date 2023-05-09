@@ -5,6 +5,7 @@ from operator import itemgetter
 
 import redis
 import pytz
+import requests
 
 
 def gen_filename(data_folder, filename):
@@ -124,3 +125,26 @@ def get_top_items(items: list, k=3):
     """
     tops = sorted(items, key=itemgetter(1), reverse=True)
     return tops[:k]
+
+
+def urlGet(url):
+    if not url:
+        return False, {}
+
+    try:
+        resp = requests.get(url)
+        return True, resp
+    except Exception as e:
+        print(f"[ERROR] urlGet failed: {e}")
+        return False, {}
+
+
+def urlUnshorten(url):
+    if not url:
+        return url
+
+    ok, resp = urlGet(url)
+    if ok:
+        url = resp.url
+
+    return url

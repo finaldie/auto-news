@@ -478,7 +478,7 @@ class NotionAgent:
             blocks.append({
                 "type": "embed",
                 "embed": {
-                    "url": tweet['embed']
+                    "url": utils.urlUnshorten(tweet['embed'])
                 }
             })
 
@@ -505,7 +505,7 @@ class NotionAgent:
                 blocks.append({
                     "type": "embed",
                     "embed": {
-                        "url": tweet['reply_embed']
+                        "url": utils.urlUnshorten(tweet['reply_embed'])
                     }
                 })
 
