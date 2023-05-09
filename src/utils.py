@@ -163,7 +163,7 @@ def splitSummaryTranslation(text):
     if not text:
         return text, ""
 
-    res = text.split("\n")
+    res = text.split("\n\n")
 
     summary = res[0]
     translation = res[1] if len(res) >= 2 else ""

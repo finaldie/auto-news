@@ -40,7 +40,7 @@ with DAG(
     'news_pulling',
     default_args=default_args,
     max_active_runs=1,
-    description='news pulling, config: {}',
+    description='news pulling, config: {"source": "twitter,article,youtube", "targets": "twitter,article,youtube"}',
     schedule_interval=timedelta(minutes=60),
     # schedule_interval=None,
     start_date=days_ago(0),
