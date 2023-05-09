@@ -514,9 +514,9 @@ class NotionAgent:
                             "type": "text",
                             "text": {
                                 "content": f"Reply-to: @{tweet['reply_to_screen_name']}: Tweet has been deleted / hidden :(",
-                                "link": tweet["reply_url"],
+                                # "link": tweet["reply_url"],
                             },
-                            "href": tweet["reply_url"],
+                            # "href": tweet["reply_url"],
                         }
                     ]
                 }
