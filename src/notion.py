@@ -749,6 +749,9 @@ class NotionAgent:
             },
         })
 
+        if len(rich_texts) > 1:
+            print(f"[notion._createBlock_RichText]: chunked rich text content into {len(rich_texts)} chunks")
+
         return rich_texts
 
     def _createBlock_Toggle(self, title, content):
