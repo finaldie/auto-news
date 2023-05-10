@@ -24,7 +24,7 @@ parser.add_argument("--data-folder", help="data folder to save",
 parser.add_argument("--sources", help="sources to pull, comma separated",
                     default="twitter,article,youtube")
 parser.add_argument("--pulling-count", help="pulling count",
-                    default=5)
+                    default=3)
 parser.add_argument("--pulling-interval", help="pulling interval (s)",
                     default=0.1)
 
