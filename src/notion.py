@@ -397,7 +397,6 @@ class NotionAgent:
         # assemble list name(s), sub-category of source, e.g.
         # The content from twitter and AI list
         source_list_names = [{"name": ln} for ln in list_names]
-        tweet_url = f"https://twitter.com/{tweet['screen_name']}/status/{tweet['tweet_id']}"
 
         preview_content = tweet['text']
         if tweet["retweeted"]:
@@ -431,19 +430,19 @@ class NotionAgent:
                 }
             },
 
-            "Preview": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": preview_content,
-                            "link": {
-                                "url": tweet_url,
-                            }
-                        },
-                        "href": tweet_url,
-                    },
-                ]
-            },
+            # "Preview": {
+            #     "rich_text": [
+            #         {
+            #             "text": {
+            #                 "content": preview_content,
+            #                 "link": {
+            #                     "url": tweet_url,
+            #                 }
+            #             },
+            #             "href": tweet_url,
+            #         },
+            #     ]
+            # },
 
             "List Name": {
                 "multi_select": source_list_names,
@@ -522,6 +521,23 @@ class NotionAgent:
                 }
             })
 
+        # In the bottom, append the original tweet link
+        blocks.append({
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": "Tweet link",
+                            "link": tweet["url"],
+                        },
+                        "href": tweet["url"],
+                    },
+                ],
+            }
+        })
+
         return properties, blocks
 
     def _createDatabaseItem_ArticleBase(self, ranked_page):
@@ -556,19 +572,19 @@ class NotionAgent:
                 }
             },
 
-            "Preview": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": preview_content,
-                            "link": {
-                                "url": ranked_page["source_url"],
-                            }
-                        },
-                        "href": ranked_page["source_url"],
-                    },
-                ]
-            },
+            # "Preview": {
+            #     "rich_text": [
+            #         {
+            #             "text": {
+            #                 "content": preview_content,
+            #                 "link": {
+            #                     "url": ranked_page["source_url"],
+            #                 }
+            #             },
+            #             "href": ranked_page["source_url"],
+            #         },
+            #     ]
+            # },
         }
 
         # put summary content
@@ -646,19 +662,19 @@ class NotionAgent:
                 }
             },
 
-            "Preview": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": preview_content,
-                            "link": {
-                                "url": source_url,
-                            }
-                        },
-                        "href": source_url,
-                    },
-                ]
-            },
+            # "Preview": {
+            #     "rich_text": [
+            #         {
+            #             "text": {
+            #                 "content": preview_content,
+            #                 "link": {
+            #                     "url": source_url,
+            #                 }
+            #             },
+            #             "href": source_url,
+            #         },
+            #     ]
+            # },
         }
 
         summary_en, summary_trans = utils.splitSummaryTranslation(summary)
