@@ -39,7 +39,6 @@ class OperatorArticle(OperatorBase):
         redis_url = os.getenv("BOT_REDIS_URL")
         redis_conn = utils.redis_conn(redis_url)
 
-
         created_time_tpl = data_model.NOTION_INBOX_CREATED_TIME_KEY
         redis_key = created_time_tpl.format("article", "default")
 
@@ -52,9 +51,7 @@ class OperatorArticle(OperatorBase):
 
         # 2. get inbox database indexes
         db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
-        db_pages = notion_agent.queryDatabaseIndex_Inbox(
-            db_index_id, "Article")
-
+        db_pages = self._get_inbox_database_id(db_index_id, "Article")
         print(f"The database pages founded: {db_pages}")
 
         # 2. get latest two databases and collect items by created_time

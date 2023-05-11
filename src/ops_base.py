@@ -8,6 +8,14 @@ class OperatorBase:
     """
     Operator Base class
     """
+
+    def _get_inbox_database_id(self, db_index_id, source):
+        db_pages = notion_agent.queryDatabaseIndex_Inbox(
+            db_index_id, source)
+
+        print(f"The database pages founded: {db_pages}")
+        return db_pages
+
     def pull(self):
         return None
 
