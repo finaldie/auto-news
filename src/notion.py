@@ -618,30 +618,7 @@ class NotionAgent:
             },
         }
 
-        block_content = f"{tweet['name']}"
-        if tweet["retweeted"]:
-            block_content += " (Retweeted)"
-
-        block_content += f": {tweet['text']}"
-
-        blocks = [
-            {
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": self._createBlock_RichText(block_content)
-                }
-            }
-        ]
-
-        # append embeded content (if have)
-        if tweet['embed']:
-            blocks.append({
-                "type": "embed",
-                "embed": {
-                    "url": utils.urlUnshorten(tweet['embed'])
-                }
-            })
+        blocks = []
 
         if tweet['reply_text']:
             blocks.append({
@@ -687,6 +664,30 @@ class NotionAgent:
                             # "href": tweet["reply_url"],
                         }
                     ]
+                }
+            })
+
+        # Append author's tweet
+        block_content = f"{tweet['name']}"
+        if tweet["retweeted"]:
+            block_content += " (Retweeted)"
+
+        block_content += f": {tweet['text']}"
+
+        blocks.append({
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": self._createBlock_RichText(block_content)
+            }
+        })
+
+        # append embeded content (if have)
+        if tweet['embed']:
+            blocks.append({
+                "type": "embed",
+                "embed": {
+                    "url": utils.urlUnshorten(tweet['embed'])
                 }
             })
 
