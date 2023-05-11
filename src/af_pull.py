@@ -58,8 +58,7 @@ def pull_article(args, op):
     print("######################################################")
     print(f"environment: {os.environ}")
 
-    database_id = os.getenv("NOTION_DATABASE_ID_ARTICLE_INBOX")
-    data = op.pull(database_id)
+    data = op.pull()
     return data
 
 
@@ -79,8 +78,7 @@ def pull_youtube(args, op):
     print("######################################################")
     print(f"environment: {os.environ}")
 
-    database_id = os.getenv("NOTION_DATABASE_ID_YOUTUBE_INBOX")
-    data = op.pull(database_id)
+    data = op.pull()
 
     print(f"Pulled {len(data.keys())} youtube videos")
     return data

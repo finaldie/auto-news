@@ -190,7 +190,10 @@ class OperatorTwitter(OperatorBase):
                 notion_api_key = os.getenv("NOTION_TOKEN")
                 notion_agent = NotionAgent(notion_api_key)
 
-                database_id = os.getenv("NOTION_DATABASE_ID_TOREAD")
+                # Get the latest toread database id from index db
+                db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+                database_id = utils.get_notion_database_id_toread(
+                        notion_agent, db_index_id)
 
                 for list_name, tweets in data.items():
                     for ranked_tweet in tweets:

@@ -199,7 +199,6 @@ def splitSummaryTranslation(text):
 
 
 def get_notion_database_id_inbox(
-    self,
     notion_agent,
     db_index_id,
     source
@@ -211,7 +210,7 @@ def get_notion_database_id_inbox(
     return db_pages
 
 
-def get_notion_database_id_toread(self, notion_agent, db_index_id):
+def get_notion_database_id_toread(notion_agent, db_index_id):
     db_pages = notion_agent.queryDatabaseIndex_ToRead(db_index_id)
 
     print(f"Query index db (toread): {db_index_id}, the database pages founded: {db_pages}")

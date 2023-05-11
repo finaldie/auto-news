@@ -57,7 +57,7 @@ class OperatorYoutube(OperatorBase):
 
         return content, metadata
 
-    def pull(self, database_id):
+    def pull(self):
         print("#####################################################")
         print("# Pulling Youtube video transcripts")
         print("#####################################################")
@@ -313,7 +313,10 @@ class OperatorYoutube(OperatorBase):
                 notion_api_key = os.getenv("NOTION_TOKEN")
                 notion_agent = NotionAgent(notion_api_key)
 
-                database_id = os.getenv("NOTION_DATABASE_ID_TOREAD")
+                # Get the latest toread database id from index db
+                db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+                database_id = utils.get_notion_database_id_toread(
+                        notion_agent, db_index_id)
 
                 for ranked_page in ranked_data:
                     try:
