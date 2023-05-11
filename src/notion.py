@@ -699,6 +699,9 @@ class NotionAgent:
                     {
                         "text": {
                             "content": "Tweet link",
+                            "link": {
+                                "url": tweet["url"],
+                            },
                         },
                         "href": tweet["url"],
                     },
