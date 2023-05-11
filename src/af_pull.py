@@ -91,6 +91,7 @@ def save_youtube(args, op, data):
 
 def run(args):
     sources = args.sources.split(",")
+    print(f"Sources: {sources}")
 
     for source in sources:
         print(f"Pulling from source: {source} ...")
