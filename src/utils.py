@@ -229,6 +229,6 @@ def get_notion_database_id_toread(notion_agent, db_index_id):
         print("[ERROR] no index db pages found...")
         return ""
 
-    latest_db_page = db_pages[:1]
+    latest_db_page = db_pages[0]
     database_id = latest_db_page["database_id"]
     return database_id
