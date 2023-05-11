@@ -233,7 +233,7 @@ class OperatorTwitter(OperatorBase):
         categories_top_k
     ):
         # topics: [(name, score), ...]
-        topics = self._get_topk_items(ranked_tweet["__topics"], topics_top_k)
+        topics = self._get_top_items(ranked_tweet["__topics"], topics_top_k)
         print(f"Original topics: {ranked_tweet['__topics']}, top-k: {topics}")
 
         # Notes: notion doesn't accept comma in the selection type
@@ -241,7 +241,7 @@ class OperatorTwitter(OperatorBase):
         topics_topk = [x[0].replace(",", " ") for x in topics]
 
         # categories: [(name, score), ...]
-        categories = self._get_topk_items(ranked_tweet["__categories"], categories_top_k)
+        categories = self._get_top_items(ranked_tweet["__categories"], categories_top_k)
         print(f"Original categories: {ranked_tweet['__categories']}, top-k: {categories}")
         categories_topk = [x[0].replace(",", " ") for x in categories]
 
@@ -266,7 +266,7 @@ class OperatorTwitter(OperatorBase):
         utils.redis_set(redis_conn, key, "true")
         print(f"Mark tweet as visited, key: {key}")
 
-    def printStats(self, source, data, inbox_data_deduped, rank_data_deduped, data_ranked):
+    def printStats(self, source, data, inbox_data_deduped, data_ranked):
         print("#####################################################")
         print(f"# Stats of {source}")
         print("#####################################################")
@@ -276,9 +276,6 @@ class OperatorTwitter(OperatorBase):
 
         for list_name, items in inbox_data_deduped.items():
             print(f"{list_name}: Deduped inbox data count: {len(items)}")
-
-        for list_name, items in rank_data_deduped.items():
-            print(f"{list_name}: Deduped rank data count: {len(items)}")
 
         rank_stats = {}
         for list_name, items in data_ranked.items():
