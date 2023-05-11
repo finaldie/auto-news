@@ -80,7 +80,7 @@ class OperatorYoutube(OperatorBase):
 
         # 2. get inbox database indexes
         db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
-        db_pages = self._get_database_id_inbox(db_index_id, "Youtube")
+        db_pages = utils.get_notion_database_id_inbox(db_index_id, "Youtube")
         print(f"The database pages founded: {db_pages}")
 
         # 2. get latest two databases and collect items by created_time

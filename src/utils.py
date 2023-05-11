@@ -196,3 +196,23 @@ def splitSummaryTranslation(text):
     translation = res[1] if len(res) >= 2 else ""
 
     return summary, translation
+
+
+def get_notion_database_id_inbox(
+    self,
+    notion_agent,
+    db_index_id,
+    source
+):
+    db_pages = notion_agent.queryDatabaseIndex_Inbox(
+        db_index_id, source)
+
+    print(f"Query index db (inbox): {db_index_id}, the database pages founded: {db_pages}")
+    return db_pages
+
+
+def get_notion_database_id_toread(self, notion_agent, db_index_id):
+    db_pages = notion_agent.queryDatabaseIndex_ToRead(db_index_id)
+
+    print(f"Query index db (toread): {db_index_id}, the database pages founded: {db_pages}")
+    return db_pages

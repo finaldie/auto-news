@@ -9,19 +9,6 @@ class OperatorBase:
     Operator Base class
     """
 
-    def _get_database_id_inbox(self, db_index_id, source):
-        db_pages = notion_agent.queryDatabaseIndex_Inbox(
-            db_index_id, source)
-
-        print(f"Query index db (inbox): {db_index_id}, the database pages founded: {db_pages}")
-        return db_pages
-
-    def _get_database_id_toread(self, db_index_id):
-        db_pages = notion_agent.queryDatabaseIndex_ToRead(db_index_id)
-
-        print(f"Query index db (toread): {db_index_id}, the database pages founded: {db_pages}")
-        return db_pages
-
     def pull(self):
         return None
 
