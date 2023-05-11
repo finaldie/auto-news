@@ -262,16 +262,18 @@ class NotionAgent:
                     "direction": "descending",
                 },
             ],
-        }
 
-        # filter by source
-        query_data["filter"]["and"] = []
-        query_data["filter"]["and"].append({
-            "property": "Source",
-            "select": {
-                "equals": source,
+            "filter": {
+                "and": [
+                    {
+                        "property": "Source",
+                        "select": {
+                            "equals": source,
+                        }
+                    },
+                ]
             }
-        })
+        }
 
         pages = self.api.databases.query(**query_data).get("results")
         extracted_pages = []
@@ -426,6 +428,8 @@ class NotionAgent:
                     "direction": "ascending",
                 },
             ],
+
+            "filter": {}
         }
 
         # filter by created_time
