@@ -274,18 +274,19 @@ class NotionAgent:
         })
 
         pages = self.api.databases.query(**query_data).get("results")
-        extracted_pages = {}
+        extracted_pages = []
 
         for page in pages:
             print(f"result: page id: {page['id']}")
             page_id = page["id"]
 
-            extracted_pages[page_id] = {
+            extracted_pages.append({
+                "page_id": page_id,
                 "database_id": page["properties"]["id"]["title"][0]["text"]["content"],
                 "created_time": page["created_time"],
                 "last_edited_time": page["last_edited_time"],
                 "source": source,
-            }
+            })
 
         return extracted_pages
 
@@ -301,17 +302,18 @@ class NotionAgent:
         }
 
         pages = self.api.databases.query(**query_data).get("results")
-        extracted_pages = {}
+        extracted_pages = []
 
         for page in pages:
             print(f"result: page id: {page['id']}")
             page_id = page["id"]
 
-            extracted_pages[page_id] = {
+            extracted_pages.append({
+                "page_id": page_id,
                 "database_id": page["properties"]["id"]["title"][0]["text"]["content"],
                 "created_time": page["created_time"],
                 "last_edited_time": page["last_edited_time"],
-            }
+            })
 
         return extracted_pages
 

@@ -198,7 +198,7 @@ def splitSummaryTranslation(text):
     return summary, translation
 
 
-def get_notion_database_id_inbox(
+def get_notion_database_pages_inbox(
     notion_agent,
     db_index_id,
     source
@@ -210,8 +210,25 @@ def get_notion_database_id_inbox(
     return db_pages
 
 
-def get_notion_database_id_toread(notion_agent, db_index_id):
+def get_notion_database_pages_toread(notion_agent, db_index_id):
     db_pages = notion_agent.queryDatabaseIndex_ToRead(db_index_id)
 
     print(f"Query index db (toread): {db_index_id}, the database pages founded: {db_pages}")
+
     return db_pages
+
+
+def get_notion_database_id_toread(notion_agent, db_index_id):
+    """
+    Get latest notion toread database id id 
+    """
+    db_pages = get_notion_database_pages_toread(
+        notion_agent, db_index_id)
+
+    if len(db_pages) == 0:
+        print("[ERROR] no index db pages found...")
+        return ""
+
+    latest_db_page = db_pages[:1]
+    database_id = latest_db_page["database_id"]
+    return database_id

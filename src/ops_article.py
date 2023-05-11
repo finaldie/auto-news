@@ -51,7 +51,7 @@ class OperatorArticle(OperatorBase):
 
         # 2. get inbox database indexes
         db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
-        db_pages = utils.get_notion_database_id_inbox(
+        db_pages = utils.get_notion_database_pages_inbox(
             notion_agent, db_index_id, "Article")
         print(f"The database pages founded: {db_pages}")
 
@@ -61,8 +61,8 @@ class OperatorArticle(OperatorBase):
 
         pages = {}
 
-        for page_id, page in db_pages.items():
-            database_id = page["database_id"]
+        for db_page in db_pages:
+            database_id = db_page["database_id"]
             print(f"Pulling from database_id: {database_id}...")
 
             # The api will return the pages and sort by "created time" asc
@@ -279,7 +279,12 @@ class OperatorArticle(OperatorBase):
                 # Get the latest toread database id from index db
                 db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
                 database_id = utils.get_notion_database_id_toread(
-                        notion_agent, db_index_id)
+                    notion_agent, db_index_id)
+                print(f"Latest ToRead database id: {database_id}")
+
+                if not database_id:
+                    print("[ERROR] no index db pages found... skip")
+                    break
 
                 for ranked_page in ranked_data:
                     try:

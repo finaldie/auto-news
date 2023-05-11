@@ -193,7 +193,12 @@ class OperatorTwitter(OperatorBase):
                 # Get the latest toread database id from index db
                 db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
                 database_id = utils.get_notion_database_id_toread(
-                        notion_agent, db_index_id)
+                    notion_agent, db_index_id)
+                print(f"Latest ToRead database id: {database_id}")
+
+                if not database_id:
+                    print("[ERROR] no index db pages found... skip")
+                    break
 
                 for list_name, tweets in data.items():
                     for ranked_tweet in tweets:

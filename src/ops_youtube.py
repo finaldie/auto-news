@@ -80,7 +80,7 @@ class OperatorYoutube(OperatorBase):
 
         # 2. get inbox database indexes
         db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
-        db_pages = utils.get_notion_database_id_inbox(db_index_id, "Youtube")
+        db_pages = utils.get_notion_database_pages_inbox(db_index_id, "Youtube")
         print(f"The database pages founded: {db_pages}")
 
         # 2. get latest two databases and collect items by created_time
@@ -89,7 +89,7 @@ class OperatorYoutube(OperatorBase):
 
         pages = {}
 
-        for _, db_page in db_pages.items():
+        for db_page in db_pages:
             database_id = db_page["database_id"]
             print(f"Pulling from database_id: {database_id}...")
 
@@ -316,7 +316,12 @@ class OperatorYoutube(OperatorBase):
                 # Get the latest toread database id from index db
                 db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
                 database_id = utils.get_notion_database_id_toread(
-                        notion_agent, db_index_id)
+                    notion_agent, db_index_id)
+                print(f"Latest ToRead database id: {database_id}")
+
+                if not database_id:
+                    print("[ERROR] no index db pages found... skip")
+                    break
 
                 for ranked_page in ranked_data:
                     try:
