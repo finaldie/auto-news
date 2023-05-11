@@ -309,10 +309,13 @@ class OperatorArticle(OperatorBase):
                             categories_topk,
                             rating)
 
-                        self.markVisited(page_id)
+                        self.markVisited(page_id, source="article", list_name="default")
 
                         created_time = ranked_page["created_time"]
-                        self.updateCreatedTime(created_time)
+                        self.updateCreatedTime(
+                            created_time,
+                            source="article",
+                            list_name="default")
 
                     except Exception as e:
                         print(f"[ERROR]: Push to notion failed, skip: {e}")
@@ -320,46 +323,3 @@ class OperatorArticle(OperatorBase):
 
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
-
-    def markVisited(self, page_id: str):
-        redis_url = os.getenv("BOT_REDIS_URL")
-        redis_conn = utils.redis_conn(redis_url)
-
-        # Mark toread item as visited
-        toread_key_tpl = data_model.NOTION_TOREAD_ITEM_ID
-        toread_key = toread_key_tpl.format("article", "default", page_id)
-        utils.redis_set(redis_conn, toread_key, "true")
-
-    def updateCreatedTime(self, last_created_time: str):
-        print(f"[updateCreatedTime] last_created_time: {last_created_time}")
-        redis_url = os.getenv("BOT_REDIS_URL")
-        redis_conn = utils.redis_conn(redis_url)
-
-        # Update the latest created time
-        created_time_tpl = data_model.NOTION_INBOX_CREATED_TIME_KEY
-        redis_key = created_time_tpl.format("article", "default")
-
-        curr_created_time = utils.redis_get(redis_conn, redis_key)
-        curr_created_time = utils.bytes2str(curr_created_time)
-        print("Updating created time: curr_created_time: {curr_created_time}")
-
-        if not curr_created_time:
-            utils.redis_set(
-                redis_conn,
-                redis_key,
-                last_created_time,
-                overwrite=True)
-
-            print(f"Last created time has not been set yet, set to {last_created_time}")
-        else:
-            curr = utils.parseDataFromIsoFormat(curr_created_time)
-            last = utils.parseDataFromIsoFormat(last_created_time)
-
-            if last > curr:
-                utils.redis_set(
-                    redis_conn,
-                    redis_key,
-                    last_created_time,
-                    overwrite=True)
-
-            print(f"Update Last created time curr: {curr_created_time}, set to {last_created_time}")

@@ -83,7 +83,7 @@ class OperatorBase:
 
         curr_created_time = utils.redis_get(redis_conn, redis_key)
         curr_created_time = utils.bytes2str(curr_created_time)
-        print("Updating created time: curr_created_time: {curr_created_time}")
+        print(f"Updating created time: curr_created_time: {curr_created_time}")
 
         if not curr_created_time:
             utils.redis_set(

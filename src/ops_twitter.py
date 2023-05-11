@@ -178,7 +178,7 @@ class OperatorTwitter(OperatorBase):
                list_name2: [...], ...}
         """
         print("#####################################################")
-        print("# Push Articles")
+        print("# Push Tweets")
         print("#####################################################")
         print(f"Targets: {targets}")
         print(f"input data: {data}")
@@ -253,18 +253,10 @@ class OperatorTwitter(OperatorBase):
             topics_topk, categories_topk, rate)
 
         print("Inserted one tweet into ToRead database")
-        self.markVisited(list_name, ranked_tweet["tweet_id"])
-
-    def markVisited(self, list_name, tweet_id: str):
-        redis_url = os.getenv("BOT_REDIS_URL")
-        redis_conn = utils.redis_conn(redis_url)
-
-        key_tpl = data_model.NOTION_TOREAD_ITEM_ID
-        key = key_tpl.format("twitter", list_name, tweet_id)
-
-        # mark as visited
-        utils.redis_set(redis_conn, key, "true")
-        print(f"Mark tweet as visited, key: {key}")
+        self.markVisited(
+            ranked_tweet["tweet_id"],
+            source="twitter",
+            list_name=list_name)
 
     def printStats(self, source, data, inbox_data_deduped, data_ranked):
         print("#####################################################")
