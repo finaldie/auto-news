@@ -5,6 +5,7 @@ from datetime import date, timedelta, datetime
 from dotenv import load_dotenv
 
 from tweets import TwitterAgent
+from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
 import utils
@@ -29,49 +30,23 @@ parser.add_argument("--pulling-interval", help="pulling interval (s)",
                     default=0.1)
 
 
-def pull_twitter(args):
+def pull_twitter(args, op):
     print("######################################################")
     print("# Pull from Twitter")
     print("######################################################")
     print(f"environment: {os.environ}")
-
-    screen_names_famous = os.getenv("TWITTER_LIST_FAMOUS", "")
-    screen_names_ai = os.getenv("TWITTER_LIST_AI", "")
-
-    print(f"screen name famous: {screen_names_famous}")
-    print(f"screen name ai: {screen_names_ai}")
-
-    api_key = os.getenv("TWITTER_API_KEY")
-    api_key_secret = os.getenv("TWITTER_API_KEY_SECRET")
-    access_token = os.getenv("TWITTER_ACCESS_TOKEN")
-    access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
-
-    agent = TwitterAgent(api_key, api_key_secret, access_token, access_token_secret)
-
-    agent.subscribe("Famous", screen_names_famous.split(","), args.pulling_count)
-    agent.subscribe("AI", screen_names_ai.split(","), args.pulling_count)
-
-    data = agent.pull(pulling_interval_sec=args.pulling_interval)
-    print(f"Pulled from twitter: {data}")
-
+    data = op.pull()
     return data
 
 
-def save_twitter(args, data):
+def save_twitter(args, op, data):
     """
     Save the middle result (json) to data folder
     """
     print("######################################################")
     print("# Save Twitter data to json")
     print("######################################################")
-    workdir = os.getenv("WORKDIR")
-
-    filename = "twitter.json"
-    data_path = f"{workdir}/{args.data_folder}/{args.run_id}"
-    full_path = utils.gen_filename(data_path, filename)
-
-    print(f"Save data to {full_path}, data: {data}")
-    utils.save_data_json(full_path, data)
+    op.save2json(args.data_folder, args.run_id, "twitter.json", data)
 
 
 def pull_article(args, op):
@@ -85,7 +60,6 @@ def pull_article(args, op):
 
     database_id = os.getenv("NOTION_DATABASE_ID_ARTICLE_INBOX")
     data = op.pull(database_id)
-
     return data
 
 
@@ -126,8 +100,9 @@ def run(args):
         print(f"Pulling from source: {source} ...")
 
         if source == "Twitter":
-            data = pull_twitter(args)
-            save_twitter(args, data)
+            op = OperatorTwitter()
+            data = pull_twitter(args, op)
+            save_twitter(args, op, data)
 
         elif source == "Article":
             op = OperatorArticle()
