@@ -1,14 +1,12 @@
 import argparse
 import os
-from datetime import date, timedelta, datetime
+from datetime import datetime
 
 from dotenv import load_dotenv
 
-from tweets import TwitterAgent
 from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
-import utils
 
 
 parser = argparse.ArgumentParser()
@@ -35,7 +33,7 @@ def pull_twitter(args, op):
     print("# Pull from Twitter")
     print("######################################################")
     print(f"environment: {os.environ}")
-    data = op.pull()
+    data = op.pull(args.pulling_count, args.pulling_interval)
     return data
 
 
