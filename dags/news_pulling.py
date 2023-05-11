@@ -40,7 +40,7 @@ with DAG(
     'news_pulling',
     default_args=default_args,
     max_active_runs=1,
-    description='news pulling, config: {"sources": "twitter,article,youtube", "targets": "notion", "dedup": true}',
+    description='news pulling, config: {"sources": "Twitter,Article,Youtube", "targets": "notion", "dedup": true}',
     schedule_interval=timedelta(minutes=60),
     # schedule_interval=None,
     start_date=days_ago(0),
@@ -70,7 +70,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder="data" '
-        '--sources={{ dag_run.conf.setdefault("sources", "twitter,article,youtube") }} ',
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} ',
     )
 
     t4 = BashOperator(
@@ -81,7 +81,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder="data" '
-        '--sources={{ dag_run.conf.setdefault("sources", "twitter,article,youtube") }} '
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
         '--dedup={{ dag_run.conf.setdefault("dedup", True) }} ',
     )

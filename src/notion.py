@@ -1,5 +1,6 @@
 import time
 import traceback
+from datetime import date
 
 from notion_client import Client
 
@@ -251,6 +252,168 @@ class NotionAgent:
                 blocks[block_id] = block_data
 
         return properties, blocks
+
+    def queryDatabaseIndex_Inbox(self, database_id, source):
+        query_data = {
+            "database_id": database_id,
+            "sorts": [
+                {
+                    "property": "Created time",
+                    "direction": "descending",
+                },
+            ],
+        }
+
+        # filter by source
+        query_data["filter"]["and"] = []
+        query_data["filter"]["and"].append({
+            "property": "Source",
+            "select": {
+                "equals": source,
+            }
+        })
+
+        pages = self.api.databases.query(**query_data).get("results")
+        extracted_pages = {}
+
+        for page in pages:
+            print(f"result: page id: {page['id']}")
+            page_id = page["id"]
+
+            extracted_pages[page_id] = {
+                "database_id": page["properties"]["id"]["title"][0]["text"]["content"],
+                "created_time": page["created_time"],
+                "last_edited_time": page["last_edited_time"],
+                "source": source,
+            }
+
+        return extracted_pages
+
+    def queryDatabaseIndex_ToRead(self, database_id):
+        query_data = {
+            "database_id": database_id,
+            "sorts": [
+                {
+                    "property": "Created time",
+                    "direction": "descending",
+                },
+            ],
+        }
+
+        pages = self.api.databases.query(**query_data).get("results")
+        extracted_pages = {}
+
+        for page in pages:
+            print(f"result: page id: {page['id']}")
+            page_id = page["id"]
+
+            extracted_pages[page_id] = {
+                "database_id": page["properties"]["id"]["title"][0]["text"]["content"],
+                "created_time": page["created_time"],
+                "last_edited_time": page["last_edited_time"],
+            }
+
+        return extracted_pages
+
+    def createDatabaseItem_Index_ToRead(
+        self,
+        database_id,
+        to_read_db_id,
+        title
+    ):
+        properties = {
+            "id": {
+                "title": [
+                    {
+                        "text": {
+                            "content": to_read_db_id
+                        }
+                    }
+                ]
+            },
+
+            "Title": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": title,
+                        },
+                    },
+                ]
+            },
+        }
+
+        # Add the new page to the database
+        new_page = self.api.pages.create(
+            parent={"database_id": database_id},
+            properties=properties)
+
+        return new_page
+
+    def createDatabase_ToRead(self, parent_page_id):
+        title = [
+            {
+                "type": "text",
+                "text": {
+                    "content": f"ToRead {date.today().isoformat()}"
+                }
+            }
+        ]
+
+        # Set the properties of the new database
+        new_database_properties = {
+            "Name": {
+                "title": {}
+            },
+            "To": {
+                "rich_text": {}
+            },
+            "Created at": {
+                "date": {}
+            },
+            "Topic": {
+                "multi_select": {}
+            },
+            "Category": {
+                "multi_select": {}
+            },
+            "Rating": {
+                "number": {}
+            },
+            "Read": {
+                "checkbox": {}
+            },
+            "Created time": {
+                "created_time": {}
+            },
+            "List Name": {
+                "multi_select": {}
+            },
+            "Last edited time": {
+                "last_edited_time": {}
+            },
+            "User Rating": {
+                "select": {}
+            },
+            "Tags": {
+                "multi_select": {}
+            },
+            "Source": {
+                "select": {}
+            },
+            "Take Aways": {
+                "rich_text": {}
+            },
+        }
+
+        # Create the new database under the specified page
+        new_database = self.api.databases.create(
+            parent={"type": "page_id", "page_id": parent_page_id},
+            title=title,
+            properties=new_database_properties
+        )
+
+        return new_database
 
     def queryDatabaseInbox_Twitter(self, database_id, created_time=None):
         query_data = {

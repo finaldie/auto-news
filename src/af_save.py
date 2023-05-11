@@ -28,7 +28,7 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default="twitter,article,youtube")
+                    default="Twitter,Article,Youtube")
 parser.add_argument("--targets", help="targets to push, comma separated",
                     default="notion")
 parser.add_argument("--topics-top-k", help="pick top-k topics to push",
@@ -378,7 +378,7 @@ def run(args):
         print(f"Pushing data for source: {source} ...")
 
         # Notes: For twitter we don't need summary step
-        if source == "twitter":
+        if source == "Twitter":
             # Dedup and push to inbox
             data = retrieve_twitter(args)
             data_deduped = tweets_dedup(args, data, target="inbox")
@@ -391,10 +391,10 @@ def run(args):
 
             printStats(source, data, data_deduped, rank_data_deduped, data_ranked)
 
-        elif source == "article":
+        elif source == "Article":
             process_article(args)
 
-        elif source == "youtube":
+        elif source == "Youtube":
             process_youtube(args)
 
 

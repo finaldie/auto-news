@@ -52,7 +52,7 @@ class OperatorBase:
     def markVisited(
         self,
         item_id: str,
-        source="article",
+        source="Article",
         list_name="default"
     ):
         """
@@ -69,7 +69,7 @@ class OperatorBase:
     def updateCreatedTime(
         self,
         last_created_time: str,
-        source="article",
+        source="Article",
         list_name="default",
     ):
         print(f"[updateCreatedTime] last_created_time: {last_created_time}")

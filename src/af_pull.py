@@ -22,7 +22,7 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default="twitter,article,youtube")
+                    default="Twitter,Article,Youtube")
 parser.add_argument("--pulling-count", help="pulling count",
                     default=3)
 parser.add_argument("--pulling-interval", help="pulling interval (s)",
@@ -125,16 +125,16 @@ def run(args):
     for source in sources:
         print(f"Pulling from source: {source} ...")
 
-        if source == "twitter":
+        if source == "Twitter":
             data = pull_twitter(args)
             save_twitter(args, data)
 
-        elif source == "article":
+        elif source == "Article":
             op = OperatorArticle()
             data = pull_article(args, op)
             save_article(args, op, data)
 
-        elif source == "youtube":
+        elif source == "Youtube":
             op = OperatorYoutube()
             data = pull_youtube(args, op)
             save_youtube(args, op, data)
