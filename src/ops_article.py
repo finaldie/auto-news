@@ -32,11 +32,13 @@ class OperatorArticle(OperatorBase):
         print("#####################################################")
         print("# Pulling Articles")
         print("#####################################################")
+        # 1. prepare notion agent and redis connection
         notion_api_key = os.getenv("NOTION_TOKEN")
         notion_agent = NotionAgent(notion_api_key)
 
         redis_url = os.getenv("BOT_REDIS_URL")
         redis_conn = utils.redis_conn(redis_url)
+
 
         created_time_tpl = data_model.NOTION_INBOX_CREATED_TIME_KEY
         redis_key = created_time_tpl.format("article", "default")
@@ -48,13 +50,32 @@ class OperatorArticle(OperatorBase):
         if not last_created_time:
             last_created_time = (datetime.now() - timedelta(days=1)).isoformat()
 
-        # The api will return the pages and sort by "created time" asc
-        # format dict(<page_id, page>)
-        extracted_pages = notion_agent.queryDatabaseInbox_Article(
-            database_id,
-            filter_created_time=last_created_time)
+        # 2. get inbox database indexes
+        db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
+        db_pages = notion_agent.queryDatabaseIndex_Inbox(
+            db_index_id, "Article")
 
-        return extracted_pages
+        print(f"The database pages founded: {db_pages}")
+
+        # 2. get latest two databases and collect items by created_time
+        db_pages = db_pages[:2]
+        print(f"The latest 2 databases: {db_pages}")
+
+        pages = {}
+
+        for page_id, page in db_pages.items():
+            database_id = page["database_id"]
+            print(f"Pulling from database_id: {database_id}...")
+
+            # The api will return the pages and sort by "created time" asc
+            # format dict(<page_id, page>)
+            extracted_pages = notion_agent.queryDatabaseInbox_Article(
+                database_id,
+                filter_created_time=last_created_time)
+
+            pages.update(extracted_pages)
+
+        return pages
 
     def dedup(self, extractedPages, target="inbox"):
         print("#####################################################")

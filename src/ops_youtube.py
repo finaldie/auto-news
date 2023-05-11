@@ -61,6 +61,7 @@ class OperatorYoutube(OperatorBase):
         print("#####################################################")
         print("# Pulling Youtube video transcripts")
         print("#####################################################")
+        # 1. prepare notion agent and redis connection
         notion_api_key = os.getenv("NOTION_TOKEN")
         notion_agent = NotionAgent(notion_api_key)
 
@@ -77,45 +78,64 @@ class OperatorYoutube(OperatorBase):
         if not last_created_time:
             last_created_time = (datetime.now() - timedelta(days=1)).isoformat()
 
-        # The api will return the pages and sort by "created time" asc
-        # format dict(<page_id, page>)
-        extracted_pages = notion_agent.queryDatabaseInbox_Youtube(
-            database_id,
-            filter_created_time=last_created_time)
+        # 2. get inbox database indexes
+        db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
+        db_pages = notion_agent.queryDatabaseIndex_Inbox(
+            db_index_id, "Youtube")
 
-        # The extracted pages contains
-        # - title
-        # - video url
-        # Pull transcipt and merge it
-        for page_id, page in extracted_pages.items():
-            title = page["title"]
+        print(f"The database pages founded: {db_pages}")
 
-            # Notes: some app (e.g. From iOS) will only fill the title
-            # with the url link, it wont fill other fields
-            source_url = page["source_url"] or title
-            print(f"Pulling youtube transcript, title: {title}, page_id: {page_id}, source_url: {source_url}")
+        # 2. get latest two databases and collect items by created_time
+        db_pages = db_pages[:2]
+        print(f"The latest 2 databases: {db_pages}")
 
-            transcript, metadata = self._load_youtube_transcript(source_url)
+        pages = {}
 
-            page["__transcript"] = transcript
+        for _, db_page in db_pages.items():
+            database_id = db_page["database_id"]
+            print(f"Pulling from database_id: {database_id}...")
 
-            page["__title"] = metadata.setdefault("title", "")
-            page["__description"] = metadata.setdefault("description", "")
-            page["__thumbnail_url"] = metadata.setdefault("thumbnail_url", "")
-            page["__publish_date"] = ""
-            if metadata.get("publish_date"):
-                # Notes: pd is datetime object
-                pd = metadata["publish_date"]
-                pd_pdt = pd.astimezone(pytz.timezone('America/Los_Angeles'))
-                page["__publish_date"] = pd_pdt.isoformat()
+            # The api will return the pages and sort by "created time" asc
+            # format dict(<page_id, page>)
+            extracted_pages = notion_agent.queryDatabaseInbox_Youtube(
+                database_id,
+                filter_created_time=last_created_time)
 
-            page["__author"] = metadata.setdefault("author", "")
-            page["__view_count"] = metadata.setdefault("view_count", 0)
+            # The extracted pages contains
+            # - title
+            # - video url
+            # Pull transcipt and merge it
+            for page_id, page in extracted_pages.items():
+                title = page["title"]
 
-            # unit: second
-            page["__length"] = metadata.setdefault("length", 0)
+                # Notes: some app (e.g. From iOS) will only fill the title
+                # with the url link, it wont fill other fields
+                source_url = page["source_url"] or title
+                print(f"Pulling youtube transcript, title: {title}, page_id: {page_id}, source_url: {source_url}")
 
-        return extracted_pages
+                transcript, metadata = self._load_youtube_transcript(source_url)
+
+                page["__transcript"] = transcript
+
+                page["__title"] = metadata.setdefault("title", "")
+                page["__description"] = metadata.setdefault("description", "")
+                page["__thumbnail_url"] = metadata.setdefault("thumbnail_url", "")
+                page["__publish_date"] = ""
+                if metadata.get("publish_date"):
+                    # Notes: pd is datetime object
+                    pd = metadata["publish_date"]
+                    pd_pdt = pd.astimezone(pytz.timezone('America/Los_Angeles'))
+                    page["__publish_date"] = pd_pdt.isoformat()
+
+                page["__author"] = metadata.setdefault("author", "")
+                page["__view_count"] = metadata.setdefault("view_count", 0)
+
+                # unit: second
+                page["__length"] = metadata.setdefault("length", 0)
+
+            pages.update(extracted_pages)
+
+        return pages
 
     def dedup(self, extractedPages, target="inbox"):
         print("#####################################################")
