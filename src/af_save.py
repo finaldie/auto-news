@@ -53,7 +53,7 @@ def process_article(args):
     print("#####################################################")
     op = OperatorArticle()
 
-    data = op.readFromJson(args.data_folder, args.run_id)
+    data = op.readFromJson(args.data_folder, args.run_id, "article.json")
     data_deduped = op.dedup(data, target="toread")
     data_summarized = op.summarize(data_deduped)
     data_ranked = op.rank(data_summarized)

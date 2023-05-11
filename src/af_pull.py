@@ -67,7 +67,7 @@ def save_article(args, op, data):
     print("######################################################")
     print("# Save Articles to json file")
     print("######################################################")
-    op.save2json(args.data_folder, args.run_id, data)
+    op.save2json(args.data_folder, args.run_id, "article.json", data)
 
 
 def pull_youtube(args, op):

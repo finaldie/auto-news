@@ -13,9 +13,10 @@ from llm_agent import (
 )
 import utils
 import data_model
+from ops_base import OperatorBase
 
 
-class OperatorArticle:
+class OperatorArticle(OperatorBase):
     """
     An Operator to handle:
     - pulling data from source
@@ -54,28 +55,6 @@ class OperatorArticle:
             filter_created_time=last_created_time)
 
         return extracted_pages
-
-    def save2json(self, data_folder, run_id, data):
-        workdir = os.getenv("WORKDIR")
-
-        filename = "article.json"
-        data_path = f"{workdir}/{data_folder}/{run_id}"
-        full_path = utils.gen_filename(data_path, filename)
-
-        print(f"Save data to {full_path}, data: {data}")
-        utils.save_data_json(full_path, data)
-
-    def readFromJson(self, data_folder, run_id):
-        workdir = os.getenv("WORKDIR")
-
-        filename = "article.json"
-        data_path = f"{workdir}/{data_folder}/{run_id}"
-        full_path = utils.gen_filename(data_path, filename)
-
-        data = utils.read_data_json(full_path)
-
-        print(f"Retrieve article data from {full_path}, data: {data}")
-        return data
 
     def dedup(self, extractedPages, target="inbox"):
         print("#####################################################")
