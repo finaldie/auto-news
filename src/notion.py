@@ -1120,11 +1120,11 @@ class NotionAgent:
 
         # Add video metadata as a comment
         video_metadata = f"""
-        author: {ranked_page['__author']}
-        description: {ranked_page['__description']}
-        publishing_date: {ranked_page['__publish_date']}
-        duration: {ranked_page['__length'] / 60:.2f} minutes
-        view_count: {ranked_page['__view_count']}
+        Author: {ranked_page['__author']}
+        Description: {ranked_page['__description']}
+        Publishing date: {ranked_page['__publish_date']}
+        Duration: {ranked_page['__length'] / 60:.2f} minutes
+        View count: {ranked_page['__view_count']}
         """
 
         try:
