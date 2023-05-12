@@ -30,7 +30,7 @@ class OperatorYoutube(OperatorBase):
     """
     def _load_youtube_transcript(self, url):
         loader = LLMYoutubeLoader()
-        langs = ["en", "zh-Hans", "zh-Hant"]
+        langs = ["en", "zh", "zh-Hans", "zh-Hant"]
         print(f"Loading Youtube transcript, supported language list: {langs}")
 
         docs = []
