@@ -187,7 +187,7 @@ class OperatorYoutube(OperatorBase):
                 # Double check the content, if empty, load it from
                 # the source url
                 if not content:
-                    print(f"[ERROR] Empty Youtube transcript loaded via WebBaseLoader, title: {title}, source_url: {source_url}, skip it")
+                    print(f"[ERROR] Empty Youtube transcript loaded, title: {title}, source_url: {source_url}, skip it")
                     continue
 
                 summary = llm_agent.run(content)
