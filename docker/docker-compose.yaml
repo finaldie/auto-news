@@ -311,6 +311,45 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  mysql:
+    image: mysql:latest
+    container_name: mysql-db
+    networks:
+      - bot_network
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-}
+      MYSQL_USER: ${MYSQL_USER:-}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-}
+    volumes:
+      - ${MYSQL_PROJ_DIR}/data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "${BOT_SVC_BIND_IP:-127.0.0.1}:3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  mysql-adminer:
+    image: adminer
+    container_name: mysql-db-adminer
+    networks:
+      - bot_network
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "${BOT_SVC_BIND_IP:-127.0.0.1}:8070:8080"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+
 volumes:
   postgres-db-volume:
 
