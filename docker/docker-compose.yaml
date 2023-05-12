@@ -317,10 +317,10 @@ services:
     networks:
       - bot_network
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-}
-      MYSQL_USER: ${MYSQL_USER:-}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-bot}
+      MYSQL_USER: ${MYSQL_USER:-bot}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-bot}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-bot}
     volumes:
       - ${MYSQL_PROJ_DIR}/data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
@@ -333,14 +333,15 @@ services:
       timeout: 5s
       retries: 3
 
-  mysql-adminer:
+  adminer:
     image: adminer
-    container_name: mysql-db-adminer
+    container_name: adminer
     networks:
       - bot_network
     restart: always
     depends_on:
       - mysql
+      - postgres
     ports:
       - "${BOT_SVC_BIND_IP:-127.0.0.1}:8070:8080"
     healthcheck:

@@ -26,6 +26,11 @@ deploy-redis:
 	mkdir -p $(REDIS_PROJ_DIR)/data
 	@echo "Redis deployment finished"
 
+deploy-mysql:
+	@echo "Assembling mysql ..."
+	mkdir -p $(MYSQL_PROJ_DIR)/data
+	@echo "Mysql deployment finished"
+
 post-deploy:
 
 init-airflow:
@@ -35,7 +40,7 @@ init-airflow:
 build:
 	docker compose build
 
-deploy: deploy-airflow deploy-redis post-deploy
+deploy: deploy-airflow deploy-redis deploy-mysql post-deploy
 
 
 init: init-airflow push_dags
