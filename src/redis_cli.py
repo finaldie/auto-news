@@ -3,7 +3,7 @@ import redis
 
 
 class RedisClient:
-    def __init__(self, url):
+    def __init__(self, url=None):
         self.url = url or os.getenv("BOT_REDIS_URL")
         self.api = self._init()
 
