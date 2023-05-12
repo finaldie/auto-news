@@ -14,7 +14,7 @@ class DBClientBase(ABC):
         pass
 
     @abstractmethod
-    def set_notion_inbox_created_time(self, source, category, t):
+    def set_notion_inbox_created_time(self, source, category, t, **kwargs):
         pass
 
     @abstractmethod
@@ -22,7 +22,7 @@ class DBClientBase(ABC):
         pass
 
     @abstractmethod
-    def set_notion_toread_item_id(self, source, category, item_id):
+    def set_notion_toread_item_id(self, source, category, item_id, **kwargs):
         pass
 
     @abstractmethod
@@ -30,21 +30,21 @@ class DBClientBase(ABC):
         pass
 
     @abstractmethod
-    def set_notion_last_edited_time(self, source, category, t):
+    def set_notion_last_edited_time(self, source, category, t, **kwargs):
         pass
 
     @abstractmethod
-    def get_notion_ranking_item_id(self):
+    def get_notion_ranking_item_id(self, source, category, item_id):
         pass
 
     @abstractmethod
-    def set_notion_ranking_item_id(self):
+    def set_notion_ranking_item_id(self, source, category, item_id, r: str, **kwargs):
         pass
 
     @abstractmethod
-    def get_notion_summary_item_id(self):
+    def get_notion_summary_item_id(self, source, category, item_id):
         pass
 
     @abstractmethod
-    def set_notion_summary_item_id(self):
+    def set_notion_summary_item_id(self, source, category, item_id, s: str, **kwargs):
         pass

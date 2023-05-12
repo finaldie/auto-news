@@ -10,7 +10,6 @@ from llm_agent import (
     LLMAgentCategoryAndRanking
 )
 import utils
-import data_model
 from ops_base import OperatorBase
 from db_cli import DBClient
 
@@ -72,17 +71,9 @@ class OperatorTwitter(OperatorBase):
             for tweet in data:
                 tweet_id = tweet["tweet_id"]
 
-                key_tpl = ""
-                if target == "inbox":
-                    key_tpl = data_model.NOTION_INBOX_ITEM_ID
-                elif target == "toread":
-                    key_tpl = data_model.NOTION_TOREAD_ITEM_ID
-
-                key = key_tpl.format("twitter", list_name, tweet_id)
-
                 if client.get_notion_toread_item_id(
                         "twitter", list_name, tweet_id):
-                    print(f"Duplicated tweet found, key: {key}, skip")
+                    print(f"Duplicated tweet found, tweet_id: {tweet_id}, skip")
                 else:
                     tweets_list.append(tweet)
 

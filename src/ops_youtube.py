@@ -14,6 +14,7 @@ from llm_agent import (
 import utils
 import data_model
 from ops_base import OperatorBase
+from db_cli import DBClient
 
 
 class OperatorYoutube(OperatorBase):
@@ -61,17 +62,14 @@ class OperatorYoutube(OperatorBase):
         print("#####################################################")
         print("# Pulling Youtube video transcripts")
         print("#####################################################")
-        # 1. prepare notion agent and redis connection
+        # 1. prepare notion agent and db connection
         notion_api_key = os.getenv("NOTION_TOKEN")
         notion_agent = NotionAgent(notion_api_key)
 
-        redis_url = os.getenv("BOT_REDIS_URL")
-        redis_conn = utils.redis_conn(redis_url)
+        client = DBClient()
+        last_created_time = client.get_notion_inbox_created_time(
+            "youtube", "default")
 
-        created_time_tpl = data_model.NOTION_INBOX_CREATED_TIME_KEY
-        redis_key = created_time_tpl.format("youtube", "default")
-
-        last_created_time = utils.redis_get(redis_conn, redis_key)
         last_created_time = utils.bytes2str(last_created_time)
         print(f"Get last_created_time from redis: {last_created_time}")
 
@@ -136,29 +134,22 @@ class OperatorYoutube(OperatorBase):
 
         return pages
 
-    def dedup(self, extractedPages, target="inbox"):
+    def dedup(self, extractedPages, target="toread"):
         print("#####################################################")
         print("# Dedup Youtube pages")
         print("#####################################################")
         print(f"Number of pages: {len(extractedPages)}")
 
-        redis_url = os.getenv("BOT_REDIS_URL")
-        redis_conn = utils.redis_conn(redis_url)
-
-        redis_page_tpl = data_model.NOTION_INBOX_ITEM_ID
-        if target == "toread":
-            redis_page_tpl = data_model.NOTION_TOREAD_ITEM_ID
-
+        client = DBClient()
         deduped_pages = []
 
         for page_id, page in extractedPages.items():
             title = page["title"]
             print(f"Dedupping page, title: {title}")
 
-            redis_page_key = redis_page_tpl.format("youtube", "default", page_id)
-
-            if utils.redis_get(redis_conn, redis_page_key):
-                print(f"Duplicated youtube found, skip. key: {redis_page_key}")
+            if client.get_notion_toread_item_id(
+                    "youtube", "default", page_id):
+                print(f"Duplicated youtube found, skip. page_id: {page_id}")
             else:
                 deduped_pages.append(page)
 
@@ -173,9 +164,9 @@ class OperatorYoutube(OperatorBase):
         llm_agent.init_prompt()
         llm_agent.init_llm()
 
-        redis_url = os.getenv("BOT_REDIS_URL")
-        redis_conn = utils.redis_conn(redis_url)
-        redis_key_expire_time = os.getenv("BOT_REDIS_KEY_EXPIRE_TIME", 604800)
+        client = DBClient()
+        redis_key_expire_time = os.getenv(
+            "BOT_REDIS_KEY_EXPIRE_TIME", 604800)
 
         summarized_pages = []
 
@@ -189,10 +180,8 @@ class OperatorYoutube(OperatorBase):
 
             st = time.time()
 
-            summary_key = data_model.NOTION_SUMMARY_ITEM_ID.format(
+            llm_summary_resp = client.get_notion_summary_item_id(
                 "youtube", "default", page_id)
-
-            llm_summary_resp = utils.redis_get(redis_conn, summary_key)
 
             if not llm_summary_resp:
                 # Double check the content, if empty, load it from
@@ -203,11 +192,10 @@ class OperatorYoutube(OperatorBase):
 
                 summary = llm_agent.run(content)
 
-                print(f"Cache llm response for {redis_key_expire_time}s, key: {summary_key}, summary: {summary}")
-                utils.redis_set(
-                    redis_conn,
-                    summary_key,
-                    summary,
+                print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")
+
+                client.set_notion_summary_item_id(
+                    "youtube", "default", page_id, summary,
                     expire_time=int(redis_key_expire_time))
 
             else:
@@ -236,9 +224,9 @@ class OperatorYoutube(OperatorBase):
         llm_agent.init_prompt()
         llm_agent.init_llm()
 
-        redis_url = os.getenv("BOT_REDIS_URL")
-        redis_conn = utils.redis_conn(redis_url)
-        redis_key_expire_time = os.getenv("BOT_REDIS_KEY_EXPIRE_TIME", 604800)
+        client = DBClient()
+        redis_key_expire_time = os.getenv(
+            "BOT_REDIS_KEY_EXPIRE_TIME", 604800)
 
         # array of ranged pages
         ranked = []
@@ -252,10 +240,8 @@ class OperatorYoutube(OperatorBase):
             # Let LLM to category and rank
             st = time.time()
 
-            ranking_key = data_model.NOTION_RANKING_ITEM_ID.format(
+            llm_ranking_resp = client.get_notion_ranking_item_id(
                 "youtube", "default", page_id)
-
-            llm_ranking_resp = utils.redis_get(redis_conn, ranking_key)
 
             category_and_rank_str = None
 
@@ -263,10 +249,10 @@ class OperatorYoutube(OperatorBase):
                 print("Not found category_and_rank_str in cache, fallback to llm_agent to rank")
                 category_and_rank_str = llm_agent.run(text)
 
-                print(f"Cache llm response for {redis_key_expire_time}s, key: {ranking_key}")
-                utils.redis_set(
-                    redis_conn,
-                    ranking_key,
+                print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}")
+
+                client.set_notion_ranking_item_id(
+                    "youtube", "default", page_id,
                     category_and_rank_str,
                     expire_time=int(redis_key_expire_time))
 

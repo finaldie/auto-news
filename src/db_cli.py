@@ -47,17 +47,31 @@ class DBClient(DBClientBase):
         key = key_tpl.format(source, category, item_id)
         return self.driver.get(key)
 
-    def set_notion_ranking_item_id(self, source, category, item_id, **kwargs):
+    def set_notion_ranking_item_id(
+        self,
+        source,
+        category,
+        item_id,
+        r: str,
+        **kwargs
+    ):
         key_tpl = data_model.NOTION_RANKING_ITEM_ID
         key = key_tpl.format(source, category, item_id)
-        self.driver.set(key, "true", **kwargs)
+        self.driver.set(key, r, **kwargs)
 
     def get_notion_summary_item_id(self, source, category, item_id):
         key_tpl = data_model.NOTION_SUMMARY_ITEM_ID
         key = key_tpl.format(source, category, item_id)
         return self.driver.get(key)
 
-    def set_notion_summary_item_id(self, source, category, item_id, **kwargs):
+    def set_notion_summary_item_id(
+        self,
+        source,
+        category,
+        item_id,
+        s: str,
+        **kwargs
+    ):
         key_tpl = data_model.NOTION_SUMMARY_ITEM_ID
         key = key_tpl.format(source, category, item_id)
-        self.driver.set(key, "true", **kwargs)
+        self.driver.set(key, s, **kwargs)
