@@ -294,11 +294,11 @@ class OperatorArticle(OperatorBase):
 
                         topics = ranked_page["__topics"]
                         topics_topk = self._get_top_items(topics, topk)
-                        topics_topk = [x[0].replace(",", " ") for x in topics_topk]
+                        topics_topk = [x[0].replace(",", " ")[:20] for x in topics_topk]
 
                         categories = ranked_page["__categories"]
                         categories_topk = self._get_top_items(categories, topk)
-                        categories_topk = [x[0].replace(",", " ") for x in categories_topk]
+                        categories_topk = [x[0].replace(",", " ")[:20] for x in categories_topk]
 
                         rating = ranked_page["__rate"]
 

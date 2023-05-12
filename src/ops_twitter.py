@@ -238,12 +238,12 @@ class OperatorTwitter(OperatorBase):
 
         # Notes: notion doesn't accept comma in the selection type
         # fix it first
-        topics_topk = [x[0].replace(",", " ") for x in topics]
+        topics_topk = [x[0].replace(",", " ")[:20] for x in topics]
 
         # categories: [(name, score), ...]
         categories = self._get_top_items(ranked_tweet["__categories"], categories_top_k)
         print(f"Original categories: {ranked_tweet['__categories']}, top-k: {categories}")
-        categories_topk = [x[0].replace(",", " ") for x in categories]
+        categories_topk = [x[0].replace(",", " ")[:20] for x in categories]
 
         # The __rate is [0, 1], scale to [0, 100]
         rate = ranked_tweet["__rate"] * 100
