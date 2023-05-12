@@ -387,7 +387,7 @@ services:
     command: ["milvus", "run", "standalone"]
     environment:
       ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
+      MINIO_ADDRESS: milvus-minio:9000
     networks:
       - bot_network
     volumes:
@@ -401,7 +401,7 @@ services:
 
   milvus-ui:
     container_name: milvus-ui
-    image: zilliz/attu:v2.2.4
+    image: zilliz/attu:v2.2.5
     environment:
       MILVUS_URL: milvus-standalone:19530
     networks:
