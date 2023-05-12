@@ -16,20 +16,25 @@ deploy-code:
 # - The init steps: in venv, install.sh -> init-airflow -> push_dag
 # - Then go to airflow home, start web and scheduler
 deploy-airflow: deploy-code
-	@echo "Assembling airflow ..."
+	@echo "Assembling Airflow ..."
 	mkdir -p $(AIRFLOW_PROJ_DIR)
 	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs plugins run data
 	@echo "Airflow deployment finished"
 
 deploy-redis:
-	@echo "Assembling redis ..."
+	@echo "Assembling Redis ..."
 	mkdir -p $(REDIS_PROJ_DIR)/data
 	@echo "Redis deployment finished"
 
 deploy-mysql:
-	@echo "Assembling mysql ..."
+	@echo "Assembling Mysql ..."
 	mkdir -p $(MYSQL_PROJ_DIR)/data
 	@echo "Mysql deployment finished"
+
+deploy-milvus:
+	@echo "Assembling Milvus ..."
+	mkdir -p $(MILVUS_PROJ_DIR)/volumes
+	@echo "Milvus deployment finished"
 
 post-deploy:
 
@@ -40,7 +45,8 @@ init-airflow:
 build:
 	docker compose build
 
-deploy: deploy-airflow deploy-redis deploy-mysql post-deploy
+deploy: deploy-airflow deploy-redis deploy-mysql deploy-milvus
+deploy: post-deploy
 
 
 init: init-airflow push_dags
