@@ -30,7 +30,7 @@ class DBClient(DBClientBase):
     def set_notion_toread_item_id(self, source, category, item_id, **kwargs):
         key_tpl = data_model.NOTION_TOREAD_ITEM_ID
         key = key_tpl.format(source, category, item_id)
-        self.driver.set(key, "true", kwargs)
+        self.driver.set(key, "true", **kwargs)
 
     def get_notion_last_edited_time(self, source, category):
         key_tpl = data_model.NOTION_TOREAD_LAST_EDITED_KEY
