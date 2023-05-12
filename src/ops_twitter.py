@@ -124,6 +124,7 @@ class OperatorTwitter(OperatorBase):
                     print(f"Cache llm response for {redis_key_expire_time}s, tweet_id: {tweet['tweet_id']}")
                     client.set_notion_ranking_item_id(
                         "twitter", list_name, tweet["tweet_id"],
+                        category_and_rank_str,
                         expire_time=int(redis_key_expire_time))
 
                 else:
