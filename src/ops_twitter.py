@@ -12,6 +12,7 @@ from llm_agent import (
 import utils
 import data_model
 from ops_base import OperatorBase
+from db_cli import DBClient
 
 
 class OperatorTwitter(OperatorBase):
@@ -62,11 +63,7 @@ class OperatorTwitter(OperatorBase):
         print("#####################################################")
         print(f"Target: {target}")
 
-        redis_url = os.getenv("BOT_REDIS_URL")
-        redis_conn = utils.redis_conn(redis_url)
-
-        print(f"Redis keys: {redis_conn.keys()}")
-
+        client = DBClient()
         tweets_deduped = {}
 
         for list_name, data in tweets.items():
@@ -83,7 +80,8 @@ class OperatorTwitter(OperatorBase):
 
                 key = key_tpl.format("twitter", list_name, tweet_id)
 
-                if utils.redis_get(redis_conn, key):
+                if client.get_notion_toread_item_id(
+                        "twitter", list_name, tweet_id):
                     print(f"Duplicated tweet found, key: {key}, skip")
                 else:
                     tweets_list.append(tweet)
@@ -105,9 +103,8 @@ class OperatorTwitter(OperatorBase):
         llm_agent.init_prompt()
         llm_agent.init_llm()
 
-        redis_url = os.getenv("BOT_REDIS_URL")
+        client = DBClient()
         redis_key_expire_time = os.getenv("BOT_REDIS_KEY_EXPIRE_TIME", 604800)
-        redis_conn = utils.redis_conn(redis_url)
 
         ranked = {}
 
@@ -124,10 +121,8 @@ class OperatorTwitter(OperatorBase):
                 # Let LLM to category and rank
                 st = time.time()
 
-                ranking_key = data_model.NOTION_RANKING_ITEM_ID.format(
+                llm_ranking_resp = client.get_notion_ranking_item_id(
                     "twitter", list_name, tweet["tweet_id"])
-
-                llm_ranking_resp = utils.redis_get(redis_conn, ranking_key)
 
                 category_and_rank_str = None
 
@@ -135,11 +130,9 @@ class OperatorTwitter(OperatorBase):
                     print("Not found category_and_rank_str in cache, fallback to llm_agent to rank")
                     category_and_rank_str = llm_agent.run(text)
 
-                    print(f"Cache llm response for {redis_key_expire_time}s, key: {ranking_key}")
-                    utils.redis_set(
-                        redis_conn,
-                        ranking_key,
-                        category_and_rank_str,
+                    print(f"Cache llm response for {redis_key_expire_time}s, tweet_id: {tweet['tweet_id']}")
+                    client.set_notion_ranking_item_id(
+                        "twitter", list_name, tweet["tweet_id"],
                         expire_time=int(redis_key_expire_time))
 
                 else:

@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 from operator import itemgetter
 
-import redis
 import pytz
 import requests
 
@@ -40,47 +39,6 @@ def read_data_json(full_path):
     f.close()
 
     return data
-
-
-def redis_conn(url):
-    conn = None
-
-    try:
-        conn = redis.from_url(url)
-    except Exception as e:
-        print(f"[ERROR]: Connect to redis @{url} failed: {e}")
-
-    return conn
-
-
-def redis_get(conn, key: str):
-    data = None
-
-    try:
-        data = conn.get(key)
-    except Exception as e:
-        print(f"[ERROR]: Failed to get key {key}: {e}")
-
-    return data
-
-
-def redis_set(conn, key: str, val: str, expire_time=0, overwrite=False):
-    """
-    expire_time: the key will be expired after expire_time seconds
-    """
-    try:
-        if expire_time <= 0:
-            if overwrite:
-                conn.set(key, val)
-            else:
-                conn.setnx(key, val)
-        else:
-            conn.setex(key, int(expire_time), val)
-
-        return True
-    except Exception as e:
-        print(f"[ERROR]: Failed to set key {key} and val {val}: {e}")
-        return False
 
 
 def bytes2str(data):
@@ -124,6 +82,9 @@ def parseDataFromIsoFormat(dt: str):
 
     @return datetime object
     """
+    if not dt:
+        return dt
+
     return datetime.fromisoformat(dt.replace('Z', '+00:00'))
 
 
@@ -220,7 +181,7 @@ def get_notion_database_pages_toread(notion_agent, db_index_id):
 
 def get_notion_database_id_toread(notion_agent, db_index_id):
     """
-    Get latest notion toread database id id 
+    Get latest notion ToRead database id
     """
     db_pages = get_notion_database_pages_toread(
         notion_agent, db_index_id)
