@@ -83,6 +83,9 @@ class LLMAgentBase:
         self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
         print(f"LLM chain initalized, model_name: {model_name}, temperature: {temperature}")
 
+    def get_num_tokens(self, text):
+        return self.llm.get_num_tokens(text)
+
 
 class LLMAgentCategoryAndRanking(LLMAgentBase):
     def __init__(self, api_key="", model_name="gpt-3.5-turbo"):
@@ -104,8 +107,10 @@ class LLMAgentCategoryAndRanking(LLMAgentBase):
          'overall_score': 0.82
         }
         """
-        response = self.llmchain.run(text)
+        tokens = self.get_num_tokens(text)
+        print(f"[LLM] Category and Ranking, number of tokens: {tokens}")
 
+        response = self.llmchain.run(text)
         return response
 
 
@@ -158,8 +163,8 @@ class LLMAgentSummary(LLMAgentBase):
             print("[LLM] Empty input text, return empty summary")
             return ""
 
-        tokens = self.llm.get_num_tokens(text)
-        print(f"[LLM] tokens needed: {tokens}")
+        tokens = self.get_num_tokens(text)
+        print(f"[LLM] Summary, number of tokens needed: {tokens}")
 
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
