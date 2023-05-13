@@ -59,7 +59,7 @@ with DAG(
 
     t2 = BashOperator(
         task_id='prepare',
-        bash_command='cd ~/airflow/data && mkdir -p {{ run_id }}',
+        bash_command='mkdir -p ~/airflow/data/news_pulling/{{ run_id }}',
     )
 
     t3 = BashOperator(
@@ -69,7 +69,7 @@ with DAG(
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder="data" '
+        '--data-folder="data/news_pulling" '
         '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} ',
     )
 
@@ -80,7 +80,7 @@ with DAG(
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder="data" '
+        '--data-folder="data/news_pulling" '
         '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
         '--dedup={{ dag_run.conf.setdefault("dedup", True) }} ',
