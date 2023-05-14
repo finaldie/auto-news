@@ -147,8 +147,14 @@ class OperatorObsidian:
         return filename, content
 
     def _save_ob_page(self, data_path, filename, content):
-        full_path = f"{data_path}/{filename}"
-        print(f"[INFO] Obsidian data path: {data_path}, filename: {filename}, full_path: {full_path}")
+        workdir = os.getenv("WORKDIR")
+        topdir = f"{workdir}/{data_path}"
+        full_path = f"{topdir}/{filename}"
+        print(f"[INFO] Obsidian data path: {topdir}, filename: {filename}, full_path: {full_path}")
+
+        if not os.path.exists(topdir):
+            print(f"[ERROR] Not found Obsidian folder, skip to save: {topdir}")
+            return
 
         if os.path.exists(full_path):
             print("[INFO] the file exsit, skip")

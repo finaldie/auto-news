@@ -20,7 +20,7 @@ parser.add_argument("--run-id", help="run-id",
 parser.add_argument("--job-id", help="job-id",
                     default="")
 parser.add_argument("--data-folder", help="data folder to save",
-                    default="./data")
+                    default="data")
 parser.add_argument("--sources",
                     help="sources to pull, comma separated",
                     default="Twitter,Article,Youtube")
