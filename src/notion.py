@@ -177,6 +177,8 @@ class NotionAgent:
             print(f"[Unsupported block type]!!!: {block['type']}, block: {block}")
 
         block_data["text"] = text
+        block_data["type"] = block["type"]
+        block_data["__raw"] = block
         return block_data
 
     def _extractPageProps(self, page):
