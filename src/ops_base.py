@@ -27,7 +27,7 @@ class OperatorBase:
         db_pages = utils.get_notion_database_pages_toread(
             notion_agent, db_index_id)
 
-        if len(db_pages):
+        if len(db_pages) == 0:
             print("[ERROR] No valid ToRead databases found")
             return {}
 
