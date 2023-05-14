@@ -1,3 +1,4 @@
+import os
 import time
 import traceback
 from datetime import date
@@ -12,7 +13,7 @@ class NotionAgent:
     A notion agent to operate page/database
     """
     def __init__(self, api_key):
-        self.api_key = api_key
+        self.api_key = api_key or os.getenv("NOTION_TOKEN")
 
         self.api = self._init_client(self.api_key)
         self.databases = {}  # <source, {database_id}>
@@ -25,7 +26,7 @@ class NotionAgent:
             "database_id": database_id,
         }
 
-    def _extractRichText(self, data, prefix="", suffix=""):
+    def extractRichText(self, data, prefix="", suffix=""):
         """
         The rich_text is a data type and can be used for many blocks,
         e.g. paragraph, bulleted_list_item, headings, etc
@@ -45,64 +46,64 @@ class NotionAgent:
 
         return content
 
-    def _extractBlockParagraph(self, block):
+    def extractBlockParagraph(self, block):
         """
         block: notion block object (paragraph type)
         """
-        return self._extractRichText(block["paragraph"]["rich_text"])
+        return self.extractRichText(block["paragraph"]["rich_text"])
 
-    def _extractQuote(self, block):
+    def extractQuote(self, block):
         """
         block: notion block object (quote type)
         """
-        return self._extractRichText(block["quote"]["rich_text"])
+        return self.extractRichText(block["quote"]["rich_text"])
 
-    def _extractBulletedListItems(self, block):
+    def extractBulletedListItems(self, block):
         """
         block: notion block object (bulleted_list_item type)
         """
-        return self._extractRichText(
+        return self.extractRichText(
             block["bulleted_list_item"]["rich_text"],
             prefix="- ",
             suffix="\n")
 
-    def _extractNumberedListItems(self, block):
+    def extractNumberedListItems(self, block):
         """
         block: notion block object (numbered_list_item type)
         """
-        return self._extractRichText(
+        return self.extractRichText(
             block["numbered_list_item"]["rich_text"],
             prefix="1. ",
             suffix="\n")
 
-    def _extractHeading_1(self, block):
+    def extractHeading_1(self, block):
         """
         block: notion block object (heading_1 type)
         """
-        return self._extractRichText(block["heading_1"]["rich_text"])
+        return self.extractRichText(block["heading_1"]["rich_text"])
 
-    def _extractHeading_2(self, block):
+    def extractHeading_2(self, block):
         """
         block: notion block object (heading_2 type)
         """
-        return self._extractRichText(block["heading_2"]["rich_text"])
+        return self.extractRichText(block["heading_2"]["rich_text"])
 
-    def _extractHeading_3(self, block):
+    def extractHeading_3(self, block):
         """
         block: notion block object (heading_3 type)
         """
-        return self._extractRichText(block["heading_3"]["rich_text"])
+        return self.extractRichText(block["heading_3"]["rich_text"])
 
-    def _extractCode(self, block):
+    def extractCode(self, block):
         """
         block: notion block object (code type)
         """
-        return self._extractRichText(
+        return self.extractRichText(
             block["code"]["rich_text"],
             prefix="```",
             suffix="```")
 
-    def _extractTableRow(self, block):
+    def extractTableRow(self, block):
         """
         block: notion block object (table_row type)
         """
@@ -121,7 +122,15 @@ class NotionAgent:
 
         return content
 
-    def _extractBlock(self, block):
+    def extractMultiSelect(self, block):
+        selects = []
+
+        for select in block["multi_select"]:
+            selects.append(select["name"])
+
+        return selects
+
+    def extractBlock(self, block):
         """
         block: notion block object
 
@@ -139,22 +148,22 @@ class NotionAgent:
         text = ""
 
         if block["type"] == "paragraph":
-            text = self._extractBlockParagraph(block)
+            text = self.extractBlockParagraph(block)
 
         elif block["type"] == "bulleted_list_item":
-            text = self._extractBulletedListItems(block)
+            text = self.extractBulletedListItems(block)
 
         elif block["type"] == "numbered_list_item":
-            text = self._extractNumberedListItems(block)
+            text = self.extractNumberedListItems(block)
 
         elif block["type"] == "heading_1":
-            text = self._extractHeading_1(block)
+            text = self.extractHeading_1(block)
 
         elif block["type"] == "heading_2":
-            text = self._extractHeading_2(block)
+            text = self.extractHeading_2(block)
 
         elif block["type"] == "heading_3":
-            text = self._extractHeading_3(block)
+            text = self.extractHeading_3(block)
 
         elif block["type"] == "table":
             # depth forward in the child blocks
@@ -162,16 +171,16 @@ class NotionAgent:
             text = self.concatBlocksText(blocks)
 
         elif block["type"] == "table_row":
-            text = self._extractTableRow(block)
+            text = self.extractTableRow(block)
 
             # Easier for human reading
             text += "\n"
 
         elif block["type"] == "quote":
-            text = self._extractQuote(block)
+            text = self.extractQuote(block)
 
         elif block["type"] == "code":
-            text = self._extractCode(block)
+            text = self.extractCode(block)
 
         else:
             print(f"[Unsupported block type]!!!: {block['type']}, block: {block}")
@@ -248,7 +257,7 @@ class NotionAgent:
             # print(f"n: {len(childs)}, childs: {childs}")
 
             for block in childs:
-                block_data = self._extractBlock(block)
+                block_data = self.extractBlock(block)
 
                 block_id = block["id"]
                 blocks[block_id] = block_data

@@ -2,6 +2,7 @@ import os
 import traceback
 
 from db_cli import DBClient
+from notion import NotionAgent
 import tpl_obsidian
 
 
@@ -78,6 +79,7 @@ class OperatorObsidian:
         print(f"Data folder: {data_folder}")
 
         client = DBClient()
+        notion_agent = NotionAgent()
         tot = 0
         err = 0
 
@@ -85,7 +87,9 @@ class OperatorObsidian:
             tot += 1
 
             try:
-                filename, content = self._gen_ob_page(page)
+                filename, content = self._gen_ob_page(
+                    page, notion_agent=notion_agent)
+
                 self._save_ob_page(data_folder, filename, content)
                 # self.markVisisted(page_id, db_client=client)
 
@@ -101,7 +105,7 @@ class OperatorObsidian:
         client.set_obsidian_inbox_item_id(
             "obsidian", "default", page_id)
 
-    def _gen_ob_page(self, page):
+    def _gen_ob_page(self, page, notion_agent: NotionAgent = None):
         # print(f"[_gen_ob_page] page: {page}")
         tpl_title = tpl_obsidian.TEMPLATE_OBSIDIAN_INBOX_FILE
         tpl_body = tpl_obsidian.TEMPLATE_OBSIDIAN_INBOX_BODY
@@ -110,15 +114,17 @@ class OperatorObsidian:
         props = page["properties"]["properties"]
         source = page.get("source") or props["Source"]["select"]["name"]
 
-        # TODO: Use notion util to extract content
         created_at = page["created_at"]
         rating = props["Rating"]["number"]
         user_rating = props["User Rating"]["select"]["name"]
         alias = name
-        to = props["To"]["rich_text"][0]["plain_text"] if props["To"]["rich_text"] else ""
-        list_name = props["List Name"]["multi_select"][0]["name"] if props["List Name"]["multi_select"] else ""
+        to = notion_agent.extractRichText(props["To"]["rich_text"])
+        list_name = notion_agent.extractMultiSelect(props["List Name"])
         notion_url = page["notion_url"]
-        take_aways = props["Take Aways"]["rich_text"][0]["plain_text"] if props["Take Aways"]["rich_text"] else ""
+        take_aways = notion_agent.extractRichText(props["Take Aways"]["rich_text"])
+        topic = notion_agent.extractMultiSelect(props["Topic"])
+        category = notion_agent.extractMultiSelect(props["Category"])
+        body = notion_agent.concatBlocksText(page["blocks"])
 
         filename = tpl_title.format(source, "default", name)
         content = tpl_body.format(
@@ -130,10 +136,10 @@ class OperatorObsidian:
             source,
             list_name,
             notion_url,
-            "default",  # TODO: topic
-            "default",  # TODO: category
+            topic,
+            category,
             take_aways,
-            "test",     # TODO: body
+            body
         )
 
         print(f"[INFO] Gen obsidian page, filename: {filename}")
@@ -144,4 +150,11 @@ class OperatorObsidian:
         full_path = f"{data_path}/{filename}"
         print(f"[INFO] Obsidian data path: {data_path}, filename: {filename}, full_path: {full_path}")
 
-        # TODO: save page
+        if os.path.exists(full_path):
+            print("[INFO] the file exsit, skip")
+            return
+
+        with open(full_path, "w") as file:
+            file.write(content)
+
+        print(f"File saved: {full_path}")
