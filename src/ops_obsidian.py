@@ -33,7 +33,33 @@ class OperatorObsidian:
         print(f"Pages after dedup: {len(deduped_pages)}")
         return deduped_pages
 
-    def push(self, pages, min_rating, **kwargs):
+    def filters(self, pages: list, **kwargs):
+        """
+        pages after dedup, format: [page1, page2, ...]
+        """
+        min_rating = kwargs.setdefault("min_rating", 4)
+        print(f"min_rating: {min_rating}, type: {type(min_rating)}")
+
+        filtered_pages = []
+        tot = 0
+        skipped = 0
+
+        for page in pages:
+            name = page["name"]
+            user_rating = page["user_rating"]
+            tot += 1
+
+            if user_rating < min_rating:
+                print(f"[INFO] Skip low quality content, name: {name}, user_rating: {user_rating}")
+                skipped += 1
+                continue
+
+            filtered_pages.append(page)
+
+        print(f"[INFO] Finished, total {tot}, skipped: {skipped}")
+        return filtered_pages
+
+    def push(self, pages, **kwargs):
         """
         Create and push Obsidian pages to specific folder
         """
@@ -51,17 +77,9 @@ class OperatorObsidian:
         client = DBClient()
         tot = 0
         err = 0
-        skipped = 0
 
         for page in pages:
-            page_id = page["id"]
-            name = page["name"]
-            user_rating = page["user_rating"]
             tot += 1
-
-            if user_rating < min_rating:
-                print(f"[INFO] Skip low quality content, name: {name}, user_rating: {user_rating}")
-                skipped += 1
 
             try:
                 filename, content = self._gen_ob_page(page)
@@ -73,7 +91,7 @@ class OperatorObsidian:
                 traceback.print_exc()
                 err += 1
 
-        print(f"[INFO] Finished, total {tot}, skipped: {skipped}, errors: {err}")
+        print(f"[INFO] Finished, total {tot}, errors: {err}")
 
     def markVisisted(self, page_id, db_client=None):
         client = db_client or DBClient()

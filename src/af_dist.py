@@ -79,7 +79,8 @@ def dist(args, data, target):
     if target == "Obsidian":
         op = OperatorObsidian()
         dedup = op.dedup(data)
-        op.push(dedup, args.min_rating)
+        filtered = op.filters(dedup, min_rating=args.min_rating)
+        op.push(filtered)
 
 
 def run(args):
