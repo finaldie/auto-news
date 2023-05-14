@@ -37,6 +37,9 @@ class OperatorObsidian:
         """
         pages after dedup, format: [page1, page2, ...]
         """
+        print("#####################################################")
+        print("# Filtering Obsidian pages")
+        print("#####################################################")
         min_rating = kwargs.setdefault("min_rating", 4)
         print(f"min_rating: {min_rating}, type: {type(min_rating)}")
 
@@ -105,6 +108,7 @@ class OperatorObsidian:
         name = page["name"]
         props = page["properties"]["properties"]
         source = page["source"] or props["select"]["name"]
+        print("[_gen_ob_page] source: {source}, page: {page}")
 
         # TODO: Use notion util to extract content
         created_at = page["created_at"]
