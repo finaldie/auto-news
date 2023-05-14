@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
+from ops_obsidian import OperatorObsidian
 
 
 parser = argparse.ArgumentParser()
@@ -45,6 +46,8 @@ def process_twitter(args, folders):
     data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
+    return data_deduped
+
 
 def process_article(args, folders):
     print("#####################################################")
@@ -56,6 +59,8 @@ def process_article(args, folders):
     data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
+    return data_deduped
+
 
 def process_youtube(args, folders):
     print("#####################################################")
@@ -66,6 +71,15 @@ def process_youtube(args, folders):
     data = op.load_folders(folders, "youtube.json")
     data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
+
+    return data_deduped
+
+
+def dist(args, data, target):
+    if target == "Obsidian":
+        op = OperatorObsidian()
+        dedup = op.dedup(data)
+        op.push(dedup, args.min_rating)
 
 
 def run(args):
@@ -82,15 +96,20 @@ def run(args):
         name = dt.isoformat()
         folders.append(f"{workdir}/{args.data_folder}/{name}")
 
+    data_deduped = {}
+
     for source in sources:
         if source == "Twitter":
-            process_twitter(args, folders)
+            data_deduped = process_twitter(args, folders)
 
         elif source == "Article":
-            process_article(args, folders)
+            data_deduped = process_article(args, folders)
 
         elif source == "Youtube":
-            process_youtube(args, folders)
+            data_deduped = process_youtube(args, folders)
+
+        for target in args.targets.split(","):
+            dist(args, data_deduped, target)
 
 
 if __name__ == "__main__":
