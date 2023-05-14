@@ -80,7 +80,7 @@ def run(args):
     for i in range(args.past_days):
         dt = exec_date - timedelta(days=i)
         name = dt.isoformat()
-        folders.append(f"{args.data_path}/{name}")
+        folders.append(f"{args.data_folder}/{name}")
 
     for source in sources:
         print(f"Pushing data for source: {source} ...")
