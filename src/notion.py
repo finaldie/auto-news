@@ -613,7 +613,6 @@ class NotionAgent:
                 "created_time": page["created_time"],
                 "last_edited_time": props["last_edited_time"],
                 "notion_url": page["url"],
-                "source_url": props["properties"]["URL"]["url"],
 
                 # extract user rating (frequent used field)
                 "user_rating": rating_prop["name"] if rating_prop else None,
