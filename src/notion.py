@@ -12,7 +12,7 @@ class NotionAgent:
     """
     A notion agent to operate page/database
     """
-    def __init__(self, api_key):
+    def __init__(self, api_key=None):
         self.api_key = api_key or os.getenv("NOTION_TOKEN")
 
         self.api = self._init_client(self.api_key)
