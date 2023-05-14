@@ -1,6 +1,6 @@
 import argparse
 import os
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from dotenv import load_dotenv
 import utils
@@ -72,7 +72,7 @@ def process_youtube(args, folders):
 def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
-    exec_date = datetime.fromisoformat(args.start)
+    exec_date = date.fromisoformat(args.start)
 
     # folder names to load
     folders = []
