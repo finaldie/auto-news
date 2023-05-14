@@ -624,6 +624,7 @@ class NotionAgent:
 
                 # extract user rating (frequent used field)
                 "user_rating": rating_prop["name"] if rating_prop else None,
+                "source": source,
 
                 "properties": props,
                 "blocks": blocks,
