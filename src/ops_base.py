@@ -50,6 +50,7 @@ class OperatorBase:
                 database_id, source, last_edited_time=last_edited_time)
 
             for page_id, page in pages.items():
+                name = page["name"]
                 user_rating = page["user_rating"]
                 cur_edited_time = page["last_edited_time"]
                 cur = utils.parseDataFromIsoFormat(cur_edited_time)
@@ -57,6 +58,8 @@ class OperatorBase:
                 if not user_rating:
                     print("[INFO] Skip sync the content, user rating is empty")
                     continue
+
+                print(f"Syncing page: {name}")
 
                 old_page = data.get(page_id)
                 if not old_page:
