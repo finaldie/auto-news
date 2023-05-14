@@ -3,7 +3,6 @@ import os
 from datetime import date, datetime, timedelta
 
 from dotenv import load_dotenv
-import utils
 
 from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
@@ -73,6 +72,7 @@ def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
     exec_date = date.fromisoformat(args.start)
+    workdir = os.getenv("WORKDIR")
 
     # folder names to load
     folders = []
@@ -80,7 +80,7 @@ def run(args):
     for i in range(args.past_days):
         dt = exec_date - timedelta(days=i)
         name = dt.isoformat()
-        folders.append(f"{args.data_folder}/{name}")
+        folders.append(f"{workdir}/{args.data_folder}/{name}")
 
     for source in sources:
         print(f"Pushing data for source: {source} ...")
