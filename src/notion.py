@@ -453,7 +453,7 @@ class NotionAgent:
             page_content = self.concatBlocksText(blocks)
 
             extracted_pages[page_id] = {
-                "name": page["properties"]["Name"]["title"]["text"]["content"],
+                "name": page["properties"]["Name"]["title"][0]["text"]["content"],
                 "to": page["properties"]["To"]["rich_text"][0]["text"]["content"],
                 # pdt timezone
                 "created_at": page["properties"]["Created at"]["date"]["start"],
@@ -607,7 +607,7 @@ class NotionAgent:
 
             extracted_pages[page_id] = {
                 "id": page_id,
-                "name": page["properties"]["Name"]["title"]["text"]["content"],
+                "name": page["properties"]["Name"]["title"][0]["text"]["content"],
                 # pdt timezone
                 "created_at": page["properties"]["Created at"]["date"]["start"],
                 "created_time": page["created_time"],
