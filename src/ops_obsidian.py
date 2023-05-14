@@ -102,13 +102,13 @@ class OperatorObsidian:
             "obsidian", "default", page_id)
 
     def _gen_ob_page(self, page):
+        print("[_gen_ob_page] page: {page}")
         tpl_title = tpl_obsidian.TEMPLATE_OBSIDIAN_INBOX_FILE
         tpl_body = tpl_obsidian.TEMPLATE_OBSIDIAN_INBOX_BODY
 
         name = page["name"]
         props = page["properties"]["properties"]
         source = page.get("source") or props["select"]["name"]
-        print("[_gen_ob_page] source: {source}, page: {page}")
 
         # TODO: Use notion util to extract content
         created_at = page["created_at"]
