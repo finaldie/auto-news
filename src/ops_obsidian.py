@@ -46,6 +46,8 @@ class OperatorObsidian:
             print("[ERROR] Data folder path is invalid, skip pushing")
             return
 
+        print(f"Data folder: {data_folder}")
+
         client = DBClient()
         tot = 0
         err = 0
