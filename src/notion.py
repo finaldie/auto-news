@@ -583,6 +583,12 @@ class NotionAgent:
                             "equals": source,
                         }
                     },
+                    {
+                        "property": "User Rating",
+                        "select": {
+                            "is_not_empty": True,
+                        }
+                    },
                 ]
             }
         }
