@@ -97,6 +97,60 @@ class OperatorBase:
 
         print("Finished for updating last_edited_time")
 
+    def load_folders(self, folder_paths: str, target_filename: str):
+        """
+        Load target_filename from folder_path
+        """
+        file_list = []
+        folders = folder_paths.split(",")
+        print(f"Loading folders: {folders}")
+
+        for folder_path in folders:
+            for root, dirs, files in os.walk(folder_path):
+                for filename in files:
+                    if filename != target_filename:
+                        continue
+
+                    file_path = os.path.join(root, filename)
+                    file_list.append(file_path)
+
+                    print(f"Found file to read: {file_path}")
+
+        pages = []
+        for file_path in file_list:
+            page = self.readFromJson2(file_path)
+            pages.append(page)
+
+        return pages
+
+    def unique(self, data: list):
+        """
+        For same page_id, keep one copy with latest edited time
+        """
+        deduped_pages = {}
+
+        for pages in data:
+            for page_id, page in pages.items():
+                name = page["name"]
+                last_edited_time = page["last_edited_time"]
+                last = utils.parseDataFromIsoFormat(last_edited_time)
+
+                print(f"Dedupping page name: {name}, last_edited_time: l{last_edited_time} ...")
+
+                if not deduped_pages.get(page_id):
+                    deduped_pages[page_id] = page
+
+                else:
+                    curr_page = deduped_pages[page_id]
+                    curr_edited_time = curr_page["last_edited_time"]
+                    curr = utils.parseDataFromIsoFormat(curr_edited_time)
+
+                    if last > curr:
+                        deduped_pages[page_id] = page
+                        print(f"Overwrite the page due to it's latest one, last: {last}, curr: {curr}")
+
+        return deduped_pages
+
     def save2json(
         self,
         data_folder,
@@ -118,6 +172,15 @@ class OperatorBase:
         data_path = f"{workdir}/{data_folder}/{run_id}"
         full_path = utils.gen_filename(data_path, filename)
 
+        data = utils.read_data_json(full_path)
+
+        print(f"Retrieve data from {full_path}, data: {data}")
+        return data
+
+    def readFromJson2(self, file_path):
+        workdir = os.getenv("WORKDIR")
+
+        full_path = f"{workdir}/{file_path}"
         data = utils.read_data_json(full_path)
 
         print(f"Retrieve data from {full_path}, data: {data}")

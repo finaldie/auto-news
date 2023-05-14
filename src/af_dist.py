@@ -36,8 +36,8 @@ def process_twitter(args):
     print("# Process Twitter")
     print("#####################################################")
     op = OperatorTwitter()
-    data = op.readFromJson(args.data_folder, args.run_id, "twitter.json")
-    data_deduped = op.dedup(data, target="syncing")
+    data = op.load_folders(args.data_folder, "twitter.json")
+    data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
 
@@ -47,8 +47,8 @@ def process_article(args):
     print("#####################################################")
     op = OperatorArticle()
 
-    data = op.readFromJson(args.data_folder, args.run_id, "article.json")
-    data_deduped = op.dedup(data, target="syncing")
+    data = op.load_folders(args.data_folder, "article.json")
+    data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
 
@@ -58,8 +58,8 @@ def process_youtube(args):
     print("#####################################################")
     op = OperatorYoutube()
 
-    data = op.readFromJson(args.data_folder, args.run_id, "youtube.json")
-    data_deduped = op.dedup(data, target="syncing")
+    data = op.load_folders(args.data_folder, "youtube.json")
+    data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
 
