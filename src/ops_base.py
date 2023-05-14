@@ -97,12 +97,11 @@ class OperatorBase:
 
         print("Finished for updating last_edited_time")
 
-    def load_folders(self, folder_paths: str, target_filename: str):
+    def load_folders(self, folders: list, target_filename: str):
         """
         Load target_filename from folder_path
         """
         file_list = []
-        folders = folder_paths.split(",")
         print(f"Loading folders: {folders}")
 
         for folder_path in folders:

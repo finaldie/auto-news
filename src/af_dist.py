@@ -1,6 +1,6 @@
 import argparse
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 import utils
@@ -21,44 +21,50 @@ parser.add_argument("--job-id", help="job-id",
                     default="")
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
-parser.add_argument("--sources", help="sources to pull, comma separated",
+parser.add_argument("--sources",
+                    help="sources to pull, comma separated",
                     default="Twitter,Article,Youtube")
-parser.add_argument("--targets", help="targets to push, comma separated",
+parser.add_argument("--targets",
+                    help="targets to push, comma separated",
                     default="Obsidian")
-parser.add_argument("--min-rating", help="Minimum user rating to distribute",
+parser.add_argument("--min-rating",
+                    help="Minimum user rating to distribute",
                     default=4)
 parser.add_argument("--dedup", help="whether dedup item",
                     default=True)
+parser.add_argument("--past-days",
+                    help="How many days in the past to process",
+                    default=2)
 
 
-def process_twitter(args):
+def process_twitter(args, folders):
     print("#####################################################")
     print("# Process Twitter")
     print("#####################################################")
     op = OperatorTwitter()
-    data = op.load_folders(args.data_folder, "twitter.json")
+    data = op.load_folders(folders, "twitter.json")
     data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
 
-def process_article(args):
+def process_article(args, folders):
     print("#####################################################")
     print("# Process Article")
     print("#####################################################")
     op = OperatorArticle()
 
-    data = op.load_folders(args.data_folder, "article.json")
+    data = op.load_folders(folders, "article.json")
     data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
 
-def process_youtube(args):
+def process_youtube(args, folders):
     print("#####################################################")
     print(f"# Process Youtube, dedup: {args.dedup}")
     print("#####################################################")
     op = OperatorYoutube()
 
-    data = op.load_folders(args.data_folder, "youtube.json")
+    data = op.load_folders(folders, "youtube.json")
     data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
@@ -66,18 +72,27 @@ def process_youtube(args):
 def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
+    exec_date = datetime.fromisoformat(args.start)
+
+    # folder names to load
+    folders = []
+
+    for i in range(args.past_days):
+        dt = exec_date - timedelta(days=i)
+        name = dt.isoformat()
+        folders.append(f"{args.data_path}/{name}")
 
     for source in sources:
         print(f"Pushing data for source: {source} ...")
 
         if source == "Twitter":
-            process_twitter(args)
+            process_twitter(args, folders)
 
         elif source == "Article":
-            process_article(args)
+            process_article(args, folders)
 
         elif source == "Youtube":
-            process_youtube(args)
+            process_youtube(args, folders)
 
 
 if __name__ == "__main__":
