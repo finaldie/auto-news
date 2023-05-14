@@ -68,7 +68,7 @@ with DAG(
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder=data/sync/{{ ds }}/{{ run_id }} '
+        '--data-folder=data/sync/{{ ds }} '
         '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} '
     )
 
@@ -79,7 +79,7 @@ with DAG(
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder=data/sync/{{ ds }}/{{ run_id }} '
+        '--data-folder=data/sync/{{ ds }} '
         '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "obsidian") }} '
         '--min-rating={{ dag_run.conf.setdefault("min_rating", 4) }} '
