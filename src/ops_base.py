@@ -39,6 +39,8 @@ class OperatorBase:
         if not last_edited_time:
             last_edited_time = (datetime.now() - timedelta(days=365)).isoformat()
 
+        print(f"Start syncing content, last_edited_time: {last_edited_time}")
+
         data = {}
 
         for db_page in db_pages:
