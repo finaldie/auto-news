@@ -117,7 +117,7 @@ class OperatorBase:
 
         pages = []
         for file_path in file_list:
-            page = self.readFromJson2(file_path)
+            page = utils.read_data_json(file_path)
             pages.append(page)
 
         return pages
@@ -171,15 +171,6 @@ class OperatorBase:
         data_path = f"{workdir}/{data_folder}/{run_id}"
         full_path = utils.gen_filename(data_path, filename)
 
-        data = utils.read_data_json(full_path)
-
-        print(f"Retrieve data from {full_path}, data: {data}")
-        return data
-
-    def readFromJson2(self, file_path):
-        workdir = os.getenv("WORKDIR")
-
-        full_path = f"{workdir}/{file_path}"
         data = utils.read_data_json(full_path)
 
         print(f"Retrieve data from {full_path}, data: {data}")
