@@ -108,7 +108,7 @@ class OperatorObsidian:
 
         name = page["name"]
         props = page["properties"]["properties"]
-        source = page.get("source") or props["select"]["name"]
+        source = page.get("source") or props["Source"]["select"]["name"]
 
         # TODO: Use notion util to extract content
         created_at = page["created_at"]
