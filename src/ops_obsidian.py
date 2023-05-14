@@ -107,7 +107,7 @@ class OperatorObsidian:
 
         name = page["name"]
         props = page["properties"]["properties"]
-        source = page["source"] or props["select"]["name"]
+        source = page.get("source") or props["select"]["name"]
         print("[_gen_ob_page] source: {source}, page: {page}")
 
         # TODO: Use notion util to extract content
