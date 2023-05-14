@@ -1,4 +1,6 @@
 import os
+import traceback
+
 from db_cli import DBClient
 import tpl_obsidian
 
@@ -66,9 +68,10 @@ class OperatorObsidian:
 
             except Exception as e:
                 print(f"[ERROR] Failed to push obsidian md: {e}")
+                traceback.print_exc()
                 err += 1
 
-        print(f"[INFO] Total pushed {tot}, skipped: {skipped}, errors: {err}")
+        print(f"[INFO] Finished, total {tot}, skipped: {skipped}, errors: {err}")
 
     def markVisisted(self, page_id, db_client=None):
         client = db_client or DBClient()
@@ -106,6 +109,7 @@ class OperatorObsidian:
             "default",  # TODO: topic
             "default",  # TODO: category
             take_aways,
+            "test",     # TODO: body
         )
 
         print(f"[INFO] Gen obsidian page, filename: {filename}")
