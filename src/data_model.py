@@ -17,7 +17,7 @@ NOTION_TOREAD_ITEM_ID = "notion_toread_item_id_{}_{}_{}"
 
 # key: prefix + source_name (article) + list_name (default)
 # val: time
-NOTION_TOREAD_LAST_EDITED_KEY = "notion_inbox_last_edited_{}_{}"
+NOTION_TOREAD_LAST_EDITED_KEY = "notion_toread_last_edited_{}_{}"
 
 # key: prefix + source_name + list_name + id
 # val: llm ranking respones

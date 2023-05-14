@@ -159,7 +159,7 @@ class NotionAgent:
         elif block["type"] == "table":
             # depth forward in the child blocks
             pros, blocks = self.extractPage(block_id)
-            text = self._concatBlocksText(blocks)
+            text = self.concatBlocksText(blocks)
 
         elif block["type"] == "table_row":
             text = self._extractTableRow(block)
@@ -194,7 +194,7 @@ class NotionAgent:
             "properties": page["properties"],
         }
 
-    def _concatBlocksText(self, blocks):
+    def concatBlocksText(self, blocks):
         """
         blocks: Converted internal blocks dict (not notion block
                 object). format: <block_id, block_data>
@@ -450,7 +450,7 @@ class NotionAgent:
 
             page_id = page["id"]
             props, blocks = self.extractPage(page_id)
-            page_content = self._concatBlocksText(blocks)
+            page_content = self.concatBlocksText(blocks)
 
             extracted_pages[page_id] = {
                 "name": page["properties"]["Name"]["title"]["text"]["content"],
@@ -515,7 +515,7 @@ class NotionAgent:
 
             page_id = page["id"]
             props, blocks = self.extractPage(page_id)
-            page_content = self._concatBlocksText(blocks)
+            page_content = self.concatBlocksText(blocks)
 
             print(f"Extracting one page: {page}, props: {props}")
 
@@ -555,6 +555,72 @@ class NotionAgent:
         # Fix fields such as 'source'
         for page_id, page in extracted_pages.items():
             page["source"] = "Youtube"
+
+        return extracted_pages
+
+    def queryDatabaseToRead(
+        self,
+        database_id,
+        source: str,
+        last_edited_time=None
+    ):
+        query_data = {
+            "database_id": database_id,
+            "sorts": [
+                {
+                    "property": "Last edited time",
+                    "direction": "ascending",
+                },
+            ],
+
+            "filter": {
+                "and": [
+                    {
+                        "property": "Source",
+                        "select": {
+                            "equals": source,
+                        }
+                    },
+                ]
+            }
+        }
+
+        # filter by created_time
+        if last_edited_time:
+            query_data["filter"]["and"].append({
+                "property": "Last edited time",
+                "date": {
+                    "on_or_after": last_edited_time,
+                }
+            })
+
+        pages = self.api.databases.query(**query_data).get("results")
+
+        extracted_pages = {}
+        for page in pages:
+            print(f"result: page id: {page['id']}")
+
+            page_id = page["id"]
+            props, blocks = self.extractPage(page_id)
+
+            rating_prop = page["properties"]["User Rating"]["select"]
+
+            extracted_pages[page_id] = {
+                "id": page_id,
+                "name": page["properties"]["Name"]["title"]["text"]["content"],
+                # pdt timezone
+                "created_at": page["properties"]["Created at"]["date"]["start"],
+                "created_time": page["created_time"],
+                "last_edited_time": props["last_edited_time"],
+                "notion_url": page["url"],
+                "source_url": props["properties"]["URL"]["url"],
+
+                # extract user rating (frequent used field)
+                "user_rating": rating_prop["name"] if rating_prop else None,
+
+                "properties": props,
+                "blocks": blocks,
+            }
 
         return extracted_pages
 
