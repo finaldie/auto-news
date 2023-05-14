@@ -45,7 +45,7 @@ class OperatorBase:
             database_id = db_page["database_id"]
 
             pages = notion_agent.queryDatabaseToRead(
-                database_id, last_edited_time=last_edited_time)
+                database_id, source, last_edited_time=last_edited_time)
 
             for page_id, page in pages.items():
                 user_rating = page["user_rating"]
