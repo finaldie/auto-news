@@ -83,8 +83,6 @@ def run(args):
         folders.append(f"{workdir}/{args.data_folder}/{name}")
 
     for source in sources:
-        print(f"Pushing data for source: {source} ...")
-
         if source == "Twitter":
             process_twitter(args, folders)
 
