@@ -40,7 +40,7 @@ class DBClient(DBClientBase):
     def set_notion_last_edited_time(self, source, category, t, **kwargs):
         key_tpl = data_model.NOTION_TOREAD_LAST_EDITED_KEY
         key = key_tpl.format(source, category)
-        self.driver.get(key, t, **kwargs)
+        self.driver.set(key, t, **kwargs)
 
     def get_notion_ranking_item_id(self, source, category, item_id):
         key_tpl = data_model.NOTION_RANKING_ITEM_ID
