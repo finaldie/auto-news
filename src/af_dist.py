@@ -85,8 +85,11 @@ def dist(args, data, target):
 def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
+    targets = args.targets.split(",")
     exec_date = date.fromisoformat(args.start)
     workdir = os.getenv("WORKDIR")
+
+    print(f"sources: {sources}, targets: {targets}, exec_date: {exec_date}, workdir: {workdir}")
 
     # folder names to load
     folders = []
@@ -108,7 +111,7 @@ def run(args):
         elif source == "Youtube":
             data_deduped = process_youtube(args, folders)
 
-        for target in args.targets.split(","):
+        for target in targets:
             dist(args, data_deduped, target)
 
 

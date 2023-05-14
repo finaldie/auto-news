@@ -81,7 +81,7 @@ with DAG(
         '--job-id={{ ti.job_id }} '
         '--data-folder=data/sync '
         '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} '
-        '--targets={{ dag_run.conf.setdefault("targets", "obsidian") }} '
+        '--targets={{ dag_run.conf.setdefault("targets", "Obsidian") }} '
         '--min-rating={{ dag_run.conf.setdefault("min_rating", 4) }} '
         '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
     )
