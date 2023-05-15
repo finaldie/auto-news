@@ -8,6 +8,7 @@ from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
 from ops_obsidian import OperatorObsidian
+import utils
 
 
 parser = argparse.ArgumentParser()
@@ -76,11 +77,13 @@ def process_youtube(args, folders):
 
 
 def dist(args, data, target):
+    dedup = utils.str2bool(args.dedup)
+
     if target == "Obsidian":
         op = OperatorObsidian()
 
         dedup = []
-        if args.dedup:
+        if dedup:
             dedup = op.dedup(data)
         else:
             dedup = [page for page_id, page in data.items()]
@@ -95,8 +98,9 @@ def run(args):
     targets = args.targets.split(",")
     exec_date = date.fromisoformat(args.start)
     workdir = os.getenv("WORKDIR")
+    dedup = utils.str2bool(args.dedup)
 
-    print(f"sources: {sources}, targets: {targets}, exec_date: {exec_date}, workdir: {workdir}, dedup: {args.dedup}")
+    print(f"sources: {sources}, targets: {targets}, exec_date: {exec_date}, workdir: {workdir}, dedup: {dedup}")
 
     # folder names to load
     folders = []
