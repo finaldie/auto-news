@@ -39,7 +39,7 @@ with DAG(
     'sync_dist',
     default_args=default_args,
     max_active_runs=1,
-    description='Sync content from ToRead. config: {"sources": "Twitter,Article,Youtube", "targets": "obsidian", "dedup": true, "min_rating": 4}',
+    description='Sync content from ToRead. config: {"sources": "Twitter,Article,Youtube", "targets": "Obsidian", "dedup": true, "min-rating": 4}',
     schedule_interval=timedelta(days=1),
     # schedule_interval=None,
     start_date=days_ago(1),
@@ -82,7 +82,7 @@ with DAG(
         '--data-folder=data/sync '
         '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "Obsidian") }} '
-        '--min-rating={{ dag_run.conf.setdefault("min_rating", 4) }} '
+        '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
         '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
     )
 
