@@ -84,6 +84,7 @@ class OperatorObsidian:
         err = 0
 
         for page in pages:
+            page_id = page["id"]
             tot += 1
 
             try:
@@ -91,7 +92,7 @@ class OperatorObsidian:
                     page, notion_agent=notion_agent)
 
                 self._save_ob_page(data_folder, filename, content)
-                # self.markVisisted(page_id, db_client=client)
+                self.markVisisted(page_id, db_client=client)
 
             except Exception as e:
                 print(f"[ERROR] Failed to push obsidian md: {e}")
