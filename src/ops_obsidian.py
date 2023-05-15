@@ -76,12 +76,13 @@ class OperatorObsidian:
             print("[ERROR] Data folder path is invalid, skip pushing")
             return
 
-        print(f"Data folder: {data_folder}")
+        print(f"Data folder: {data_folder}, total pages: {len(pages)}")
 
         client = DBClient()
         notion_agent = NotionAgent()
         tot = 0
         err = 0
+        skipped = 0
 
         for page in pages:
             page_id = page["id"]
@@ -95,13 +96,15 @@ class OperatorObsidian:
                     print(f"[INFO] Gen obsidian page, filename: {filename}")
                     print(f"[INFO] Gen obsidian body, content: {content}")
                     self.markVisisted(page_id, db_client=client)
+                else:
+                    skipped += 1
 
             except Exception as e:
                 print(f"[ERROR] Failed to push obsidian md: {e}")
                 traceback.print_exc()
                 err += 1
 
-        print(f"[INFO] Finished, total {tot}, errors: {err}")
+        print(f"[INFO] Finished, total {tot}, skipped: {skipped}, errors: {err}")
 
     def markVisisted(self, page_id, db_client=None):
         client = db_client or DBClient()
