@@ -728,7 +728,7 @@ class NotionAgent:
                         {
                             "type": "text",
                             "text": {
-                                "content": f"Reply-to: {tweet['reply_to_name']}: {tweet['reply_text']}",
+                                "content": f"{tweet['reply_to_name']}: {tweet['reply_text']}",
                                 # "link": tweet["reply_url"],
                             },
                             # "href": tweet["reply_url"],
@@ -757,7 +757,7 @@ class NotionAgent:
                         {
                             "type": "text",
                             "text": {
-                                "content": f"Reply-to: @{tweet['reply_to_screen_name']}: Tweet has been deleted / hidden :(",
+                                "content": f"@{tweet['reply_to_screen_name']}: Tweet has been deleted / hidden :(",
                                 # "link": tweet["reply_url"],
                             },
                             # "href": tweet["reply_url"],
