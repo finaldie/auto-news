@@ -130,9 +130,13 @@ class OperatorObsidian:
         take_aways = notion_agent.extractRichText(props["Take Aways"]["rich_text"])
         topic = notion_agent.extractMultiSelect(props["Topic"])
         category = notion_agent.extractMultiSelect(props["Category"])
-        body = notion_agent.concatBlocksText(page["blocks"])
+        body = notion_agent.concatBlocksText(page["blocks"], separator="\n")
 
-        filename = tpl_title.format(source, "default", name)
+        title = name
+        if source == "Twitter":
+            title = f"{alias}_{to}_{created_at}"
+
+        filename = tpl_title.format(source, "default", title)
         content = tpl_body.format(
             created_at,
             rating,

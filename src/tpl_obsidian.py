@@ -1,5 +1,5 @@
 # parameters: source, category, original title
-TEMPLATE_OBSIDIAN_INBOX_FILE = "notion_toread_{}_{}_{}.md"
+TEMPLATE_OBSIDIAN_INBOX_FILE = "{}_{}_{}.md"
 
 
 TEMPLATE_OBSIDIAN_INBOX_BODY = """

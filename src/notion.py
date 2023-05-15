@@ -103,6 +103,18 @@ class NotionAgent:
             prefix="```",
             suffix="```")
 
+    def extractToggle(self, block):
+        content = ""
+        content += self.extractRichText(block["toggle"]["rich_text"])
+        content += "\n"
+
+        if block["has_children"]:
+            block_id = block["id"]
+            props, blocks = self.extractPage(block_id)
+            content += self.concatBlocksText(blocks)
+
+        return content
+
     def extractTableRow(self, block):
         """
         block: notion block object (table_row type)
@@ -182,6 +194,9 @@ class NotionAgent:
         elif block["type"] == "code":
             text = self.extractCode(block)
 
+        elif block["type"] == "toggle":
+            text = self.extractToggle(block)
+
         else:
             print(f"[Unsupported block type]!!!: {block['type']}, block: {block}")
 
@@ -205,7 +220,7 @@ class NotionAgent:
             "properties": page["properties"],
         }
 
-    def concatBlocksText(self, blocks):
+    def concatBlocksText(self, blocks, separator=''):
         """
         blocks: Converted internal blocks dict (not notion block
                 object). format: <block_id, block_data>
@@ -217,6 +232,7 @@ class NotionAgent:
             text = block_data["text"]
 
             content += text
+            content += separator
 
         return content
 
