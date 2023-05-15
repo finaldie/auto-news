@@ -78,7 +78,13 @@ def process_youtube(args, folders):
 def dist(args, data, target):
     if target == "Obsidian":
         op = OperatorObsidian()
-        dedup = op.dedup(data)
+
+        dedup = []
+        if args.dedup:
+            dedup = op.dedup(data)
+        else:
+            dedup = [page for page_id, page in data.items()]
+
         filtered = op.filters(dedup, min_rating=args.min_rating)
         op.push(filtered)
 
