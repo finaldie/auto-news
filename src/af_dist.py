@@ -122,8 +122,10 @@ def run(args):
         elif source == "Youtube":
             data_deduped = process_youtube(args, folders)
 
-        for target in targets:
-            dist(args, data_deduped, target)
+        # TODO: The distribution part is only for weekly or monthly
+        #       job, to minimize the number of items
+        # for target in targets:
+        #     dist(args, data_deduped, target)
 
 
 if __name__ == "__main__":

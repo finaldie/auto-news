@@ -116,6 +116,7 @@ class OperatorObsidian:
         tpl_title = tpl_obsidian.TEMPLATE_OBSIDIAN_INBOX_FILE
         tpl_body = tpl_obsidian.TEMPLATE_OBSIDIAN_INBOX_BODY
 
+        page_id = page["id"]
         name = page["name"]
         props = page["properties"]["properties"]
         source = page.get("source") or props["Source"]["select"]["name"]
@@ -132,11 +133,10 @@ class OperatorObsidian:
         category = notion_agent.extractMultiSelect(props["Category"])
         body = notion_agent.concatBlocksText(page["blocks"], separator="\n")
 
-        title = name
-        if source == "Twitter":
-            title = f"{alias}_{to}_{created_at}"
+        # The filename is using page_id (uuid) directly
+        # To query the actual title using 'alias' field
+        filename = tpl_title.format(source, "default", page_id)
 
-        filename = tpl_title.format(source, "default", title)
         content = tpl_body.format(
             created_at,
             rating,
