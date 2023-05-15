@@ -91,8 +91,8 @@ class OperatorObsidian:
                 filename, content = self._gen_ob_page(
                     page, notion_agent=notion_agent)
 
-                self._save_ob_page(data_folder, filename, content)
-                self.markVisisted(page_id, db_client=client)
+                if self._save_ob_page(data_folder, filename, content):
+                    self.markVisisted(page_id, db_client=client)
 
             except Exception as e:
                 print(f"[ERROR] Failed to push obsidian md: {e}")
@@ -155,13 +155,14 @@ class OperatorObsidian:
 
         if not os.path.exists(topdir):
             print(f"[ERROR] Not found Obsidian folder, skip to save: {topdir}")
-            return
+            return False
 
         if os.path.exists(full_path):
             print("[INFO] the file exsit, skip")
-            return
+            return False
 
         with open(full_path, "w") as file:
             file.write(content)
 
         print(f"File saved: {full_path}")
+        return True
