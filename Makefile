@@ -8,7 +8,7 @@ help:
 topdir := $(shell pwd)
 build_dir := $(topdir)/build
 
-include $(topdir)/install.env
+include $(build_dir)/install.env
 
 docker-network:
 	@echo "creating docker network for bot..."
