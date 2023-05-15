@@ -92,6 +92,8 @@ class OperatorObsidian:
                     page, notion_agent=notion_agent)
 
                 if self._save_ob_page(data_folder, filename, content):
+                    print(f"[INFO] Gen obsidian page, filename: {filename}")
+                    print(f"[INFO] Gen obsidian body, content: {content}")
                     self.markVisisted(page_id, db_client=client)
 
             except Exception as e:
@@ -143,8 +145,6 @@ class OperatorObsidian:
             body
         )
 
-        print(f"[INFO] Gen obsidian page, filename: {filename}")
-        print(f"[INFO] Gen obsidian body, content: {content}")
         return filename, content
 
     def _save_ob_page(self, data_path, filename, content):
