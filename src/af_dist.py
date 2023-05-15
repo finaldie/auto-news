@@ -96,7 +96,7 @@ def run(args):
     exec_date = date.fromisoformat(args.start)
     workdir = os.getenv("WORKDIR")
 
-    print(f"sources: {sources}, targets: {targets}, exec_date: {exec_date}, workdir: {workdir}")
+    print(f"sources: {sources}, targets: {targets}, exec_date: {exec_date}, workdir: {workdir}, dedup: {args.dedup}")
 
     # folder names to load
     folders = []
