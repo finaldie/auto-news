@@ -122,6 +122,10 @@ class OperatorMilvus:
             page_metadata = client.get_page_item_id(page_id)
             page_metadata = utils.fix_and_parse_json(page_metadata)
 
+            if not page_metadata:
+                print(f"[WARN] cannot find any metadata for page_id: {page_id}, skip it")
+                continue
+
             res.append(page_metadata)
 
         return res
