@@ -81,6 +81,9 @@ def dist(args, data, source, target):
     """
     data: The past few days unique data
     """
+    print("#####################################################")
+    print(f"# Data distribution, dedup: {args.dedup}, source: {source}, target: {target}, start_date: {args.start}")
+    print("#####################################################")
     dedup = utils.str2bool(args.dedup)
 
     if target == "Obsidian":
@@ -146,8 +149,8 @@ def run(args):
         elif source == "Youtube":
             data_deduped = process_youtube(args, folders)
 
-        # for target in targets:
-        #     dist(args, data_deduped, source, target)
+        for target in targets:
+            dist(args, data_deduped, source, target)
 
 
 if __name__ == "__main__":

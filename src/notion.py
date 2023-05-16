@@ -426,6 +426,9 @@ class NotionAgent:
             "User Rating": {
                 "select": {}
             },
+            "Relevant Score": {
+                "number": {}
+            },
             "Tags": {
                 "multi_select": {}
             },
@@ -1102,6 +1105,11 @@ class NotionAgent:
         properties.update({"Rating": {
             "number": rate_number
         }})
+
+        if tweet.get("__relevant_score"):
+            properties.update({"Relevant Score": {
+                "number": tweet["__relevant_score"]
+            }})
 
         print(f"notion ToRead: database_id: {database_id}, properties: {properties}, blocks: {blocks}")
 

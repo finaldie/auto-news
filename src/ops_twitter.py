@@ -12,6 +12,7 @@ from llm_agent import (
 import utils
 from ops_base import OperatorBase
 from db_cli import DBClient
+from ops_milvus import OperatorMilvus
 
 
 class OperatorTwitter(OperatorBase):
@@ -200,6 +201,38 @@ class OperatorTwitter(OperatorBase):
                             print(f"[ERROR]: Push to notion failed, skip: {e}")
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
+
+    def score(self, data, **kwargs):
+        start_date = kwargs.setdefault("start_date", "")
+        op_milvus = OperatorMilvus()
+
+        scored_pages = {}
+
+        for list_name, tweets in data.items():
+            scored_list = scored_pages.setdefault(list_name, [])
+
+            for ranked_tweet in tweets:
+                try:
+                    text = ""
+                    if ranked_tweet["reply_text"]:
+                        text += f"{ranked_tweet['reply_to_name']}: {ranked_tweet['reply_text']}"
+                    text += f"{ranked_tweet['name']}: {ranked_tweet['text']}"
+
+                    relevant_metas = op_milvus.get_relevant(
+                        start_date, text, topk=10)
+
+                    page_score = op_milvus.score(relevant_metas)
+
+                    scored_page = copy.deepcopy(ranked_tweet)
+                    scored_page["__relevant_score"] = page_score
+
+                    scored_list.append(scored_page)
+
+                except Exception as e:
+                    print(f"[ERROR]: Score page failed, skip: {e}")
+
+        print(f"Scored_pages: {scored_pages}")
+        return scored_pages
 
     def _get_top_items(self, items: list, k):
         """

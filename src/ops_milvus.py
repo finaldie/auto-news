@@ -1,7 +1,5 @@
-import os
 import traceback
-import json
-from datetime import date, datetime
+from datetime import date
 
 from db_cli import DBClient
 from notion import NotionAgent
@@ -66,9 +64,13 @@ class OperatorMilvus:
         for page in pages:
             page_id = page["id"]
             user_rating = int(page["user_rating"])
+            last_edited_time = page["last_edited_time"]
             tot += 1
 
-            data = {"user_rating": user_rating}
+            data = {
+                "last_edited_time": last_edited_time,
+                "user_rating": user_rating,
+            }
 
             try:
                 client.set_page_item_id(
@@ -93,8 +95,48 @@ class OperatorMilvus:
 
         return pages
 
-    def get_relevant(self, text: str, topk: int = 5):
-        pass
+    def get_relevant(self, start_date, text: str, topk: int = 5):
+        print("#####################################################")
+        print("# Get relevant Milvus pages")
+        print("#####################################################")
+
+        collection_name = f"news_embedding__{start_date}"
+        print(f"[get_relevant] collection_name: {collection_name}")
+
+        client = DBClient()
+        milvus_client = MilvusClient()
+
+        response_arr = milvus_client.get(collection_name, text, topk=5)
+        res = []
+
+        for response in response_arr:
+            print(f"Processing response: {response}")
+
+            page_id = response["item_id"]
+            page_metadata = client.get_page_item_id(page_id)
+            page_metadata = utils.fix_and_parse_json(page_metadata)
+
+            res.append(page_metadata)
+
+        return res
+
+    def score(self, relevant_page_metas: list):
+        """
+        @param relevant_page_metas: From get_relevant
+
+        @return the average rating of all the user ratings
+        """
+
+        tot = 0
+        n = len(relevant_page_metas)
+
+        if n == 0:
+            return -1  # unknown score
+
+        for page_metadata in relevant_page_metas:
+            tot += page_metadata["user_rating"]
+
+        return tot / n
 
     def push(self, pages, **kwargs):
         """

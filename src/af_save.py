@@ -34,6 +34,17 @@ parser.add_argument("--dedup", help="whether dedup item",
 
 
 def process_twitter(args):
+    """
+    Twitter has tons of tweets to process, apply embedding-based algo
+    to calcuate the candidates and merge/select into final data_ranked
+
+    The score source is based on user_rating field: [1, 5], ideally
+    >= 4 will be a good
+
+    cold start: user still filing GPT ranked score
+    warm/hot start: user can filter the new relevant score, e.g.
+                    filter score >= 4
+    """
     print("#####################################################")
     print("# Process Twitter")
     print("#####################################################")
@@ -41,6 +52,18 @@ def process_twitter(args):
     data = op.readFromJson(args.data_folder, args.run_id, "twitter.json")
     data_deduped = op.dedup(data, target="toread")
     data_ranked = op.rank(data_deduped)
+
+    # TODO: For test, Fix this section later, pass data_scored to
+    #       op.push(...)
+    data_scored = {}
+
+    try:
+        data_scored = op.score(data_ranked, start_date=args.start)
+
+    except Exception as e:
+        print(f"[ERROR] score pages failed: {e}")
+
+    print(f"Data scored: {data_scored}")
 
     targets = args.targets.split(",")
     op.push(data_ranked, targets, args.topics_top_k, args.categories_top_k)

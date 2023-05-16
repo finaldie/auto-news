@@ -185,6 +185,9 @@ class OperatorBase:
     def rank(self, data):
         return
 
+    def score(self, data):
+        return
+
     def push(self, ranked_data, targets, topk=3):
         return
 
