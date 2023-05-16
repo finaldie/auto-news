@@ -38,7 +38,6 @@ class MilvusClient:
         It creates the embedding with 1536 dimentions by default
         """
         api_key = os.getenv("OPENAI_API_KEY")
-        print(f"[createEmbedding] openai api key: {api_key}")
 
         emb = openai.Embedding.create(
             input=[text],

@@ -95,6 +95,11 @@ class OperatorMilvus:
         for page_id in page_ids:
             # format: {user_rating: xx, ...}
             page_metadata = client.get_page_item_id(page_id)
+
+            if not page_metadata:
+                print(f"[WARN] cannot find any metadata for page_id: {page_id}, skip it")
+                continue
+
             page_metadata = utils.fix_and_parse_json(page_metadata)
 
             pages.append(page_metadata)
@@ -120,12 +125,12 @@ class OperatorMilvus:
 
             page_id = response["item_id"]
             page_metadata = client.get_page_item_id(page_id)
-            page_metadata = utils.fix_and_parse_json(page_metadata)
 
             if not page_metadata:
                 print(f"[WARN] cannot find any metadata for page_id: {page_id}, skip it")
                 continue
 
+            page_metadata = utils.fix_and_parse_json(page_metadata)
             res.append(page_metadata)
 
         return res
@@ -139,6 +144,7 @@ class OperatorMilvus:
         print("#####################################################")
         print("# Score Milvus pages")
         print("#####################################################")
+        print(f"relevant_page_metas: {relevant_page_metas}")
 
         tot = 0
         n = len(relevant_page_metas)

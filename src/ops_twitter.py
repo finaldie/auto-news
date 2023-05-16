@@ -1,6 +1,7 @@
 import os
 import time
 import copy
+import traceback
 from operator import itemgetter
 from collections import Counter
 
@@ -231,6 +232,7 @@ class OperatorTwitter(OperatorBase):
 
                 except Exception as e:
                     print(f"[ERROR]: Score page failed, skip: {e}")
+                    traceback.print_exc()
 
         print(f"Scored_pages: {scored_pages}")
         return scored_pages
