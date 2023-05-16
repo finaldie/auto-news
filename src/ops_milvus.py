@@ -56,6 +56,9 @@ class OperatorMilvus:
         return deduped_pages, updated_pages
 
     def update(self, source, pages: list, **kwargs):
+        print("#####################################################")
+        print("# Update Milvus pages")
+        print("#####################################################")
         client = DBClient()
         tot = 0
         err = 0
@@ -68,6 +71,7 @@ class OperatorMilvus:
             tot += 1
 
             data = {
+                "page_id": page_id,
                 "last_edited_time": last_edited_time,
                 "user_rating": user_rating,
             }
@@ -126,6 +130,9 @@ class OperatorMilvus:
 
         @return the average rating of all the user ratings
         """
+        print("#####################################################")
+        print("# Score Milvus pages")
+        print("#####################################################")
 
         tot = 0
         n = len(relevant_page_metas)
@@ -158,7 +165,6 @@ class OperatorMilvus:
 
         if not milvus_client.exist(collection_name):
             milvus_client.createCollection(collection_name, desc=f"Collection end by {start_date}")
-            milvus_client.create_index(collection_name)
             print(f"[INFO] No collection {collection_name} found, created a new one")
 
         # The collection exists, add new embeddings

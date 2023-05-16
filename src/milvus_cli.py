@@ -75,6 +75,9 @@ class MilvusClient:
             # shards_num=2
         )
 
+        # Create index
+        self._create_index(collection)
+
         # Let server load the collection data into memory before actual search
         collection.load()
 
@@ -99,9 +102,7 @@ class MilvusClient:
         self.collections[name] = collection
         return collection
 
-    def create_index(self, name):
-        collection = self.getCollection(name)
-
+    def _create_index(self, collection):
         if collection.has_index():
             print("[INFO] The collection has index already, skip")
             return
@@ -115,6 +116,11 @@ class MilvusClient:
         }, index_name="embeddings")
 
         print("[INFO] Created index for the collection")
+
+    def create_index(self, name):
+        collection = self.getCollection(name)
+
+        self._create_index(collection)
 
     def add(
         self,
