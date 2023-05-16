@@ -8,6 +8,7 @@ from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
 from ops_obsidian import OperatorObsidian
+from ops_milvus import OperatorMilvus
 import utils
 
 
@@ -27,7 +28,7 @@ parser.add_argument("--sources",
                     default="Twitter,Article,Youtube")
 parser.add_argument("--targets",
                     help="targets to push, comma separated",
-                    default="Obsidian")
+                    default="Milvus")
 parser.add_argument("--min-rating",
                     help="Minimum user rating to distribute",
                     default=4)
@@ -76,20 +77,43 @@ def process_youtube(args, folders):
     return data_deduped
 
 
-def dist(args, data, target):
+def dist(args, data, source, target):
+    """
+    data: The past few days unique data
+    """
     dedup = utils.str2bool(args.dedup)
 
     if target == "Obsidian":
-        op = OperatorObsidian()
+        # TODO: The distribution part is only for weekly or monthly
+        #       job, to minimize the number of items
+        # op = OperatorObsidian()
 
-        dedup = []
+        # data_deduped = []
+        # if dedup:
+        #     data_deduped = op.dedup(data)
+        # else:
+        #     data_deduped = [page for page_id, page in data.items()]
+
+        # filtered = op.filters(data_deduped, min_rating=args.min_rating)
+        # op.push(filtered)
+        pass
+
+    elif target == "Milvus":
+        op = OperatorMilvus()
+
+        data_deduped = []
+        data_updated = []
+
         if dedup:
-            dedup = op.dedup(data)
+            data_deduped, data_updated = op.dedup(data, start_date=args.start, source=source)
         else:
-            dedup = [page for page_id, page in data.items()]
+            data_deduped = [page for page_id, page in data.items()]
 
-        filtered = op.filters(dedup, min_rating=args.min_rating)
-        op.push(filtered)
+        # update page metadata cache, e.g. user_rating
+        op.update(source, data_updated)
+
+        # push to vector database
+        op.push(data_deduped, start_date=args.start, source=source)
 
 
 def run(args):
@@ -122,10 +146,8 @@ def run(args):
         elif source == "Youtube":
             data_deduped = process_youtube(args, folders)
 
-        # TODO: The distribution part is only for weekly or monthly
-        #       job, to minimize the number of items
         # for target in targets:
-        #     dist(args, data_deduped, target)
+        #     dist(args, data_deduped, source, target)
 
 
 if __name__ == "__main__":

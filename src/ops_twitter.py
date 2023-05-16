@@ -125,7 +125,7 @@ class OperatorTwitter(OperatorBase):
                     client.set_notion_ranking_item_id(
                         "twitter", list_name, tweet["tweet_id"],
                         category_and_rank_str,
-                        expire_time=int(redis_key_expire_time))
+                        expired_time=int(redis_key_expire_time))
 
                 else:
                     print("Found category_and_rank_str from cache")

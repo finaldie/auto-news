@@ -21,12 +21,30 @@ NOTION_TOREAD_LAST_EDITED_KEY = "notion_toread_last_edited_{}_{}"
 
 # key: prefix + source_name + list_name + id
 # val: llm ranking respones
+# ttl: 2 weeks
 NOTION_RANKING_ITEM_ID = "notion_ranking_item_id_{}_{}_{}"
 
 # key: prefix + source_name + list_name + id
 # val: llm summary respones
+# ttl: 2 weeks
 NOTION_SUMMARY_ITEM_ID = "notion_summary_item_id_{}_{}_{}"
 
 # key: prefix + source_name + list_name + id
 # val: true/false
 OBSIDIAN_INBOX_ITEM_ID = "obsidian_inbox_item_id_{}_{}_{}"
+
+# key: prefix + source_name + id
+# val: embedding data
+# ttl: 4 weeks
+MILVUS_EMBEDDING_ITEM_ID = "milvus_embedding_item_id_{}_{}"
+
+# key: prefix + source_name + date + id
+# val: true/false
+# ttl: 4 weeks
+MILVUS_PERF_DATA_ITEM_ID = "milvus_collection_item_id_{}_{}_{}"
+
+
+# key: page_id
+# val: json format: {"user_rating": xx}
+# ttl: 4 weeks
+PAGE_ITEM_ID = "page_item_id_{}"

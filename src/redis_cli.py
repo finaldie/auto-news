@@ -29,7 +29,7 @@ class RedisClient:
 
     def set(self, key: str, val: str, **kwargs):
         """
-        expire_time: the key will be expired after expire_time seconds
+        expired_time: the key will be expired after expired_time seconds
         """
         expired_time = kwargs.setdefault("expired_time", 0)
         overwrite = kwargs.setdefault("overwrite", False)

@@ -196,7 +196,7 @@ class OperatorYoutube(OperatorBase):
 
                 client.set_notion_summary_item_id(
                     "youtube", "default", page_id, summary,
-                    expire_time=int(redis_key_expire_time))
+                    expired_time=int(redis_key_expire_time))
 
             else:
                 print("Found llm summary from cache, decoding (utf-8) ...")
@@ -254,7 +254,7 @@ class OperatorYoutube(OperatorBase):
                 client.set_notion_ranking_item_id(
                     "youtube", "default", page_id,
                     category_and_rank_str,
-                    expire_time=int(redis_key_expire_time))
+                    expired_time=int(redis_key_expire_time))
 
             else:
                 print("Found category_and_rank_str from cache")

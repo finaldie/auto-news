@@ -85,3 +85,50 @@ class DBClient(DBClientBase):
         key_tpl = data_model.OBSIDIAN_INBOX_ITEM_ID
         key = key_tpl.format(source, category, item_id)
         self.driver.set(key, "true", **kwargs)
+
+    def get_milvus_embedding_item_id(self, source, item_id):
+        key_tpl = data_model.MILVUS_EMBEDDING_ITEM_ID
+        key = key_tpl.format(source, item_id)
+        return self.driver.get(key)
+
+    def set_milvus_embedding_item_id(
+        self,
+        source,
+        item_id,
+        embed: list,
+        **kwargs
+    ):
+        key_tpl = data_model.MILVUS_EMBEDDING_ITEM_ID
+        key = key_tpl.format(source, item_id)
+        self.driver.set(key, embed, **kwargs)
+
+    def get_milvus_perf_data_item_id(self, source, dt: str, item_id):
+        key_tpl = data_model.MILVUS_PERF_DATA_ITEM_ID
+        key = key_tpl.format(source, dt, item_id)
+        return self.driver.get(key)
+
+    def set_milvus_perf_data_item_id(
+        self,
+        source,
+        dt: str,
+        item_id,
+        **kwargs
+    ):
+        key_tpl = data_model.MILVUS_PERF_DATA_ITEM_ID
+        key = key_tpl.format(source, dt, item_id)
+        self.driver.set(key, "true", **kwargs)
+
+    def get_page_item_id(self, item_id):
+        key_tpl = data_model.PAGE_ITEM_ID
+        key = key_tpl.format(item_id)
+        return self.driver.get(key)
+
+    def set_page_item_id(
+        self,
+        item_id,
+        json_data,
+        **kwargs
+    ):
+        key_tpl = data_model.PAGE_ITEM_ID
+        key = key_tpl.format(item_id)
+        self.driver.set(key, json_data, **kwargs)
