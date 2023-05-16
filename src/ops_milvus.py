@@ -1,3 +1,4 @@
+import json
 import traceback
 from datetime import date
 
@@ -77,6 +78,7 @@ class OperatorMilvus:
             }
 
             try:
+                print(f"Updating page_id: {page_id}, with ttl: {key_ttl}")
                 client.set_page_item_id(
                     source, page_id, data, expired_time=key_ttl)
 
@@ -191,12 +193,14 @@ class OperatorMilvus:
 
                 if not embedding:
                     embedding = milvus_client.createEmbedding(content)
-                else:
-                    embedding = utils.bytes2str(embedding)
 
-                # store embedding into redis (ttl = 1 month)
-                client.set_milvus_embedding_item_id(
-                    source, page_id, embedding, expired_time=key_ttl)
+                    # store embedding into redis (ttl = 1 month)
+                    client.set_milvus_embedding_item_id(
+                        source, page_id, json.dumps(embedding),
+                        expired_time=key_ttl)
+
+                else:
+                    embedding = utils.fix_and_parse_json(embedding)
 
                 # push to milvus
                 milvus_client.add(
