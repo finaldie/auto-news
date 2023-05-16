@@ -1,3 +1,4 @@
+import os
 import openai
 
 from pymilvus import (
@@ -36,7 +37,14 @@ class MilvusClient:
         """
         It creates the embedding with 1536 dimentions by default
         """
-        emb = openai.Embedding.create(input=[text], model=self.embedding_model)
+        api_key = os.getenv("OPENAI_API_KEY")
+        print(f"[createEmbedding] openai api key: {api_key}")
+
+        emb = openai.Embedding.create(
+            input=[text],
+            api_key=api_key,
+            model=self.embedding_model)
+
         return emb["data"][0]["embedding"]
 
     def getConnAlias(self):
