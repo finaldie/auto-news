@@ -159,7 +159,7 @@ class OperatorMilvus:
         if not milvus_client.exist(collection_name):
             milvus_client.createCollection(collection_name, desc=f"Collection end by {start_date}")
             milvus_client.create_index(collection_name)
-            print(f"[INFO] No collection {} found, created a new one")
+            print(f"[INFO] No collection {collection_name} found, created a new one")
 
         # The collection exists, add new embeddings
         milvus_client.getCollection(collection_name)
