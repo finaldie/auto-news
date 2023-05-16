@@ -100,7 +100,7 @@ class OperatorMilvus:
         print("# Get relevant Milvus pages")
         print("#####################################################")
 
-        collection_name = f"news_embedding__{start_date}"
+        collection_name = self._get_collection_name(start_date)
         print(f"[get_relevant] collection_name: {collection_name}")
 
         client = DBClient()
@@ -149,16 +149,17 @@ class OperatorMilvus:
         start_date = kwargs.setdefault(
             "start_date", date.today().isoformat())
 
-        collection_name = f"news_embedding__{start_date}"
-        print(f"source: {source}, start_date: {start_date}")
+        collection_name = self._get_collection_name(start_date)
+        print(f"source: {source}, start_date: {start_date}, collection name: {collection_name}")
 
         client = DBClient()
         notion_agent = NotionAgent()
         milvus_client = MilvusClient()
 
         if not milvus_client.exist(collection_name):
-            self._create_collection(collection_name, pages, source, start_date)
-            return
+            milvus_client.createCollection(collection_name, desc=f"Collection end by {start_date}")
+            milvus_client.create_index(collection_name)
+            print(f"[INFO] No collection {} found, created a new one")
 
         # The collection exists, add new embeddings
         milvus_client.getCollection(collection_name)
@@ -215,3 +216,6 @@ class OperatorMilvus:
         client = db_client or DBClient()
         client.set_milvus_perf_data_item_id(
             source, dt, page_id)
+
+    def _get_collection_name(self, start_date):
+        return f"news_embedding__{start_date}".replace("-", "_")

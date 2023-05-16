@@ -227,6 +227,7 @@ class OperatorTwitter(OperatorBase):
                     scored_page["__relevant_score"] = page_score
 
                     scored_list.append(scored_page)
+                    print(f"Tweet scored {page_score}")
 
                 except Exception as e:
                     print(f"[ERROR]: Score page failed, skip: {e}")
