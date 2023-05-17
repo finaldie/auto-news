@@ -33,7 +33,7 @@ parser.add_argument("--dedup", help="whether dedup item",
                     default=True)
 parser.add_argument("--min-score-to-rank",
                     help="The minimum relevant score to start ranking",
-                    default=4)
+                    default=3)
 
 
 def process_twitter(args):
