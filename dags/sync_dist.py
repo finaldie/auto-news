@@ -40,9 +40,10 @@ with DAG(
     default_args=default_args,
     max_active_runs=1,
     description='Sync content from ToRead. config: {"sources": "Twitter,Article,Youtube", "targets": "Obsidian", "dedup": true, "min-rating": 4}',
-    schedule_interval=timedelta(days=1),
+    schedule_interval=timedelta(minutes=60),
     # schedule_interval=None,
-    start_date=days_ago(1),
+    # start_date=days_ago(1),
+    start_date=datetime.now() + timedelta(hours=1),
     tags=['NewsBot'],
 ) as dag:
 
