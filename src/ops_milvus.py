@@ -82,7 +82,7 @@ class OperatorMilvus:
             try:
                 print(f"Updating page_id: {page_id}, with ttl: {key_ttl}, data: {data}")
                 client.set_page_item_id(
-                    source, page_id, data, expired_time=key_ttl)
+                    page_id, data, expired_time=key_ttl)
 
             except Exception as e:
                 print(f"[ERROR] Failed to update page metadata: {e}")
@@ -228,9 +228,6 @@ class OperatorMilvus:
                 print(f"[ERROR] Failed to push to Milvus: {e}")
                 traceback.print_exc()
                 err += 1
-
-            # TODO: Remove it after testing
-            break
 
         print(f"[INFO] Finished, total {tot}, skipped: {skipped}, errors: {err}")
 
