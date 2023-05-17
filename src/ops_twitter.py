@@ -120,7 +120,7 @@ class OperatorTwitter(OperatorBase):
 
                 ranked_tweet = copy.deepcopy(tweet)
 
-                if relevant_score and relevant_score < min_score:
+                if relevant_score and relevant_score >= 0 and relevant_score < min_score:
                     print("Skip the low score tweet to rank")
 
                     ranked_tweet["__topics"] = []
@@ -131,7 +131,7 @@ class OperatorTwitter(OperatorBase):
                     continue
 
                 # Let LLM to category and rank, for:
-                # cold-start: no relevant score
+                # cold-start: no relevant score or < 0
                 # warm/hot-start: relevant score >= min_score
                 st = time.time()
 
