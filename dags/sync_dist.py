@@ -43,7 +43,7 @@ with DAG(
     schedule_interval=timedelta(minutes=60),
     # schedule_interval=None,
     # start_date=days_ago(1),
-    start_date=datetime.now() + timedelta(hours=1),
+    start_date=datetime.now(),
     tags=['NewsBot'],
 ) as dag:
 
