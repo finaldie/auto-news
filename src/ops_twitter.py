@@ -204,8 +204,12 @@ class OperatorTwitter(OperatorBase):
                 print(f"[ERROR]: Unknown target {target}, skip")
 
     def score(self, data, **kwargs):
+        print("#####################################################")
+        print("# Score Tweets")
+        print("#####################################################")
         start_date = kwargs.setdefault("start_date", "")
         op_milvus = OperatorMilvus()
+        client = DBClient()
 
         scored_pages = {}
 
@@ -220,7 +224,7 @@ class OperatorTwitter(OperatorBase):
                     text += f"{ranked_tweet['name']}: {ranked_tweet['text']}"
 
                     relevant_metas = op_milvus.get_relevant(
-                        start_date, text, topk=10)
+                        start_date, text, topk=10, db_client=client)
 
                     page_score = op_milvus.score(relevant_metas)
 
@@ -234,7 +238,7 @@ class OperatorTwitter(OperatorBase):
                     print(f"[ERROR]: Score page failed, skip: {e}")
                     traceback.print_exc()
 
-        print(f"Scored_pages: {scored_pages}")
+        print(f"Scored_pages ({len(scored_pages)}): {scored_pages}")
         return scored_pages
 
     def _get_top_items(self, items: list, k):

@@ -108,22 +108,28 @@ class OperatorMilvus:
 
         return pages
 
-    def get_relevant(self, start_date, text: str, topk: int = 5):
-        print("#####################################################")
-        print("# Get relevant Milvus pages")
-        print("#####################################################")
+    def get_relevant(
+        self,
+        start_date,
+        text: str,
+        topk: int = 5,
+        db_client=None
+    ):
+        # print("#####################################################")
+        # print("# Get relevant Milvus pages")
+        # print("#####################################################")
 
         collection_name = self._get_collection_name(start_date)
         print(f"[get_relevant] collection_name: {collection_name}")
 
-        client = DBClient()
+        client = db_client or DBClient()
         milvus_client = MilvusClient()
 
         response_arr = milvus_client.get(collection_name, text, topk=5)
         res = []
 
         for response in response_arr:
-            print(f"Processing response: {response}")
+            print(f"[get_relevant] Processing response: {response}")
 
             page_id = response["item_id"]
             page_metadata = client.get_page_item_id(page_id)
@@ -134,6 +140,7 @@ class OperatorMilvus:
 
             page_metadata = utils.fix_and_parse_json(page_metadata)
             res.append(page_metadata)
+            print("[get_relevant] found page_metadata: {page_metadata}")
 
         return res
 
@@ -143,10 +150,10 @@ class OperatorMilvus:
 
         @return the average rating of all the user ratings
         """
-        print("#####################################################")
-        print("# Score Milvus pages")
-        print("#####################################################")
-        print(f"relevant_page_metas: {relevant_page_metas}")
+        # print("#####################################################")
+        # print("# Score Milvus pages")
+        # print("#####################################################")
+        print(f"relevant_page_metas({len(relevant_page_metas)}): {relevant_page_metas}")
 
         tot = 0
         n = len(relevant_page_metas)

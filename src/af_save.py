@@ -53,20 +53,10 @@ def process_twitter(args):
     data_deduped = op.dedup(data, target="toread")
     data_ranked = op.rank(data_deduped)
 
-    # TODO: For test, Fix this section later, pass data_scored to
-    #       op.push(...)
-    data_scored = {}
-
-    try:
-        data_scored = op.score(data_ranked, start_date=args.start)
-
-    except Exception as e:
-        print(f"[ERROR] score pages failed: {e}")
-
-    print(f"Data scored: {data_scored}")
+    data_scored = op.score(data_ranked, start_date=args.start)
 
     targets = args.targets.split(",")
-    op.push(data_ranked, targets, args.topics_top_k, args.categories_top_k)
+    op.push(data_scored, targets, args.topics_top_k, args.categories_top_k)
     op.printStats("Twitter", data, data_deduped, data_ranked)
 
 
