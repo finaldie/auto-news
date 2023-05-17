@@ -38,7 +38,8 @@ class OperatorMilvus:
                 page_metadatas = self.get_pages([page_id], db_client=client)
 
                 if len(page_metadatas) == 0:
-                    print("Not page metadata found, skip")
+                    print("Not page metadata found, push to updating queue")
+                    updated_pages.append(page)
                     continue
 
                 # Check user_rating changed or not
@@ -52,6 +53,7 @@ class OperatorMilvus:
 
             else:
                 deduped_pages.append(page)
+                updated_pages.append(page)
 
         print(f"Pages after dedup: {len(deduped_pages)}")
         return deduped_pages, updated_pages
@@ -78,7 +80,7 @@ class OperatorMilvus:
             }
 
             try:
-                print(f"Updating page_id: {page_id}, with ttl: {key_ttl}")
+                print(f"Updating page_id: {page_id}, with ttl: {key_ttl}, data: {data}")
                 client.set_page_item_id(
                     source, page_id, data, expired_time=key_ttl)
 
