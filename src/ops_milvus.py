@@ -125,7 +125,7 @@ class OperatorMilvus:
         client = db_client or DBClient()
         milvus_client = MilvusClient()
 
-        response_arr = milvus_client.get(collection_name, text, topk=5)
+        response_arr = milvus_client.get(collection_name, text, topk=topk)
         res = []
 
         for response in response_arr:
