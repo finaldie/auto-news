@@ -110,7 +110,7 @@ class NotionAgent:
 
         if block["has_children"]:
             block_id = block["id"]
-            props, blocks = self.extractPage(block_id)
+            blocks = self.extractBlocks(block_id)
             content += self.concatBlocksText(blocks)
 
         return content
@@ -141,6 +141,21 @@ class NotionAgent:
             selects.append(select["name"])
 
         return selects
+
+    def extractBlocks(self, block_id):
+        # block_id -> block data
+        blocks = {}
+
+        childs = self.api.blocks.children.list(block_id=block_id).get("results")
+        # print(f"n: {len(childs)}, childs: {childs}")
+
+        for block in childs:
+            block_data = self.extractBlock(block)
+
+            block_id = block["id"]
+            blocks[block_id] = block_data
+
+        return blocks
 
     def extractBlock(self, block):
         """
@@ -269,14 +284,7 @@ class NotionAgent:
             return properties, blocks
 
         if extract_blocks:
-            childs = self.api.blocks.children.list(block_id=page_id).get("results")
-            # print(f"n: {len(childs)}, childs: {childs}")
-
-            for block in childs:
-                block_data = self.extractBlock(block)
-
-                block_id = block["id"]
-                blocks[block_id] = block_data
+            blocks = self.extractBlocks(page_id)
 
         return properties, blocks
 

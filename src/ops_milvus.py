@@ -34,7 +34,7 @@ class OperatorMilvus:
 
             if client.get_milvus_perf_data_item_id(
                     source, start_date, page_id):
-                print(f"Duplicated obsidian found, skip. page_id: {page_id}")
+                print(f"Duplicated page found, skip. page_id: {page_id}")
                 page_metadatas = self.get_pages([page_id], db_client=client)
 
                 if len(page_metadatas) == 0:
