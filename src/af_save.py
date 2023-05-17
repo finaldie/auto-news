@@ -31,6 +31,9 @@ parser.add_argument("--categories-top-k", help="pick top-k categories to push",
                     default=3)
 parser.add_argument("--dedup", help="whether dedup item",
                     default=True)
+parser.add_argument("--min-score-to-rank",
+                    help="The minimum relevant score to start ranking",
+                    default=4)
 
 
 def process_twitter(args):
@@ -51,9 +54,12 @@ def process_twitter(args):
     op = OperatorTwitter()
     data = op.readFromJson(args.data_folder, args.run_id, "twitter.json")
     data_deduped = op.dedup(data, target="toread")
-    data_ranked = op.rank(data_deduped)
 
-    data_scored = op.score(data_ranked, start_date=args.start)
+    # To save LLM tokens, do score on all deduped tweets, then
+    # do rank for score >= 4 tweets
+    data_scored = op.score(data_deduped, start_date=args.start)
+
+    data_ranked = op.rank(data_scored, min_score=args.min_score_to_rank)
 
     targets = args.targets.split(",")
     op.push(data_scored, targets, args.topics_top_k, args.categories_top_k)

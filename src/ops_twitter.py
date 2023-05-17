@@ -82,7 +82,7 @@ class OperatorTwitter(OperatorBase):
         print(f"tweets_deduped ({len(tweets_deduped)}): {tweets_deduped}")
         return tweets_deduped
 
-    def rank(self, data):
+    def rank(self, data, **kwargs):
         """
         Rank tweets (not the entire content)
 
@@ -91,6 +91,8 @@ class OperatorTwitter(OperatorBase):
         print("#####################################################")
         print("# Rank Tweets")
         print("#####################################################")
+        min_score = kwargs.setdefault("min_score", 4)
+        print(f"Minimum score to rank: {min_score}")
 
         llm_agent = LLMAgentCategoryAndRanking()
         llm_agent.init_prompt()
@@ -105,13 +107,32 @@ class OperatorTwitter(OperatorBase):
             ranked_list = ranked.setdefault(list_name, [])
 
             for tweet in tweets:
+                relevant_score = tweet.get("__relevant_score")
+
                 # Assemble tweet content
                 text = ""
                 if tweet["reply_text"]:
                     text += f"{tweet['reply_to_name']}: {tweet['reply_text']}"
                 text += f"{tweet['name']}: {tweet['text']}"
 
-                # Let LLM to category and rank
+                print(f"Ranking tweet: {text}")
+                print(f"Relevant score: {relevant_score}")
+
+                ranked_tweet = copy.deepcopy(tweet)
+
+                if relevant_score and relevant_score < min_score:
+                    print("Skip the low score tweet to rank")
+
+                    ranked_tweet["__topics"] = []
+                    ranked_tweet["__categories"] = []
+                    ranked_tweet["__rate"] = -0.02
+
+                    ranked_list.append(ranked_tweet)
+                    continue
+
+                # Let LLM to category and rank, for:
+                # cold-start: no relevant score
+                # warm/hot-start: relevant score >= min_score
                 st = time.time()
 
                 llm_ranking_resp = client.get_notion_ranking_item_id(
@@ -139,8 +160,6 @@ class OperatorTwitter(OperatorBase):
                 print(f"LLM ranked result (json parsed): {category_and_rank}")
 
                 # Parse LLM response and assemble category and rank
-                ranked_tweet = copy.deepcopy(tweet)
-
                 if not category_and_rank:
                     print("[ERROR] Cannot parse json string, assign default rating -0.01")
                     ranked_tweet["__topics"] = []
@@ -216,19 +235,19 @@ class OperatorTwitter(OperatorBase):
         for list_name, tweets in data.items():
             scored_list = scored_pages.setdefault(list_name, [])
 
-            for ranked_tweet in tweets:
+            for tweet in tweets:
                 try:
                     text = ""
-                    if ranked_tweet["reply_text"]:
-                        text += f"{ranked_tweet['reply_to_name']}: {ranked_tweet['reply_text']}"
-                    text += f"{ranked_tweet['name']}: {ranked_tweet['text']}"
+                    if tweet["reply_text"]:
+                        text += f"{tweet['reply_to_name']}: {tweet['reply_text']}"
+                    text += f"{tweet['name']}: {tweet['text']}"
 
                     relevant_metas = op_milvus.get_relevant(
                         start_date, text, topk=10, db_client=client)
 
                     page_score = op_milvus.score(relevant_metas)
 
-                    scored_page = copy.deepcopy(ranked_tweet)
+                    scored_page = copy.deepcopy(tweet)
                     scored_page["__relevant_score"] = page_score
 
                     scored_list.append(scored_page)
