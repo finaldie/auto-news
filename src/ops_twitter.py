@@ -100,6 +100,10 @@ class OperatorTwitter(OperatorBase):
 
         client = DBClient()
         redis_key_expire_time = os.getenv("BOT_REDIS_KEY_EXPIRE_TIME", 604800)
+        tot = 0
+        skipped = 0
+        err = 0
+        rank = 0
 
         ranked = {}
 
@@ -107,6 +111,7 @@ class OperatorTwitter(OperatorBase):
             ranked_list = ranked.setdefault(list_name, [])
 
             for tweet in tweets:
+                tot += 1
                 relevant_score = tweet.get("__relevant_score")
 
                 # Assemble tweet content
@@ -122,6 +127,7 @@ class OperatorTwitter(OperatorBase):
 
                 if relevant_score and relevant_score >= 0 and relevant_score < min_score:
                     print("Skip the low score tweet to rank")
+                    skipped += 1
 
                     ranked_tweet["__topics"] = []
                     ranked_tweet["__categories"] = []
@@ -165,15 +171,19 @@ class OperatorTwitter(OperatorBase):
                     ranked_tweet["__topics"] = []
                     ranked_tweet["__categories"] = []
                     ranked_tweet["__rate"] = -0.01
+                    err += 1
+
                 else:
                     ranked_tweet["__topics"] = [(x["topic"], x.get("score") or 1) for x in category_and_rank["topics"]]
                     ranked_tweet["__categories"] = [(x["category"], x.get("score") or 1) for x in category_and_rank["topics"]]
                     ranked_tweet["__rate"] = category_and_rank["overall_score"]
                     ranked_tweet["__feedback"] = category_and_rank.get("feedback") or ""
+                    rank += 1
 
                 ranked_list.append(ranked_tweet)
 
         print(f"Ranked tweets: {ranked}")
+        print(f"Total {tot}, ranked: {rank}, skipped: {skipped}, errors: {err}")
         return ranked
 
     def push(self, data, targets, topics_topk=3, categories_topk=3):
