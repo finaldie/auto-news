@@ -264,6 +264,9 @@ class OperatorTwitter(OperatorBase):
         """
         items: [(name, score), ...]
         """
+        if not items or len(items) == 0:
+            return []
+
         tops = sorted(items, key=itemgetter(1), reverse=True)
         return tops[:k]
 

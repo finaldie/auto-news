@@ -140,7 +140,7 @@ class OperatorMilvus:
 
             page_metadata = utils.fix_and_parse_json(page_metadata)
             res.append(page_metadata)
-            print("[get_relevant] found page_metadata: {page_metadata}")
+            print(f"[get_relevant] found page_metadata: {page_metadata}")
 
         return res
 
