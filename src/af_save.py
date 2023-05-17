@@ -62,7 +62,7 @@ def process_twitter(args):
     data_ranked = op.rank(data_scored, min_score=args.min_score_to_rank)
 
     targets = args.targets.split(",")
-    op.push(data_scored, targets, args.topics_top_k, args.categories_top_k)
+    op.push(data_ranked, targets, args.topics_top_k, args.categories_top_k)
     op.printStats("Twitter", data, data_deduped, data_ranked)
 
 

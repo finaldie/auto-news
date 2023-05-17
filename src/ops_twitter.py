@@ -219,6 +219,8 @@ class OperatorTwitter(OperatorBase):
 
                         except Exception as e:
                             print(f"[ERROR]: Push to notion failed, skip: {e}")
+                            traceback.print_exc()
+
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
 
