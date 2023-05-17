@@ -112,7 +112,7 @@ class OperatorMilvus:
         self,
         start_date,
         text: str,
-        topk: int = 5,
+        topk: int = 2,
         db_client=None
     ):
         # print("#####################################################")

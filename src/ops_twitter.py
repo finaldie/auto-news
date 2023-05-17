@@ -254,8 +254,9 @@ class OperatorTwitter(OperatorBase):
                         text += f"{tweet['reply_to_name']}: {tweet['reply_text']}"
                     text += f"{tweet['name']}: {tweet['text']}"
 
+                    # Notes: k = 10 looks too noisy, tune k = 2
                     relevant_metas = op_milvus.get_relevant(
-                        start_date, text, topk=10, db_client=client)
+                        start_date, text, topk=2, db_client=client)
 
                     page_score = op_milvus.score(relevant_metas)
 
