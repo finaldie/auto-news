@@ -42,7 +42,7 @@ with DAG(
     description='Sync content from ToRead. config: {"sources": "Twitter,Article,Youtube", "targets": "Obsidian", "dedup": true, "min-rating": 4}',
     schedule_interval=timedelta(minutes=60),
     # schedule_interval=None,
-    start_date=days_ago(0, hour=2),
+    start_date=days_ago(0, hour=1),
     tags=['NewsBot'],
 ) as dag:
 
