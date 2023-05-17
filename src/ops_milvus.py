@@ -29,7 +29,7 @@ class OperatorMilvus:
 
         for page_id, page in pages.items():
             name = page["name"]
-            new_user_rating = page["user_rating"]
+            new_user_rating = int(page["user_rating"])
             print(f"Dedupping page, title: {name}, source: {source}, user_rating: {new_user_rating}")
 
             if client.get_milvus_perf_data_item_id(
