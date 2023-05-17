@@ -41,7 +41,7 @@ with DAG(
     default_args=default_args,
     max_active_runs=1,
     description='news pulling, config: {"sources": "Twitter,Article,Youtube", "targets": "notion", "dedup": true}',
-    schedule_interval="15 /1 * * *",
+    schedule_interval="15 */1 * * *",
     # schedule_interval=timedelta(minutes=60),
     # schedule_interval=None,
     start_date=days_ago(0),
