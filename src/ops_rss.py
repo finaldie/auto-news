@@ -177,7 +177,7 @@ class OperatorRSS(OperatorBase):
 
         scored_list = []
 
-        for page_id, page in data.items():
+        for page in data:
             try:
                 title = page["title"]
                 score_text = page["summary"] or page["title"]
