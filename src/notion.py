@@ -320,7 +320,7 @@ class NotionAgent:
             extracted_pages.append({
                 "page_id": page_id,
                 "database_id": database_id,
-                "name": page["properties"]["id"]["title"][0]["text"]["content"],
+                "name": page["properties"]["Name"]["title"][0]["text"]["content"],
                 "url": page["properties"]["URL"]["url"],
                 "created_time": page["created_time"],
                 "last_edited_time": page["last_edited_time"],
