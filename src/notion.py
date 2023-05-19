@@ -1352,7 +1352,7 @@ class NotionAgent:
             topics,
             categories,
             rate_number,
-            list_name=[page["list_name"]]
+            list_names=[page["list_name"]]
         )
 
     def createPageComment(
