@@ -25,7 +25,7 @@ parser.add_argument("--data-folder", help="data folder to save",
                     default="data")
 parser.add_argument("--sources",
                     help="sources to pull, comma separated",
-                    default="Twitter,Article,Youtube")
+                    default="Twitter,Article,Youtube,RSS")
 parser.add_argument("--targets",
                     help="targets to push, comma separated",
                     default="Milvus")
@@ -71,6 +71,19 @@ def process_youtube(args, folders):
     op = OperatorYoutube()
 
     data = op.load_folders(folders, "youtube.json")
+    data_deduped = op.unique(data)
+    print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
+
+    return data_deduped
+
+
+def process_rss(args, folders):
+    print("#####################################################")
+    print(f"# Process RSS, dedup: {args.dedup}")
+    print("#####################################################")
+    op = OperatorYoutube()
+
+    data = op.load_folders(folders, "rss.json")
     data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
@@ -148,6 +161,9 @@ def run(args):
 
         elif source == "Youtube":
             data_deduped = process_youtube(args, folders)
+
+        elif source == "RSS":
+            data_deduped = process_rss(args, folders)
 
         for target in targets:
             dist(args, data_deduped, source, target)

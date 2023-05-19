@@ -69,7 +69,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder=data/sync/{{ ds }} '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} '
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
     )
 
     t4 = BashOperator(
@@ -80,7 +80,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder=data/sync '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} '
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "Milvus") }} '
         '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
         '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '

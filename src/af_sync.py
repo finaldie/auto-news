@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
-from db_cli import DBClient
+from ops_rss import OperatorRSS
 
 
 parser = argparse.ArgumentParser()
@@ -22,7 +22,7 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default="Twitter,Article,Youtube")
+                    default="Twitter,Article,Youtube,RSS")
 
 
 def pull_twitter(args, op, source):
@@ -89,6 +89,29 @@ def save_youtube(args, op, source, data):
     op.updateLastEditedTimeForData(data, source, "default")
 
 
+def pull_rss(args, op, source):
+    """
+    Pull from rss
+    """
+    print("######################################################")
+    print("# Pull from Inbox - RSS")
+    print("######################################################")
+    print(f"environment: {os.environ}")
+
+    data = op.sync(source)
+
+    print(f"Pulled {len(data.keys())} youtube videos")
+    return data
+
+
+def save_rss(args, op, source, data):
+    print("######################################################")
+    print("# Save RSS articles to json file")
+    print("######################################################")
+    op.save2json(args.data_folder, args.run_id, "rss.json", data)
+    op.updateLastEditedTimeForData(data, source, "default")
+
+
 def run(args):
     sources = args.sources.split(",")
     print(f"Sources: {sources}")
@@ -110,6 +133,11 @@ def run(args):
             op = OperatorYoutube()
             data = pull_youtube(args, op, source)
             save_youtube(args, op, source, data)
+
+        elif source == "RSS":
+            op = OperatorRSS()
+            data = pull_rss(args, op, source)
+            save_rss(args, op, source, data)
 
 
 if __name__ == "__main__":
