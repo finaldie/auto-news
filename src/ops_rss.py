@@ -4,6 +4,8 @@ import copy
 import hashlib
 import traceback
 from operator import itemgetter
+from datetime import datetime
+from time import mktime
 
 from notion import NotionAgent
 from llm_agent import (
@@ -41,7 +43,12 @@ class OperatorRSS(OperatorBase):
             # Extract relevant information from each entry
             title = entry.title
             link = entry.link
+
+            # Example: Thu, 03 Mar 2022 08:00:00 GMT
             published = entry.published
+
+            # Convert above struct_time object to datetime
+            created_time = datetime.fromtimestamp(mktime(published)).isoformat()
 
             hash_obj.update(f"{list_name}_{title}_{published}".encode('utf-8'))
             article_id = hash_obj.hexdigest()
@@ -53,7 +60,7 @@ class OperatorRSS(OperatorBase):
                 'list_name': list_name,
                 'title': title,
                 'url': link,
-                'created_time': published,
+                'created_time': created_time,
                 "summary": entry.get("summary") or "",
                 "content": "",
                 "tags": entry.get("tags") or [],
