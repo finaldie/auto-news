@@ -42,8 +42,9 @@ class OperatorRSS(OperatorBase):
             title = entry.title
             link = entry.link
             published = entry.published
-            article_id = hash_obj.update(
-                f"{list_name}_{title}_{published}".encode('utf-8')).hexdigest()
+
+            hash_obj.update(f"{list_name}_{title}_{published}".encode('utf-8'))
+            article_id = hash_obj.hexdigest()
 
             # Create a dictionary representing an article
             article = {
