@@ -161,7 +161,7 @@ class OperatorRSS(OperatorBase):
         print(f"After sorting: {tops}")
 
         filtered = []
-        for i in range(max(k, len(tops))):
+        for i in range(min(k, len(tops))):
             filtered.append(tops[i])
 
         print(f"Filter output size: {len(filtered)}")
