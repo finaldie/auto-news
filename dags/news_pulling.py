@@ -71,7 +71,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder="data/news" '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} ',
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} ',
     )
 
     t4 = BashOperator(
@@ -82,7 +82,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder="data/news" '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
         '--dedup={{ dag_run.conf.setdefault("dedup", True) }} ',
     )
