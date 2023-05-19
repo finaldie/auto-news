@@ -8,12 +8,22 @@ openai
 
 notion-client
 tweepy
-pymilvus
-pinecone-client
 mysql-connector-python
 redis
 
 youtube-transcript-api
 pytube
 
+# Vector database
 # chromadb
+pymilvus
+pinecone-client
+
+# RSS
+feedparser
+
+# Speech to Text
+speech_recognition
+
+# Text to Speech
+pyttsx3
