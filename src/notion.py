@@ -288,6 +288,46 @@ class NotionAgent:
 
         return properties, blocks
 
+    def queryDatabase_RSSList(self, database_id):
+        query_data = {
+            "database_id": database_id,
+            "sorts": [
+                {
+                    "property": "Created time",
+                    "direction": "descending",
+                },
+            ],
+
+            "filter": {
+                "and": [
+                    {
+                        "property": "Enabled",
+                        "checkbox": {
+                            "equals": True,
+                        },
+                    },
+                ]
+            }
+        }
+
+        pages = self.api.databases.query(**query_data).get("results")
+        extracted_pages = []
+
+        for page in pages:
+            print(f"result: page id: {page['id']}")
+            page_id = page["id"]
+
+            extracted_pages.append({
+                "page_id": page_id,
+                "database_id": database_id,
+                "name": page["properties"]["id"]["title"][0]["text"]["content"],
+                "url": page["properties"]["URL"]["url"],
+                "created_time": page["created_time"],
+                "last_edited_time": page["last_edited_time"],
+            })
+
+        return extracted_pages
+
     def queryDatabaseIndex_Inbox(self, database_id, source):
         query_data = {
             "database_id": database_id,
