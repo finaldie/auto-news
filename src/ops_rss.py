@@ -198,7 +198,7 @@ class OperatorRSS(OperatorBase):
                 title = page["title"]
 
                 # Get a summary text (at most 1024 chars)
-                score_text = f"{page['title']}. {page['summary']}" 
+                score_text = f"{page['title']}. {page['summary']}"
                 score_text = score_text[:1024]
                 print(f"Scoring page: {title}, score_text: {score_text}")
 
