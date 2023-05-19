@@ -46,9 +46,10 @@ class OperatorRSS(OperatorBase):
 
             # Example: Thu, 03 Mar 2022 08:00:00 GMT
             published = entry.published
+            published_parsed = entry.published_parsed
 
             # Convert above struct_time object to datetime
-            created_time = datetime.fromtimestamp(mktime(published)).isoformat()
+            created_time = datetime.fromtimestamp(mktime(published_parsed)).isoformat()
 
             hash_obj.update(f"{list_name}_{title}_{published}".encode('utf-8'))
             article_id = hash_obj.hexdigest()
