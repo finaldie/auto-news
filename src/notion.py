@@ -862,7 +862,7 @@ class NotionAgent:
 
         return properties, blocks
 
-    def _createDatabaseItem_ArticleBase(self, ranked_page):
+    def _createDatabaseItem_ArticleBase(self, ranked_page, **kwargs):
         """
         Create page properties and blocks, will put the summary
         instead of orignal content
@@ -872,9 +872,11 @@ class NotionAgent:
         - __summary  The summary content
         """
         summary = ranked_page["__summary"]
-        preview_content = summary[:100] + "..."
+        # preview_content = summary[:100] + "..."
 
         created_time_pdt = utils.convertUTC2PDT_str(ranked_page["created_time"])
+
+        append_notion_url = kwargs.setdefault("append_notion_url", True)
 
         properties = {
             "Name": {
@@ -928,13 +930,14 @@ class NotionAgent:
                 "Translation", summary_trans))
 
         # append orginal notion url
-        blocks.append({
-            "type": "link_to_page",
-            "link_to_page": {
-                "type": "page_id",
-                "page_id": ranked_page['id']
-            }
-        })
+        if append_notion_url:
+            blocks.append({
+                "type": "link_to_page",
+                "link_to_page": {
+                    "type": "page_id",
+                    "page_id": ranked_page['id']
+                }
+            })
 
         return properties, blocks
 
@@ -1195,7 +1198,8 @@ class NotionAgent:
         ranked_page,
         topics: list,
         categories: list,
-        rate_number
+        rate_number,
+        **kwargs
     ):
         # assemble topics
         topics_list = [{"name": t} for t in topics]
@@ -1203,11 +1207,21 @@ class NotionAgent:
         # assemble category (multi-select)
         categories_list = [{"name": c} for c in categories]
 
+        list_names = kwargs.setdefault("list_names", [])
+        source_list_names = [{"name": ln} for ln in list_names]
+
         properties.update({"Source": {
             "select": {
                 "name": ranked_page["source"],
             }
         }})
+
+        if len(list_names) > 0:
+            properties.update({
+                "List Name": {
+                    "multi_select": source_list_names,
+                },
+            })
 
         properties.update({"Topic": {
             "multi_select": topics_list,
@@ -1220,6 +1234,11 @@ class NotionAgent:
         properties.update({"Rating": {
             "number": rate_number
         }})
+
+        if ranked_page.get("__relevant_score"):
+            properties.update({"Relevant Score": {
+                "number": ranked_page["__relevant_score"]
+            }})
 
         print(f"notion ToRead: database_id: {database_id}, properties: {properties}, blocks: {blocks}")
 
@@ -1293,6 +1312,48 @@ class NotionAgent:
             traceback.print_exc()
 
         return new_page
+
+    def createDatabaseItem_ToRead_RSS(
+        self,
+        database_id,
+        page,
+        topics: list,
+        categories: list,
+        rate_number
+    ):
+        properties, blocks = self._createDatabaseItem_ArticleBase(
+            page, append_notion_url=False)
+
+        # Append original article link
+        blocks.append({
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": "Article Link",
+                            "link": {
+                                "url": page["url"],
+                            },
+                        },
+                        "href": page["url"],
+                    },
+                ],
+            }
+        })
+
+        # Common fields for article, youtube, etc
+        return self._postprocess_ToRead(
+            properties,
+            blocks,
+            database_id,
+            page,
+            topics,
+            categories,
+            rate_number,
+            list_name=[page["list_name"]]
+        )
 
     def createPageComment(
         self,

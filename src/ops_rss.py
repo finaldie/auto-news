@@ -4,7 +4,6 @@ import copy
 import hashlib
 import traceback
 from operator import itemgetter
-from datetime import timedelta, datetime
 
 from notion import NotionAgent
 from llm_agent import (
@@ -15,6 +14,7 @@ from llm_agent import (
 import utils
 from ops_base import OperatorBase
 from db_cli import DBClient
+from ops_milvus import OperatorMilvus
 
 import feedparser
 
@@ -51,9 +51,10 @@ class OperatorRSS(OperatorBase):
                 'source': "RSS",
                 'list_name': list_name,
                 'title': title,
-                'link': link,
+                'url': link,
                 'published': published,
                 "summary": entry.get("summary") or "",
+                "content": "",
                 "tags": entry.get("tags") or [],
             }
 
@@ -148,9 +149,60 @@ class OperatorRSS(OperatorBase):
 
         return content
 
+    def filter(self, pages, **kwargs):
+        print("#####################################################")
+        print("# Filter RSS (After Scoring)")
+        print("#####################################################")
+        k = kwargs.setdefault("k", 3)
+        print(f"k: {k}, input size: {len(pages)}")
+
+        tops = sorted(pages, key=lambda page: page["__relevant_score"], reverse=True)
+        print(f"After sorting: {tops}")
+
+        filtered = []
+        for i in range(max(k, len(tops))):
+            filtered.append(tops[i])
+
+        print(f"Filter output size: {len(filtered)}")
+        return filtered
+
+    def score(self, data, **kwargs):
+        print("#####################################################")
+        print("# Scoring RSS")
+        print("#####################################################")
+        start_date = kwargs.setdefault("start_date", "")
+        op_milvus = OperatorMilvus()
+        client = DBClient()
+
+        scored_list = []
+
+        for page_id, page in data.items():
+            try:
+                title = page["title"]
+                score_text = page["summary"] or page["title"]
+                print(f"Scoring page: {title}, score_text: {score_text}")
+
+                relevant_metas = op_milvus.get_relevant(
+                    start_date, score_text, topk=2, db_client=client)
+
+                page_score = op_milvus.score(relevant_metas)
+
+                scored_page = copy.deepcopy(page)
+                scored_page["__relevant_score"] = page_score
+
+                scored_list.append(scored_page)
+                print(f"RSS article scored {page_score}")
+
+            except Exception as e:
+                print(f"[ERROR]: Score page failed, skip: {e}")
+                traceback.print_exc()
+
+        print(f"Scored_pages ({len(scored_list)}): {scored_list}")
+        return scored_list
+
     def summarize(self, pages):
         print("#####################################################")
-        print("# Summarize Articles")
+        print("# Summarize RSS Articles")
         print("#####################################################")
         print(f"Number of pages: {len(pages)}")
         llm_agent = LLMAgentSummary()
@@ -164,21 +216,23 @@ class OperatorRSS(OperatorBase):
         summarized_pages = []
 
         for page in pages:
-            title = page["title"]
             page_id = page["id"]
+            title = page["title"]
             content = page["content"]
-            source_url = page["source_url"]
+            list_name = page["list_name"]
+            source_url = page["url"]
             print(f"Summarying page, title: {title}")
             print(f"Page content ({len(content)} chars): {content}")
 
             st = time.time()
 
             llm_summary_resp = client.get_notion_summary_item_id(
-                "article", "default", page_id)
+                "rss", list_name, page_id)
 
             if not llm_summary_resp:
                 # Double check the content, if empty, load it from
-                # the source url
+                # the source url. For RSS, we will load content
+                # from this entrypoint
                 if not content:
                     print("page content is empty, fallback to load web page via WebBaseLoader")
                     content = self._load_web(source_url)
@@ -192,7 +246,7 @@ class OperatorRSS(OperatorBase):
 
                 print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")
                 client.set_notion_summary_item_id(
-                    "article", "default", page_id, summary,
+                    "rss", list_name, page_id, summary,
                     expired_time=int(redis_key_expire_time))
 
             else:
@@ -213,7 +267,7 @@ class OperatorRSS(OperatorBase):
         Rank page summary (not the entire content)
         """
         print("#####################################################")
-        print("# Rank Articles")
+        print("# Rank RSS Articles")
         print("#####################################################")
         print(f"Number of pages: {len(pages)}")
 
@@ -231,6 +285,7 @@ class OperatorRSS(OperatorBase):
         for page in pages:
             title = page["title"]
             page_id = page["id"]
+            list_name = page["list_name"]
             text = page["__summary"]
             print(f"Ranking page, title: {title}")
 
@@ -238,7 +293,7 @@ class OperatorRSS(OperatorBase):
             st = time.time()
 
             llm_ranking_resp = client.get_notion_ranking_item_id(
-                "article", "default", page_id)
+                "rss", list_name, page_id)
 
             category_and_rank_str = None
 
@@ -248,7 +303,7 @@ class OperatorRSS(OperatorBase):
 
                 print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}")
                 client.set_notion_ranking_item_id(
-                    "article", "default", page_id,
+                    "rss", list_name, page_id,
                     category_and_rank_str,
                     expired_time=int(redis_key_expire_time))
 
@@ -287,14 +342,14 @@ class OperatorRSS(OperatorBase):
         tops = sorted(items, key=itemgetter(1), reverse=True)
         return tops[:k]
 
-    def push(self, ranked_data, targets, topk=3):
+    def push(self, pages, targets, topk=3):
         print("#####################################################")
         print("# Push RSS")
         print("#####################################################")
-        print(f"Number of pages: {len(ranked_data)}")
+        print(f"Number of pages: {len(pages)}")
         print(f"Targets: {targets}")
         print(f"Top-K: {topk}")
-        print(f"input data: {ranked_data}")
+        print(f"input data: {pages}")
 
         for target in targets:
             print(f"Pushing data to target: {target} ...")
@@ -313,30 +368,29 @@ class OperatorRSS(OperatorBase):
                     print("[ERROR] no index db pages found... skip")
                     break
 
-                for ranked_page in ranked_data:
+                for page in pages:
                     try:
-                        page_id = ranked_page["id"]
-                        title = ranked_page["title"]
+                        page_id = page["id"]
+                        list_name = page["list_name"]
+                        title = page["title"]
+                        tags = page["tags"]
+
                         print(f"Pushing page, title: {title}")
 
-                        topics = ranked_page["__topics"]
-                        topics_topk = self._get_top_items(topics, topk)
-                        topics_topk = [x[0].replace(",", " ")[:20] for x in topics_topk]
+                        topics_topk = [x["term"].replace(",", " ")[:20] for x in tags]
+                        topics_topk = topics_topk[:topk]
 
-                        categories = ranked_page["__categories"]
-                        categories_topk = self._get_top_items(categories, topk)
-                        categories_topk = [x[0].replace(",", " ")[:20] for x in categories_topk]
+                        categories_topk = []
+                        rating = page.get("__rate") or -1
 
-                        rating = ranked_page["__rate"]
-
-                        notion_agent.createDatabaseItem_ToRead_Article(
+                        notion_agent.createDatabaseItem_ToRead_RSS(
                             database_id,
-                            ranked_page,
+                            page,
                             topics_topk,
                             categories_topk,
                             rating)
 
-                        self.markVisited(page_id, source="rss", list_name="default")
+                        self.markVisited(page_id, source="rss", list_name=list_name)
 
                     except Exception as e:
                         print(f"[ERROR]: Push to notion failed, skip: {e}")

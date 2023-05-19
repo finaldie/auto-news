@@ -8,6 +8,7 @@ import utils
 from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
+from ops_rss import OperatorRSS
 
 
 parser = argparse.ArgumentParser()
@@ -102,6 +103,29 @@ def process_youtube(args):
     op.push(data_ranked, targets)
 
 
+def process_rss(args):
+    print("#####################################################")
+    print(f"# Process Youtube, dedup: {args.dedup}")
+    print("#####################################################")
+    op = OperatorRSS()
+
+    data = op.readFromJson(args.data_folder, args.run_id, "rss.json")
+    data_deduped = data
+    need_dedup = utils.str2bool(args.dedup)
+    if need_dedup:
+        data_deduped = op.dedup(data, target="toread")
+    else:
+        data_deduped = [x for x in data.values()]
+
+    data_scored = op.score(data_deduped, start_date=args.start)
+
+    data_filtered = op.filter(data_scored, k=3)
+    data_summarized = op.summarize(data_filtered)
+
+    targets = args.targets.split(",")
+    op.push(data_summarized, targets)
+
+
 def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
@@ -118,6 +142,16 @@ def run(args):
 
         elif source == "Youtube":
             process_youtube(args)
+
+        elif source == "RSS":
+            process_rss(args)
+
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    load_dotenv()
+
+    run(args)
 
 
 if __name__ == "__main__":
