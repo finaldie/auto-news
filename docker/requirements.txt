@@ -23,7 +23,7 @@ pinecone-client
 feedparser
 
 # Speech to Text
-speech_recognition
+SpeechRecognition
 
 # Text to Speech
 pyttsx3
