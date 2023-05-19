@@ -53,7 +53,7 @@ class OperatorRSS(OperatorBase):
                 'list_name': list_name,
                 'title': title,
                 'url': link,
-                'published': published,
+                'created_time': published,
                 "summary": entry.get("summary") or "",
                 "content": "",
                 "tags": entry.get("tags") or [],
