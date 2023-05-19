@@ -119,7 +119,7 @@ def process_rss(args):
 
     data_scored = op.score(data_deduped, start_date=args.start)
 
-    data_filtered = op.filter(data_scored, k=3)
+    data_filtered = op.filter(data_scored, k=3, min_score=args.min_score_to_rank)
     data_summarized = op.summarize(data_filtered)
 
     targets = args.targets.split(",")

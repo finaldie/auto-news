@@ -163,17 +163,25 @@ class OperatorRSS(OperatorBase):
         print("# Filter RSS (After Scoring)")
         print("#####################################################")
         k = kwargs.setdefault("k", 3)
-        print(f"k: {k}, input size: {len(pages)}")
+        min_score = kwargs.setdefault("min_score", 4)
+        print(f"k: {k}, input size: {len(pages)}, min_score: {min_score}")
 
-        tops = sorted(pages, key=lambda page: page["__relevant_score"], reverse=True)
+        # 1. filter all score >= min_score
+        filtered1 = []
+        for page in pages:
+            if page["__relevant_score"] >= min_score:
+                filtered1.append(page)
+
+        # 2. get top k
+        tops = sorted(filtered1, key=lambda page: page["__relevant_score"], reverse=True)
         print(f"After sorting: {tops}")
 
-        filtered = []
+        filtered2 = []
         for i in range(min(k, len(tops))):
-            filtered.append(tops[i])
+            filtered2.append(tops[i])
 
-        print(f"Filter output size: {len(filtered)}")
-        return filtered
+        print(f"Filter output size: {len(filtered2)}")
+        return filtered2
 
     def score(self, data, **kwargs):
         print("#####################################################")
