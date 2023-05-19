@@ -196,7 +196,10 @@ class OperatorRSS(OperatorBase):
         for page in data:
             try:
                 title = page["title"]
-                score_text = page["summary"] or page["title"]
+
+                # Get a summary text (at most 1024 chars)
+                score_text = f"{page['title']}. {page['summary']}" 
+                score_text = score_text[:1024]
                 print(f"Scoring page: {title}, score_text: {score_text}")
 
                 relevant_metas = op_milvus.get_relevant(

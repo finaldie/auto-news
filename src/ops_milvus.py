@@ -169,6 +169,9 @@ class OperatorMilvus:
     def push(self, pages, **kwargs):
         """
         Create and push embeddings to Milvus vector database
+
+        Notes: We only do embedding on the summary, not the original
+               long content
         """
         print("#####################################################")
         print("# Push Milvus pages")
