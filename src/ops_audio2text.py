@@ -21,6 +21,9 @@ class OperatorAudioToText:
             return ""
 
     def transcribe(self, audio_file: str):
+        """
+        text: {text: xxx, segments: [{}, ...], language: zh/en/..}
+        """
         print(f"[OperatorAudioToText] transcribe audio_file: {audio_file}")
 
         text = self.model.transcribe(audio_file)

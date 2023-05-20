@@ -12,7 +12,6 @@ from llm_agent import (
     LLMYoutubeLoader
 )
 import utils
-import data_model
 from ops_base import OperatorBase
 from db_cli import DBClient
 from ops_audio2text import OperatorAudioToText
@@ -63,7 +62,7 @@ class OperatorYoutube(OperatorBase):
                 audio_text = op_a2t.transcribe(audio_file)
                 print(f"Transcribed audio text (total {time.time() - st:.2f}s): {audio_text}")
 
-                return audio_text, {}
+                return audio_text.get("text") or "", {}
 
         content = ""
         metadata = {}
