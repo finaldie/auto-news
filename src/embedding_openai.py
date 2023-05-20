@@ -14,7 +14,7 @@ class EmbeddingOpenAI(Embedding):
     def getname(self, start_date, prefix="news"):
         return f"{prefix}_embedding__{start_date}".replace("-", "_")
 
-    def create(self, text: str):
+    def create(self, text: str, model_name="text-embedding-ada-002"):
         """
         It creates the embedding with 1536 dimentions by default
         """
@@ -23,7 +23,7 @@ class EmbeddingOpenAI(Embedding):
         emb = openai.Embedding.create(
             input=[text],
             api_key=api_key,
-            model=self.embedding_model)
+            model=model_name)
 
         return emb["data"][0]["embedding"]
 
