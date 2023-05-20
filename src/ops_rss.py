@@ -4,7 +4,7 @@ import copy
 import hashlib
 import traceback
 from operator import itemgetter
-from datetime import datetime
+from datetime import date, datetime
 from time import mktime
 
 from notion import NotionAgent
@@ -49,7 +49,10 @@ class OperatorRSS(OperatorBase):
             published_parsed = entry.published_parsed
 
             # Convert above struct_time object to datetime
-            created_time = datetime.fromtimestamp(mktime(published_parsed)).isoformat()
+            created_time = date.today().isoformat()
+            if published_parsed:
+                created_time = datetime.fromtimestamp(
+                    mktime(published_parsed)).isoformat()
 
             hash_obj.update(f"{list_name}_{title}_{published}".encode('utf-8'))
             article_id = hash_obj.hexdigest()
