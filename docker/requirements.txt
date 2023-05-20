@@ -27,3 +27,6 @@ SpeechRecognition
 
 # Text to Speech
 pyttsx3
+
+soundfile
+openai-whisper

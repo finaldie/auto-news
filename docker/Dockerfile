@@ -25,6 +25,7 @@ RUN set -ex; \
     git \
     libgomp1 \
     jq \
+    ffmpeg \
   '; \
   apt-get update && apt-get install -y --no-install-recommends \
     $deps \
