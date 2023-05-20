@@ -48,6 +48,10 @@ class OperatorRSS(OperatorBase):
         for entry in feed.entries:
             pulled_cnt += 1
 
+            if pulled_cnt > count:
+                print(f"[fetch_articles] Stop pulling, reached count: {count}")
+                break
+
             # Extract relevant information from each entry
             title = entry.title
             link = entry.link
@@ -63,10 +67,6 @@ class OperatorRSS(OperatorBase):
                     mktime(published_parsed)).isoformat()
 
             print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, title: {title}, published: {published}")
-
-            if pulled_cnt > count:
-                print(f"[fetch_articles] Stop pulling, reached count: {count}")
-                break
 
             hash_obj.update(f"{list_name}_{title}_{published}".encode('utf-8'))
             article_id = hash_obj.hexdigest()

@@ -100,7 +100,7 @@ def pull_rss(args, op, source):
 
     data = op.sync(source)
 
-    print(f"Pulled {len(data.keys())} youtube videos")
+    print(f"Pulled {len(data.keys())} RSS articles")
     return data
 
 
