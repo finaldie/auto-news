@@ -33,13 +33,21 @@ class OperatorRSS(OperatorBase):
     - publish
     """
 
-    def _fetch_articles(self, list_name, feed_url):
+    def _fetch_articles(self, list_name, feed_url, count=3):
+        """
+        Fetch artciles from feed url (pull last n)
+        """
+        print(f"[fetch_articles] list_name: {list_name}, feed_url: {feed_url}, count: {count}")
+
         # Parse the RSS feed
         feed = feedparser.parse(feed_url)
         hash_obj = hashlib.md5()
+        pulled_cnt = 0
 
         articles = []
         for entry in feed.entries:
+            pulled_cnt += 1
+
             # Extract relevant information from each entry
             title = entry.title
             link = entry.link
@@ -53,6 +61,12 @@ class OperatorRSS(OperatorBase):
             if published_parsed:
                 created_time = datetime.fromtimestamp(
                     mktime(published_parsed)).isoformat()
+
+            print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, title: {title}, published: {published}")
+
+            if pulled_cnt > count:
+                print(f"[fetch_articles] Stop pulling, reached count: {count}")
+                break
 
             hash_obj.update(f"{list_name}_{title}_{published}".encode('utf-8'))
             article_id = hash_obj.hexdigest()
@@ -118,7 +132,7 @@ class OperatorRSS(OperatorBase):
             url = rss["url"]
             print(f"Fetching RSS: {name}, url: {url}")
 
-            articles = self._fetch_articles(name, url)
+            articles = self._fetch_articles(name, url, count=3)
             print(f"articles: {articles}")
 
             for article in articles:
