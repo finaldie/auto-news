@@ -1,5 +1,6 @@
 import os
 import json
+import subprocess
 from datetime import datetime
 from operator import itemgetter
 
@@ -193,3 +194,12 @@ def get_notion_database_id_toread(notion_agent, db_index_id):
     latest_db_page = db_pages[0]
     database_id = latest_db_page["database_id"]
     return database_id
+
+
+def run_shell_command(cmd):
+    try:
+        output = subprocess.check_output(cmd, shell=True)
+        return True, output
+    except Exception as err:
+        print(f"Run shell command: Error occurred: {err}")
+        return False, str(err)

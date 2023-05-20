@@ -15,6 +15,7 @@ import utils
 import data_model
 from ops_base import OperatorBase
 from db_cli import DBClient
+from ops_audio2text import OperatorAudioToText
 
 
 class OperatorYoutube(OperatorBase):
@@ -28,7 +29,12 @@ class OperatorYoutube(OperatorBase):
     - ranking
     - publish
     """
-    def _load_youtube_transcript(self, url):
+    def _load_youtube_transcript(
+        self,
+        url,
+        page_id="",
+        audio2text=False
+    ):
         loader = LLMYoutubeLoader()
         langs = ["en", "zh", "zh-Hans", "zh-Hant", "zh-TW"]
         print(f"Loading Youtube transcript, supported language list: {langs}")
@@ -44,7 +50,20 @@ class OperatorYoutube(OperatorBase):
                 break
 
         if not docs:
-            print(f"[ERROR] Transcipt not found for language list: {langs}")
+            print(f"[WARN] Transcipt not found for language list: {langs}")
+
+            if audio2text:
+                st = time.time()
+                print(f"Audio2Text enabled, transcribe it, page_id: {page_id}, url: {url} ...")
+                op_a2t = OperatorAudioToText()
+
+                audio_file = op_a2t.extract_audio(page_id, url)
+                print(f"Extracted audio file: {audio_file}")
+
+                audio_text = op_a2t.transcribe(audio_file)
+                print(f"Transcribed audio text (total {time.time() - st:.2f}s): {audio_text}")
+
+                return audio_text, {}
 
         content = ""
         metadata = {}
@@ -110,7 +129,7 @@ class OperatorYoutube(OperatorBase):
                 source_url = page["source_url"] or title
                 print(f"Pulling youtube transcript, title: {title}, page_id: {page_id}, source_url: {source_url}")
 
-                transcript, metadata = self._load_youtube_transcript(source_url)
+                transcript, metadata = self._load_youtube_transcript(source_url, page_id=page_id)
 
                 page["__transcript"] = transcript
 

@@ -30,3 +30,5 @@ pyttsx3
 
 soundfile
 openai-whisper
+
+yt-dlp
