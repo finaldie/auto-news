@@ -1,6 +1,3 @@
-import os
-import openai
-
 from pymilvus import (
     connections,
     FieldSchema,
@@ -17,8 +14,7 @@ class MilvusClient:
         alias="default",
         host="milvus-standalone",
         port='19530',
-        dim=1536,
-        embedding_model="text-embedding-ada-002"  # OpenAI
+        emb_agent=None,
     ):
         self.alias = alias  # The server alias we connect to
 
@@ -28,23 +24,10 @@ class MilvusClient:
             port=port
         )
 
-        self.embedding_model = embedding_model
+        self.emb_agent = emb_agent
 
         # <name, collection>
         self.collections = {}
-
-    def createEmbedding(self, text: str):
-        """
-        It creates the embedding with 1536 dimensions by default
-        """
-        api_key = os.getenv("OPENAI_API_KEY")
-
-        emb = openai.Embedding.create(
-            input=[text],
-            api_key=api_key,
-            model=self.embedding_model)
-
-        return emb["data"][0]["embedding"]
 
     def getConnAlias(self):
         return self.alias
@@ -143,7 +126,7 @@ class MilvusClient:
     ):
         """ Insert embedding and data into collection (table)
         """
-        emb = embed or self.createEmbedding(text)
+        emb = embed or self.emb_agent.create(text)
         collection = self.getCollection(name)
 
         result = collection.insert([[emb], [item_id]])
@@ -155,7 +138,7 @@ class MilvusClient:
         text: str,
         topk=1
     ):
-        emb = self.createEmbedding(text)
+        emb = self.emb_agent.create(text)
         collection = self.getCollection(name)
 
         search_params = {

@@ -126,7 +126,7 @@ class OperatorMilvus:
         print(f"[get_relevant] collection_name: {collection_name}")
 
         client = db_client or DBClient()
-        milvus_client = MilvusClient()
+        milvus_client = MilvusClient(emb_agent=emb_agent)
 
         response_arr = milvus_client.get(collection_name, text, topk=topk)
         res = []
@@ -185,8 +185,8 @@ class OperatorMilvus:
 
         client = DBClient()
         notion_agent = NotionAgent()
-        milvus_client = MilvusClient()
         emb_agent = EmbeddingOpenAI()
+        milvus_client = MilvusClient(emb_agent=emb_agent)
 
         collection_name = emb_agent.getname(start_date)
         print(f"source: {source}, start_date: {start_date}, collection name: {collection_name}")
@@ -194,7 +194,7 @@ class OperatorMilvus:
         if not milvus_client.exist(collection_name):
             milvus_client.createCollection(
                 collection_name,
-                desc=f"Collection end by {start_date}",
+                desc=f"Collection end by {start_date}, dim: {emb_agent.dim()}",
                 dim=emb_agent.dim())
 
             print(f"[INFO] No collection {collection_name} found, created a new one")
