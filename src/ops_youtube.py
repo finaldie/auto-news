@@ -55,7 +55,7 @@ class OperatorYoutube(OperatorBase):
             if audio2text:
                 st = time.time()
                 print(f"Audio2Text enabled, transcribe it, page_id: {page_id}, url: {url} ...")
-                op_a2t = OperatorAudioToText(model_name="small")
+                op_a2t = OperatorAudioToText(model_name="base")
 
                 audio_file = op_a2t.extract_audio(page_id, url)
                 print(f"Extracted audio file: {audio_file}")
