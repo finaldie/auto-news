@@ -35,7 +35,7 @@ class MilvusClient:
 
     def createEmbedding(self, text: str):
         """
-        It creates the embedding with 1536 dimentions by default
+        It creates the embedding with 1536 dimensions by default
         """
         api_key = os.getenv("OPENAI_API_KEY")
 
@@ -52,7 +52,12 @@ class MilvusClient:
     def disconnect(self):
         connections.disconnect(self.alias)
 
-    def createCollection(self, name="embedding_table", desc="embeddings"):
+    def createCollection(
+        self,
+        name="embedding_table",
+        desc="embeddings",
+        dim=1536
+    ):
         # Create table schema
         self.fields = [
             FieldSchema(name="pk",
@@ -62,7 +67,7 @@ class MilvusClient:
 
             FieldSchema(name="embeddings",
                         dtype=DataType.FLOAT_VECTOR,
-                        dim=1536),
+                        dim=dim),
 
             FieldSchema(name="item_id",
                         dtype=DataType.VARCHAR,

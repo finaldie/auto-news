@@ -5,6 +5,7 @@ from datetime import date
 from db_cli import DBClient
 from notion import NotionAgent
 from milvus_cli import MilvusClient
+from embedding_openai import EmbeddingOpenAI
 import utils
 
 
@@ -119,7 +120,9 @@ class OperatorMilvus:
         # print("# Get relevant Milvus pages")
         # print("#####################################################")
 
-        collection_name = self._get_collection_name(start_date)
+        emb_agent = EmbeddingOpenAI()
+
+        collection_name = emb_agent.getname(start_date)
         print(f"[get_relevant] collection_name: {collection_name}")
 
         client = db_client or DBClient()
@@ -180,15 +183,20 @@ class OperatorMilvus:
         start_date = kwargs.setdefault(
             "start_date", date.today().isoformat())
 
-        collection_name = self._get_collection_name(start_date)
-        print(f"source: {source}, start_date: {start_date}, collection name: {collection_name}")
-
         client = DBClient()
         notion_agent = NotionAgent()
         milvus_client = MilvusClient()
+        emb_agent = EmbeddingOpenAI()
+
+        collection_name = emb_agent.getname(start_date)
+        print(f"source: {source}, start_date: {start_date}, collection name: {collection_name}")
 
         if not milvus_client.exist(collection_name):
-            milvus_client.createCollection(collection_name, desc=f"Collection end by {start_date}")
+            milvus_client.createCollection(
+                collection_name,
+                desc=f"Collection end by {start_date}",
+                dim=emb_agent.dim())
+
             print(f"[INFO] No collection {collection_name} found, created a new one")
 
         # The collection exists, add new embeddings
@@ -210,19 +218,12 @@ class OperatorMilvus:
 
                 # Notes: the page does not exist, but the embedding
                 #        maybe exist
-                embedding = client.get_milvus_embedding_item_id(
-                    source, page_id)
-
-                if not embedding:
-                    embedding = milvus_client.createEmbedding(content)
-
-                    # store embedding into redis (ttl = 1 month)
-                    client.set_milvus_embedding_item_id(
-                        source, page_id, json.dumps(embedding),
-                        expired_time=key_ttl)
-
-                else:
-                    embedding = utils.fix_and_parse_json(embedding)
+                embedding = emb_agent.get_or_create(
+                    content,
+                    source=source,
+                    page_id=page_id,
+                    db_client=client,
+                    key_ttl=key_ttl)
 
                 # push to milvus
                 milvus_client.add(
@@ -245,6 +246,3 @@ class OperatorMilvus:
         client = db_client or DBClient()
         client.set_milvus_perf_data_item_id(
             source, dt, page_id)
-
-    def _get_collection_name(self, start_date):
-        return f"news_embedding__{start_date}".replace("-", "_")
