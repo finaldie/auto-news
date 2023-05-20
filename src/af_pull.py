@@ -77,7 +77,7 @@ def pull_youtube(args, op):
     print("######################################################")
     print(f"environment: {os.environ}")
 
-    data = op.pull()
+    data = op.pull(data_folder=args.data_folder, run_id=args.run_id)
 
     print(f"Pulled {len(data.keys())} youtube videos")
     return data

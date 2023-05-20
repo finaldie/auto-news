@@ -32,6 +32,8 @@ class OperatorYoutube(OperatorBase):
         self,
         url,
         page_id="",
+        data_folder="",
+        run_id="",
         audio2text=True
     ):
         loader = LLMYoutubeLoader()
@@ -56,7 +58,8 @@ class OperatorYoutube(OperatorBase):
                 print(f"Audio2Text enabled, transcribe it, page_id: {page_id}, url: {url} ...")
                 op_a2t = OperatorAudioToText(model_name="base")
 
-                audio_file = op_a2t.extract_audio(page_id, url)
+                audio_file = op_a2t.extract_audio(
+                    page_id, url, data_folder, run_id)
                 print(f"Extracted audio file: {audio_file}")
 
                 audio_text = op_a2t.transcribe(audio_file)
@@ -76,10 +79,14 @@ class OperatorYoutube(OperatorBase):
 
         return content, metadata
 
-    def pull(self):
+    def pull(self, **kwargs):
         print("#####################################################")
         print("# Pulling Youtube video transcripts")
         print("#####################################################")
+        data_folder = kwargs.setdefault("data_folder", "")
+        run_id = kwargs.setdefault("run_id", "")
+        print(f"data_folder: {data_folder}, run_id: {run_id}")
+
         # 1. prepare notion agent and db connection
         notion_api_key = os.getenv("NOTION_TOKEN")
         notion_agent = NotionAgent(notion_api_key)
@@ -128,7 +135,11 @@ class OperatorYoutube(OperatorBase):
                 source_url = page["source_url"] or title
                 print(f"Pulling youtube transcript, title: {title}, page_id: {page_id}, source_url: {source_url}")
 
-                transcript, metadata = self._load_youtube_transcript(source_url, page_id=page_id)
+                transcript, metadata = self._load_youtube_transcript(
+                    source_url,
+                    page_id=page_id,
+                    data_folder=data_folder,
+                    run_id=run_id)
 
                 page["__transcript"] = transcript
 
