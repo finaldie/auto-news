@@ -8,6 +8,10 @@ import utils
 
 
 class EmbeddingOpenAI(Embedding):
+    def __init__(self, model_name="openai"):
+        super().__init__(model_name)
+        print("Initialized EmbeddingOpenAI")
+
     def dim(self):
         return 1536
 

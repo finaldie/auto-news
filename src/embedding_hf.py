@@ -15,6 +15,7 @@ class EmbeddingHuggingFace(Embedding):
         super.__init__(model_name)
 
         self.api = HuggingFaceEmbeddings(model_name=self.model_name)
+        print("Initialized EmbeddingHuggingFace")
 
     def dim(self):
         return 1536
