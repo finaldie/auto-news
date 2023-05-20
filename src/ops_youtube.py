@@ -33,7 +33,7 @@ class OperatorYoutube(OperatorBase):
         self,
         url,
         page_id="",
-        audio2text=False
+        audio2text=True
     ):
         loader = LLMYoutubeLoader()
         langs = ["en", "zh", "zh-Hans", "zh-Hant", "zh-TW"]
