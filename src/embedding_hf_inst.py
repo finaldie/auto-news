@@ -1,31 +1,31 @@
 import json
 
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import HuggingFaceInstructEmbeddings
 from embedding import Embedding
 from db_cli import DBClient
 import utils
 
 
-class EmbeddingHuggingFace(Embedding):
+class EmbeddingHuggingFaceInstruct(Embedding):
     """
-    Embedding with Sentence Transformers Embeddings (model downloaded
+    Embedding with Instruct Embeddings (model downloaded
     from HuggingFace)
     """
-    def __init__(self, model_name="all-MiniLM-L6-v2"):
+    def __init__(self, model_name="hkunlp/instructor-xl"):
         super.__init__(model_name)
 
-        self.api = HuggingFaceEmbeddings(model_name=self.model_name)
-        print("Initialized EmbeddingHuggingFace")
+        self.api = HuggingFaceInstructEmbeddings(model_name=self.model_name)
+        print("Initialized EmbeddingHuggingFaceInstruct")
 
     def dim(self):
         return 384
 
     def getname(self, start_date, prefix="news"):
-        return f"{prefix}_embedding_hf_{start_date}".replace("-", "_")
+        return f"{prefix}_embedding_hf_inst_{start_date}".replace("-", "_")
 
     def create(self, text: str):
         """
-        It creates the embedding with 1536 dimentions by default
+        It creates the embedding with 384 dimentions by default
         """
 
         return self.api.embed_query(text)
@@ -44,14 +44,14 @@ class EmbeddingHuggingFace(Embedding):
         client = db_client or DBClient()
 
         embedding = client.get_embedding_item_id(
-            source, "hf", page_id)
+            source, "hf_inst", page_id)
 
         if not embedding:
             embedding = self.create(text)
 
             # store embedding into redis (ttl = 1 month)
             client.set_embedding_item_id(
-                source, "hf", page_id, json.dumps(embedding),
+                source, "hf_inst", page_id, json.dumps(embedding),
                 expired_time=key_ttl)
 
         else:
