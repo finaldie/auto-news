@@ -258,7 +258,7 @@ class OperatorRSS(OperatorBase):
             content = page["content"]
             list_name = page["list_name"]
             source_url = page["url"]
-            print(f"Summarying page, title: {title}")
+            print(f"Summarying page, title: {title}, list_name: {list_name}")
             print(f"Page content ({len(content)} chars): {content}")
 
             st = time.time()
