@@ -6,6 +6,10 @@ langchain
 tiktoken
 openai
 
+# webbaseload related
+bs4
+fake_useragent
+
 notion-client
 tweepy
 mysql-connector-python
