@@ -35,6 +35,9 @@ default_args = {
 }
 
 
+# Important Notes: This DAG must be executed before others, since it
+# will create the new embedding table first, then other DAGs can be
+# consumed later
 with DAG(
     'sync_dist',
     default_args=default_args,
