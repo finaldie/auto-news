@@ -154,11 +154,11 @@ class OperatorRSS(OperatorBase):
         for page_id, page in extractedPages.items():
             title = page["title"]
             list_name = page["list_name"]
-            print(f"Dedupping page, title: {title}")
+            print(f"Dedupping page, title: {title}, page_id: {page_id}")
 
             if client.get_notion_toread_item_id(
                     "rss", list_name, page_id):
-                print(f"Duplicated RSS article found, skip. page_id: {page_id}")
+                print(f"Duplicated RSS article found, skip. title: {title}, page_id: {page_id}")
             else:
                 deduped_pages.append(page)
 

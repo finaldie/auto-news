@@ -105,7 +105,7 @@ def process_youtube(args):
 
 def process_rss(args):
     print("#####################################################")
-    print(f"# Process Youtube, dedup: {args.dedup}")
+    print(f"# Process RSS, dedup: {args.dedup}")
     print("#####################################################")
     op = OperatorRSS()
 
