@@ -37,7 +37,7 @@ class OperatorYoutube(OperatorBase):
         audio2text=True
     ):
         loader = LLMYoutubeLoader()
-        langs = ["en", "zh", "zh-Hans", "zh-Hant", "zh-TW"]
+        langs = ["en", "zh", "zh-CN", "zh-Hans", "zh-Hant", "zh-TW"]
         print(f"Loading Youtube transcript, supported language list: {langs}")
 
         docs = []
