@@ -94,8 +94,11 @@ class OperatorArticle(OperatorBase):
         return deduped_pages
 
     def _load_web(self, url):
+        landing_page = utils.urlHead(url)
+        print(f"[load_web] origin url: {url}, landing page: {landing_page}")
+
         loader = LLMWebLoader()
-        docs = loader.load(url)
+        docs = loader.load(landing_page)
 
         content = ""
         for doc in docs:
