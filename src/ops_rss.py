@@ -154,7 +154,9 @@ class OperatorRSS(OperatorBase):
         for page_id, page in extractedPages.items():
             title = page["title"]
             list_name = page["list_name"]
-            print(f"Dedupping page, title: {title}, list_name: {list_name}, page_id: {page_id}")
+            created_time = page["created_time"]
+
+            print(f"Dedupping page, title: {title}, list_name: {list_name}, created_time: {created_time}, page_id: {page_id}")
 
             if client.get_notion_toread_item_id(
                     "rss", list_name, page_id):
