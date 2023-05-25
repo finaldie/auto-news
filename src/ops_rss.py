@@ -69,7 +69,7 @@ class OperatorRSS(OperatorBase):
             hash_obj.update(f"{list_name}_{title}_{published}".encode('utf-8'))
             article_id = hash_obj.hexdigest()
 
-            print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, list_name: {list_name}, title: {title}, published: {published}, article_id: {article_id}")
+            print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, list_name: {list_name}, title: {title}, published: {created_time}, article_id: {article_id}")
 
             # Create a dictionary representing an article
             article = {
