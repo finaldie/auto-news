@@ -23,7 +23,7 @@ class RedisClient:
         try:
             data = self.api.get(key)
         except Exception as e:
-            print(f"[ERROR]: Failed to get key {key}: {e}")
+            print(f"[ERROR]: Redis client failed to get key {key}: {e}")
 
         return data
 
@@ -45,5 +45,5 @@ class RedisClient:
 
             return True
         except Exception as e:
-            print(f"[ERROR]: Failed to set key {key} and val {val}: {e}")
+            print(f"[ERROR]: Redis client failed to set key {key} and val {val}: {e}")
             return False
