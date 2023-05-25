@@ -33,6 +33,7 @@ class RedisClient:
         """
         expired_time = kwargs.setdefault("expired_time", 0)
         overwrite = kwargs.setdefault("overwrite", False)
+        print(f"[Redis Client] Set key: {key}, val: {val}, expired_time: {expired_time}, overwrite: {overwrite}")
 
         try:
             if expired_time <= 0:

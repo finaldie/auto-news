@@ -66,10 +66,10 @@ class OperatorRSS(OperatorBase):
                 created_time = datetime.fromtimestamp(
                     mktime(published_parsed)).isoformat()
 
-            print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, title: {title}, published: {published}")
-
             hash_obj.update(f"{list_name}_{title}_{published}".encode('utf-8'))
             article_id = hash_obj.hexdigest()
+
+            print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, list_name: {list_name}, title: {title}, published: {published}, article_id: {article_id}")
 
             # Create a dictionary representing an article
             article = {
@@ -154,7 +154,7 @@ class OperatorRSS(OperatorBase):
         for page_id, page in extractedPages.items():
             title = page["title"]
             list_name = page["list_name"]
-            print(f"Dedupping page, title: {title}, page_id: {page_id}")
+            print(f"Dedupping page, title: {title}, list_name: {list_name}, page_id: {page_id}")
 
             if client.get_notion_toread_item_id(
                     "rss", list_name, page_id):
