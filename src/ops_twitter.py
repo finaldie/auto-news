@@ -282,6 +282,7 @@ class OperatorTwitter(OperatorBase):
 
         # 1. filter all score >= min_score
         filtered = {}
+        tot = 0
         cnt = 0
 
         for list_name, tweets in pages.items():
@@ -289,13 +290,14 @@ class OperatorTwitter(OperatorBase):
 
             for page in tweets:
                 relevant_score = page["__relevant_score"]
+                tot += 1
 
                 if relevant_score < 0 or relevant_score >= min_score:
                     filtered_pages.append(page)
                     cnt += 1
                     print(f"Valid tweet with relevant score: {relevant_score}")
 
-        print(f"Filter output size: {cnt}")
+        print(f"Filter output size: {cnt} / {tot}")
         return filtered
 
     def _get_top_items(self, items: list, k):
