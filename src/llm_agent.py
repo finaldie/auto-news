@@ -157,7 +157,7 @@ class LLMAgentSummary(LLMAgentBase):
         chunk_size=2048,
         chunk_overlap=256,
     ):
-        print(f"[LLM] input text ({len(text)} chars): {text}")
+        print(f"[LLM] input text ({len(text)} chars)")
 
         if not text:
             print("[LLM] Empty input text, return empty summary")
