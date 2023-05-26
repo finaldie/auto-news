@@ -111,6 +111,7 @@ def process_rss(args):
 
     data = op.readFromJson(args.data_folder, args.run_id, "rss.json")
     data_deduped = data
+
     need_dedup = utils.str2bool(args.dedup)
     if need_dedup:
         data_deduped = op.dedup(data, target="toread")

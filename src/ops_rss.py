@@ -158,10 +158,8 @@ class OperatorRSS(OperatorBase):
 
             print(f"Dedupping page, title: {title}, list_name: {list_name}, created_time: {created_time}, page_id: {page_id}")
 
-            if client.get_notion_toread_item_id(
+            if not client.get_notion_toread_item_id(
                     "rss", list_name, page_id):
-                print(f" - Duplicated RSS article found, skip. title: {title}, page_id: {page_id}")
-            else:
                 deduped_pages.append(page)
                 print(f" - No duplicate RSS article found, move to next. title: {title}, page_id: {page_id}")
 
