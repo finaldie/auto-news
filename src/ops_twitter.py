@@ -273,6 +273,31 @@ class OperatorTwitter(OperatorBase):
         print(f"Scored_pages ({len(scored_pages)}): {scored_pages}")
         return scored_pages
 
+    def filter(self, pages, **kwargs):
+        print("#####################################################")
+        print("# Filter Tweets (After Scoring)")
+        print("#####################################################")
+        min_score = kwargs.setdefault("min_score", 3.5)
+        print(f"Min_score: {min_score}")
+
+        # 1. filter all score >= min_score
+        filtered = {}
+        cnt = 0
+
+        for list_name, tweets in pages.items():
+            filtered_pages = filtered.setdefault(list_name, [])
+
+            for page in tweets:
+                relevant_score = page["__relevant_score"]
+
+                if relevant_score < 0 or relevant_score >= min_score:
+                    filtered_pages.append(page)
+                    cnt += 1
+                    print(f"Valid tweet with relevant score: {relevant_score}")
+
+        print(f"Filter output size: {cnt}")
+        return filtered
+
     def _get_top_items(self, items: list, k):
         """
         items: [(name, score), ...]

@@ -59,8 +59,9 @@ def process_twitter(args):
     # To save LLM tokens, do score on all deduped tweets, then
     # do rank for score >= 4 tweets
     data_scored = op.score(data_deduped, start_date=args.start)
+    data_filtered = op.filter(data_scored, min_score=3.5)
 
-    data_ranked = op.rank(data_scored, min_score=args.min_score_to_rank)
+    data_ranked = op.rank(data_filtered, min_score=args.min_score_to_rank)
 
     targets = args.targets.split(",")
     op.push(data_ranked, targets, args.topics_top_k, args.categories_top_k)
