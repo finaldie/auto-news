@@ -155,10 +155,3 @@ if __name__ == "__main__":
     load_dotenv()
 
     run(args)
-
-
-if __name__ == "__main__":
-    args = parser.parse_args()
-    load_dotenv()
-
-    run(args)
