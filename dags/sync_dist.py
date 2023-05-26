@@ -44,7 +44,7 @@ with DAG(
     max_active_runs=1,
     description='Sync content from ToRead. config: {"sources": "Twitter,Article,Youtube", "targets": "Obsidian", "dedup": true, "min-rating": 4}',
     # schedule_interval=timedelta(minutes=60),
-    schedule_interval="1 */1 * * *",  # At minute 01 every hour
+    schedule_interval="1 * * * *",  # At minute 01 every hour
     # schedule_interval=None,
     start_date=days_ago(0, hour=1),
     tags=['NewsBot'],
