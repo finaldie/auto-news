@@ -130,7 +130,7 @@ class MilvusClient:
         collection = self.getCollection(name)
 
         result = collection.insert([[emb], [item_id]])
-        print(f"Inserted data into memory at primary key: {result.primary_keys[0]}:\n data: {text}, item_id: {item_id}")
+        print(f"[Milvus Client] Inserted data into memory at primary key: {result.primary_keys[0]}:\n data: {text}, item_id: {item_id}")
 
     def get(
         self,

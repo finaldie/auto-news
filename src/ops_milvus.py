@@ -233,7 +233,8 @@ class OperatorMilvus:
                     embed=embedding)
 
                 self.markVisisted(
-                    source, page_id, start_date, db_client=client)
+                    source, page_id, start_date,
+                    db_client=client, key_ttl=key_ttl)
 
             except Exception as e:
                 print(f"[ERROR] Failed to push to Milvus: {e}")
@@ -242,7 +243,7 @@ class OperatorMilvus:
 
         print(f"[INFO] Finished, total {tot}, skipped: {skipped}, errors: {err}")
 
-    def markVisisted(self, source, page_id, dt, db_client=None):
+    def markVisisted(self, source, page_id, dt, db_client=None, key_ttl=86400 * 15):
         client = db_client or DBClient()
         client.set_milvus_perf_data_item_id(
-            source, dt, page_id)
+            source, dt, page_id, expired_time=key_ttl)
