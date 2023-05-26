@@ -212,6 +212,8 @@ def hashcode_md5(data: bytes):
            current hash_key, repeat/sequatial call
            means update(a + b + c + ...), which lead
            incorrect/inconsistent hash result
+
+    Ref: https://docs.python.org/3/library/hashlib.html
     """
     hash_obj = hashlib.md5()
     hash_obj.update(data)
