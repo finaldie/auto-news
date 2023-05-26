@@ -1,7 +1,6 @@
 import os
 import time
 import copy
-import hashlib
 import traceback
 from operator import itemgetter
 from datetime import date, datetime
@@ -41,7 +40,6 @@ class OperatorRSS(OperatorBase):
 
         # Parse the RSS feed
         feed = feedparser.parse(feed_url)
-        hash_obj = hashlib.md5()
         pulled_cnt = 0
 
         articles = []
@@ -66,10 +64,10 @@ class OperatorRSS(OperatorBase):
                 created_time = datetime.fromtimestamp(
                     mktime(published_parsed)).isoformat()
 
-            hash_obj.update(f"{list_name}_{title}_{published}".encode('utf-8'))
-            article_id = hash_obj.hexdigest()
+            hash_key = f"{list_name}_{title}_{published}".encode('utf-8')
+            article_id = utils.hashcode_md5(hash_key)
 
-            print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, list_name: {list_name}, title: {title}, published: {created_time}, article_id: {article_id}")
+            print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, list_name: {list_name}, title: {title}, published: {created_time}, article_id: {article_id}, hash_key: [{hash_key}]")
 
             # Create a dictionary representing an article
             article = {

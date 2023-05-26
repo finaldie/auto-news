@@ -1,5 +1,6 @@
 import os
 import json
+import hashlib
 import subprocess
 from datetime import datetime
 from operator import itemgetter
@@ -203,3 +204,15 @@ def run_shell_command(cmd):
     except Exception as err:
         print(f"Run shell command: Error occurred: {err}")
         return False, str(err)
+
+
+def hashcode_md5(data: bytes):
+    """
+    Notes: the update() should only be applied to the
+           current hash_key, repeat/sequatial call
+           means update(a + b + c + ...), which lead
+           incorrect/inconsistent hash result
+    """
+    hash_obj = hashlib.md5()
+    hash_obj.update(data)
+    return hash_obj.hexdigest()
