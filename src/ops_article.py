@@ -9,7 +9,8 @@ from notion import NotionAgent
 from llm_agent import (
     LLMAgentCategoryAndRanking,
     LLMAgentSummary,
-    LLMWebLoader
+    LLMWebLoader,
+    LLMArxivLoader
 )
 import utils
 from ops_base import OperatorBase
@@ -166,6 +167,14 @@ class OperatorArticle(OperatorBase):
             summarized_page = copy.deepcopy(page)
             summarized_page["__summary"] = summary
 
+            # Try to load Arxiv metadata if the page is from it
+            arxiv_loader = LLMArxivLoader()
+            loaded, arxiv_res = arxiv_loader.load_from_url(source_url)
+
+            if loaded:
+                summarized_page["__arxiv_result"] = arxiv_res
+                print(f"Arxiv result: {arxiv_res}")
+
             print(f"Used {time.time() - st:.3f}s, Summarized page_id: {page_id}, summary: {summary}")
             summarized_pages.append(summarized_page)
 
@@ -292,12 +301,24 @@ class OperatorArticle(OperatorBase):
 
                         rating = ranked_page["__rate"]
 
-                        notion_agent.createDatabaseItem_ToRead_Article(
+                        new_page = notion_agent.createDatabaseItem_ToRead_Article(
                             database_id,
                             ranked_page,
                             topics_topk,
                             categories_topk,
                             rating)
+
+                        # Add Arxiv metadata as a comment
+                        if ranked_page.get("__arxiv_result"):
+                            try:
+                                new_page_id = new_page["id"]
+                                metadata_text = ranked_page["__arxiv_result"]["text"]
+
+                                notion_agent.createPageComment(
+                                    new_page_id, metadata_text)
+
+                            except Exception as e:
+                                print(f"[WARN] Failed to add Arxiv metadata, skip: {e}")
 
                         self.markVisited(page_id, source="article", list_name="default")
 

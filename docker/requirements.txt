@@ -36,3 +36,7 @@ soundfile
 openai-whisper
 
 yt-dlp
+
+# Arvix
+arxiv
+pymupdf

@@ -5,12 +5,13 @@ from langchain.text_splitter import (
     CharacterTextSplitter,
     RecursiveCharacterTextSplitter
 )
-from langchain.chains.mapreduce import MapReduceChain
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.summarize import load_summarize_chain
 from langchain.document_loaders import YoutubeLoader
 from langchain.document_loaders import WebBaseLoader
+from langchain.document_loaders import ArxivLoader
+from langchain.utilities.arxiv import ArxivAPIWrapper
 
 import llm_prompts
 
@@ -50,6 +51,89 @@ class LLMYoutubeLoader:
         except Exception as e:
             print(f"[ERROR] LLMYoutubeLoader load transcript failed: {e}")
             # traceback.print_exc()
+
+        return docs
+
+
+class LLMArxivLoader:
+    def isvalid(self, url):
+        return url.startswith("https://arxiv.org")
+
+    def load_from_url(self, url, load_all_available_meta=True, max_chars=4000):
+        if not self.isvalid(url):
+            return False, {}
+
+        arxiv_id = url.split("/")[-1]
+        print(f"[_load_arxiv]: arxiv_id: {arxiv_id}")
+
+        docs = self.load_doc_from_id(
+            arxiv_id,
+            load_all_available_meta=load_all_available_meta,
+            max_chars=max_chars)
+
+        if len(docs) == 0:
+            print("[_load_arxiv]: Empty docs loaded")
+            return False, {}
+
+        meta = docs[0].metadata
+        pdf_url = ""
+        for link in meta['links']:
+            if "pdf" in link:
+                pdf_url = link
+                break
+
+        print(f"[_load_arxiv]: Found PDF link: {pdf_url}")
+
+        text = f"""
+        Published: {meta['Published']},
+        Published First Time: {meta['published_first_time']},
+        Title: {meta['Title']},
+        Authors: {meta['Authors']},
+        Url: {meta['entry_id']},
+        Primary Category: {meta['primary_category']},
+        Categories: {meta['categories']},
+        PDF Link: {pdf_url},
+        """
+
+        res = {
+            "doc": docs[0],
+            "metadata": meta,
+            "metadata_text": text,
+        }
+
+        return True, res
+
+    def load_from_id(self, arxiv_id, load_all_available_meta=True):
+        """
+        Load doc and metadata, doc has 4000 chars limitation
+        """
+        docs = []
+
+        try:
+            docs = ArxivLoader(
+                query=arxiv_id,
+                load_all_available_meta=load_all_available_meta
+            ).load()
+
+        except Exception as e:
+            print(f"[ERROR] LLMArxivLoader.load failed: {e}")
+
+        return docs
+
+    def load_doc_from_id(self, arxiv_id, load_all_available_meta=True, max_chars=100000):
+        docs = []
+
+        try:
+            arxiv_client = ArxivAPIWrapper(
+                load_max_docs=100,
+                load_all_available_meta=load_all_available_meta,
+                doc_content_chars_max=max_chars,
+            )
+
+            docs = arxiv_client.load(query=arxiv_id)
+
+        except Exception as e:
+            print(f"[ERROR] LLMArxivLoader.load_doc failed: {e}")
 
         return docs
 

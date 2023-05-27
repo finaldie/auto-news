@@ -150,6 +150,8 @@ class MilvusClient:
             [emb], "embeddings", search_params, topk,
             output_fields=["item_id"])
 
+        print(f"[Milvus Client] get relevant results: {result}")
+
         return [{"item_id": item.entity.value_of_field("item_id")} for item in result[0]]
 
     def exist(self, name):
