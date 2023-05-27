@@ -185,7 +185,9 @@ class OperatorRSS(OperatorBase):
         # 1. filter all score >= min_score
         filtered1 = []
         for page in pages:
-            if page["__relevant_score"] >= min_score:
+            relevant_score = page["__relevant_score"]
+
+            if relevant_score < 0 or relevant_score >= min_score:
                 filtered1.append(page)
 
         # 2. get top k
@@ -204,6 +206,9 @@ class OperatorRSS(OperatorBase):
         print("# Scoring RSS")
         print("#####################################################")
         start_date = kwargs.setdefault("start_date", "")
+        max_distance = kwargs.setdefault("max_distance", 0.5)
+        print(f"start_date: {start_date}, max_distance: {max_distance}")
+
         op_milvus = OperatorMilvus()
         client = DBClient()
 
@@ -219,7 +224,8 @@ class OperatorRSS(OperatorBase):
                 print(f"Scoring page: {title}, score_text: {score_text}")
 
                 relevant_metas = op_milvus.get_relevant(
-                    start_date, score_text, topk=2, db_client=client)
+                    start_date, score_text, topk=2,
+                    max_distance=max_distance, db_client=client)
 
                 page_score = op_milvus.score(relevant_metas)
 

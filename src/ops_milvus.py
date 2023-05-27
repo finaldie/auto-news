@@ -1,4 +1,5 @@
 import json
+import copy
 import traceback
 from datetime import date
 
@@ -114,8 +115,17 @@ class OperatorMilvus:
         start_date,
         text: str,
         topk: int = 2,
+        max_distance: float = 0.5,
         db_client=None
     ):
+        """
+        @param max_distance - filter out if distance > max_distance
+
+        Notes: distance is in [0.0, 1.0], tune the max_distance for best
+        needs
+
+        Ref: https://milvus.io/blog/optimizing-billion-scale-image-search-milvus-part-2.md
+        """
         # print("#####################################################")
         # print("# Get relevant Milvus pages")
         # print("#####################################################")
@@ -135,6 +145,12 @@ class OperatorMilvus:
             print(f"[get_relevant] Processing response: {response}")
 
             page_id = response["item_id"]
+            distance = response["distance"]
+
+            if distance > max_distance:
+                print(f"[get_relevant] Filtered it out due to the distance: {distance} > max_distance {max_distance}, page_id: {page_id}")
+                continue
+
             page_metadata = client.get_page_item_id(page_id)
 
             if not page_metadata:
@@ -142,13 +158,19 @@ class OperatorMilvus:
                 continue
 
             page_metadata = utils.fix_and_parse_json(page_metadata)
-            res.append(page_metadata)
-            print(f"[get_relevant] found page_metadata: {page_metadata}")
+            copied_page_metadata = copy.deepcopy(page_metadata)
+            copied_page_metadata["distance"] = distance
+
+            res.append(copied_page_metadata)
+            print(f"[get_relevant] found page_metadata: {copied_page_metadata}")
 
         return res
 
     def score(self, relevant_page_metas: list):
         """
+        TODO: calculate score consider distance, the shorter distance
+        the higher weight of the user rating
+
         @param relevant_page_metas: From get_relevant
 
         @return the average rating of all the user ratings

@@ -152,7 +152,7 @@ class MilvusClient:
 
         print(f"[Milvus Client] get relevant results: {result}")
 
-        return [{"item_id": item.entity.value_of_field("item_id")} for item in result[0]]
+        return [{"item_id": item.entity.value_of_field("item_id"), "distance": item.distance} for item in result[0]]
 
     def exist(self, name):
         return utility.has_collection(name)

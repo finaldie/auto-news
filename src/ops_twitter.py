@@ -239,6 +239,9 @@ class OperatorTwitter(OperatorBase):
         print("# Score Tweets")
         print("#####################################################")
         start_date = kwargs.setdefault("start_date", "")
+        max_distance = kwargs.setdefault("max_distance", 0.5)
+        print(f"start_date: {start_date}, max_distance: {max_distance}")
+
         op_milvus = OperatorMilvus()
         client = DBClient()
 
@@ -256,7 +259,8 @@ class OperatorTwitter(OperatorBase):
 
                     # Notes: k = 10 looks too noisy, tune k = 2
                     relevant_metas = op_milvus.get_relevant(
-                        start_date, text, topk=2, db_client=client)
+                        start_date, text, topk=2,
+                        max_distance=max_distance, db_client=client)
 
                     page_score = op_milvus.score(relevant_metas)
 
