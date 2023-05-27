@@ -16,8 +16,8 @@ class OperatorAudioToText:
         workdir = os.getenv("WORKDIR")
         data_path = f"{workdir}/{data_folder}/{run_id}"
 
-        output_audio_filename = f"{data_path}/{page_id}_audio.wav"
-        cmd = f"yt-dlp --extract-audio --audio-format wav --output {output_audio_filename} {url}"
+        output_audio_filename = f"{data_path}/{page_id}_audio.mp3"
+        cmd = f"yt-dlp --extract-audio --audio-format mp3 --output {output_audio_filename} {url}"
 
         if utils.run_shell_command(cmd):
             return output_audio_filename
