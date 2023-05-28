@@ -115,7 +115,7 @@ class OperatorMilvus:
         start_date,
         text: str,
         topk: int = 2,
-        max_distance: float = 0.5,
+        max_distance: float = 0.45,
         db_client=None
     ):
         """
