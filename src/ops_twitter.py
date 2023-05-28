@@ -239,7 +239,7 @@ class OperatorTwitter(OperatorBase):
         print("# Score Tweets")
         print("#####################################################")
         start_date = kwargs.setdefault("start_date", "")
-        max_distance = kwargs.setdefault("max_distance", 0.5)
+        max_distance = kwargs.setdefault("max_distance", 0.45)
         print(f"start_date: {start_date}, max_distance: {max_distance}")
 
         op_milvus = OperatorMilvus()

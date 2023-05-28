@@ -35,6 +35,9 @@ parser.add_argument("--dedup", help="whether dedup item",
 parser.add_argument("--min-score-to-rank",
                     help="The minimum relevant score to start ranking",
                     default=4)
+parser.add_argument("--max-distance",
+                    help="Max distance for similarity search, range [0.0, 1.0]",
+                    default=0.45)
 
 
 def process_twitter(args):
@@ -58,7 +61,11 @@ def process_twitter(args):
 
     # To save LLM tokens, do score on all deduped tweets, then
     # do rank for score >= 4 tweets
-    data_scored = op.score(data_deduped, start_date=args.start)
+    data_scored = op.score(
+        data_deduped,
+        start_date=args.start,
+        max_distance=args.max_distance)
+
     data_filtered = op.filter(data_scored, min_score=3.5)
 
     data_ranked = op.rank(data_filtered, min_score=args.min_score_to_rank)
@@ -119,7 +126,10 @@ def process_rss(args):
     else:
         data_deduped = [x for x in data.values()]
 
-    data_scored = op.score(data_deduped, start_date=args.start)
+    data_scored = op.score(
+        data_deduped,
+        start_date=args.start,
+        max_distance=args.max_distance)
 
     # Only pick top 1 to reduce the overflow
     data_filtered = op.filter(data_scored, k=1, min_score=4)

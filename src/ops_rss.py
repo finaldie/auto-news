@@ -206,7 +206,7 @@ class OperatorRSS(OperatorBase):
         print("# Scoring RSS")
         print("#####################################################")
         start_date = kwargs.setdefault("start_date", "")
-        max_distance = kwargs.setdefault("max_distance", 0.5)
+        max_distance = kwargs.setdefault("max_distance", 0.45)
         print(f"start_date: {start_date}, max_distance: {max_distance}")
 
         op_milvus = OperatorMilvus()
