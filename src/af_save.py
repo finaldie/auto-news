@@ -37,7 +37,7 @@ parser.add_argument("--min-score-to-rank",
                     default=4)
 parser.add_argument("--max-distance",
                     help="Max distance for similarity search, range [0.0, 1.0]",
-                    default=0.45)
+                    default=0.40)
 
 
 def process_twitter(args):
