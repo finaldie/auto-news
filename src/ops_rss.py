@@ -57,14 +57,22 @@ class OperatorRSS(OperatorBase):
             # Example: Thu, 03 Mar 2022 08:00:00 GMT
             published = entry.published
             published_parsed = entry.published_parsed
+            published_key = published
 
             # Convert above struct_time object to datetime
             created_time = date.today().isoformat()
             if published_parsed:
-                created_time = datetime.fromtimestamp(
-                    mktime(published_parsed)).isoformat()
+                dt = datetime.fromtimestamp(mktime(published_parsed))
+                created_time = dt.isoformat()
 
-            hash_key = f"{list_name}_{title}_{published}".encode('utf-8')
+                # Notes: The feedparser returns unreliable dates, e.g.
+                # sometimes 2023-05-25T16:09:00.004-07:00
+                # sometimes 2023-05-25T16:09:00.003-07:00
+                # It leads the inconsistent md5 hash result which
+                # causes duplicate result, so use YYYY-MM-DD instead
+                published_key = dt.strftime("%Y-%m-%d")
+
+            hash_key = f"{list_name}_{title}_{published_key}".encode('utf-8')
             article_id = utils.hashcode_md5(hash_key)
 
             print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, list_name: {list_name}, title: {title}, published: {created_time}, article_id: {article_id}, hash_key: [{hash_key}]")
@@ -80,6 +88,10 @@ class OperatorRSS(OperatorBase):
                 "summary": entry.get("summary") or "",
                 "content": "",
                 "tags": entry.get("tags") or [],
+                "hash_key": hash_key,
+                "published": published,
+                "published_parsed": published_parsed,
+                "published_key": published_key,
             }
 
             # Add the article to the list
