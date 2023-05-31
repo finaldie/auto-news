@@ -88,7 +88,6 @@ class OperatorRSS(OperatorBase):
                 "summary": entry.get("summary") or "",
                 "content": "",
                 "tags": entry.get("tags") or [],
-                "hash_key": hash_key,
                 "published": published,
                 "published_key": published_key,
             }
