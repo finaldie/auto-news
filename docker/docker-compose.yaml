@@ -364,6 +364,7 @@ services:
     volumes:
       - ${MILVUS_PROJ_DIR:-.}/volumes/etcd:/etcd
     command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    restart: always
 
   milvus-minio:
     container_name: milvus-minio
@@ -376,6 +377,7 @@ services:
     volumes:
       - ${MILVUS_PROJ_DIR:-.}/volumes/minio:/minio_data
     command: minio server /minio_data
+    restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -396,6 +398,7 @@ services:
     ports:
       - "19530:19530"
       - "9091:9091"
+    restart: always
     depends_on:
       - "etcd"
       - "milvus-minio"
@@ -411,6 +414,7 @@ services:
       - ${MILVUS_PROJ_DIR:-.}/volumes/ui:/ui
     ports:
       - "9100:3000"
+    restart: always
     depends_on:
       - "milvus-standalone"
 
