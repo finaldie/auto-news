@@ -312,7 +312,7 @@ class OperatorArticle(OperatorBase):
                         if ranked_page.get("__arxiv_result"):
                             try:
                                 new_page_id = new_page["id"]
-                                metadata_text = ranked_page["__arxiv_result"]["text"]
+                                metadata_text = ranked_page["__arxiv_result"]["metadata_text"]
 
                                 notion_agent.createPageComment(
                                     new_page_id, metadata_text)
