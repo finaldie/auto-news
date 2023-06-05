@@ -39,12 +39,12 @@ default_args = {
 # will create the new embedding table first, then other DAGs can be
 # consumed later
 with DAG(
-    'sync_dist',
+    'collection_weekly',
     default_args=default_args,
     max_active_runs=1,
-    description='Sync content from ToRead. config: {"sources": "Twitter,Article,Youtube,RSS", "targets": "Milvus", "dedup": true, "min-rating": 4}',
+    description='Collect weekly best content. config: {"sources": "Twitter,Article,Youtube,RSS", "targets": "notion", "dedup": true, "min-rating": 4}',
     # schedule_interval=timedelta(minutes=60),
-    schedule_interval="1 * * * *",  # At minute 01 every hour
+    schedule_interval="30 * * /1 *",  # At 00:30 weekly
     # schedule_interval=None,
     start_date=days_ago(0, hour=1),
     tags=['NewsBot'],
@@ -62,32 +62,34 @@ with DAG(
 
     t2 = BashOperator(
         task_id='prepare',
-        bash_command='mkdir -p ~/airflow/data/sync/{{ ds }}/{{ run_id }}',
+        bash_command='mkdir -p ~/airflow/data/collect/{{ run_id }}',
     )
 
     t3 = BashOperator(
         task_id='pull',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_sync.py '
+        bash_command='cd ~/airflow/run/auto-news/src && python3 af_collect.py '
         '--start {{ ds }} '
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder=data/sync/{{ ds }} '
+        '--data-folder=data/collect '
+        '--collection-type=weekly '
+        '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
         '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
     )
 
     t4 = BashOperator(
         task_id='save',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_dist.py '
+        bash_command='cd ~/airflow/run/auto-news/src && python3 af_publish.py '
         '--start {{ ds }} '
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder=data/sync '
+        '--data-folder=data/collect '
         '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
-        '--targets={{ dag_run.conf.setdefault("targets", "Milvus") }} '
-        '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
-        '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
+        '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
+        '--collection-type=weekly '
+        '--min-rating={{ dag_run.conf.setdefault("min-rating", 4.5) }} '
     )
 
     t5 = BashOperator(

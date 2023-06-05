@@ -168,6 +168,8 @@ class OperatorMilvus:
 
     def score(self, relevant_page_metas: list):
         """
+        K-Mean score
+
         TODO: calculate score consider distance, the shorter distance
         the higher weight of the user rating
 

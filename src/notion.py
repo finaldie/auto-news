@@ -429,12 +429,15 @@ class NotionAgent:
 
         return new_page
 
-    def createDatabase_ToRead(self, parent_page_id):
+    def createDatabase_ToRead(self, name, parent_page_id):
+        """
+        Create a database for ToRead, Collection, etc
+        """
         title = [
             {
                 "type": "text",
                 "text": {
-                    "content": f"ToRead {date.today().isoformat()}"
+                    "content": name,
                 }
             }
         ]
@@ -877,6 +880,7 @@ class NotionAgent:
         created_time_pdt = utils.convertUTC2PDT_str(ranked_page["created_time"])
 
         append_notion_url = kwargs.setdefault("append_notion_url", True)
+        prop_add_take_away = kwargs.setdefault("prop_add_take_away", False)
 
         properties = {
             "Name": {
@@ -910,6 +914,19 @@ class NotionAgent:
             #     ]
             # },
         }
+
+        if prop_add_take_away:
+            properties.update({
+                "Take Aways": {
+                    "rich_text": [
+                        {
+                            "text": {
+                                "content": ranked_page["__take_aways"],
+                            },
+                        },
+                    ]
+                },
+            })
 
         # put summary content
         summary_en, summary_trans = utils.splitSummaryTranslation(summary)
@@ -1342,6 +1359,30 @@ class NotionAgent:
                 ],
             }
         })
+
+        # Common fields for article, youtube, etc
+        return self._postprocess_ToRead(
+            properties,
+            blocks,
+            database_id,
+            page,
+            topics,
+            categories,
+            rate_number,
+            list_names=[page["list_name"]]
+        )
+
+    def createDatabaseItem_ToRead_Collection(
+        self,
+        database_id,
+        page,
+        topics: list,
+        categories: list,
+        rate_number,
+        **kwargs
+    ):
+        properties, blocks = self._createDatabaseItem_ArticleBase(
+            page, append_notion_url=True, **kwargs)
 
         # Common fields for article, youtube, etc
         return self._postprocess_ToRead(

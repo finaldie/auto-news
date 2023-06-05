@@ -49,13 +49,13 @@ with DAG(
 ) as dag:
 
     t0 = BashOperator(
-        task_id='start',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_start.py --start {{ ds }} --prefix=./run',
+        task_id='git_pull',
+        bash_command='cd ~/airflow/run/auto-news && git pull && git log -1',
     )
 
     t1 = BashOperator(
-        task_id='git_pull',
-        bash_command='cd ~/airflow/run/auto-news && git pull && git log -1',
+        task_id='start',
+        bash_command='cd ~/airflow/run/auto-news/src && python3 af_start.py --start {{ ds }} --prefix=./run',
     )
 
     t2 = BashOperator(
