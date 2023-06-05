@@ -44,7 +44,7 @@ with DAG(
     max_active_runs=1,
     description='Collect weekly best content. config: {"sources": "Twitter,Article,Youtube,RSS", "targets": "notion", "dedup": true, "min-rating": 4}',
     # schedule_interval=timedelta(minutes=60),
-    schedule_interval="30 2 * /1 *",  # At 02:30 weekly
+    schedule_interval="30 2 * */1 *",  # At 02:30 weekly
     # schedule_interval=None,
     start_date=days_ago(0, hour=1),
     tags=['NewsBot'],
