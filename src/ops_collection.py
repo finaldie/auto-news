@@ -146,6 +146,7 @@ class OperatorCollection(OperatorBase):
         for page in data:
             try:
                 title = page.get("title") or ""
+                page_id = page["id"]
 
                 # Get a summary text (at most 1024 chars)
                 score_text = f"{page['title']}. {page['summary']}"
@@ -155,6 +156,9 @@ class OperatorCollection(OperatorBase):
                 relevant_metas = op_milvus.get_relevant(
                     start_date, score_text, topk=top_k_similar,
                     max_distance=max_distance, db_client=client)
+
+                # Exclude the page itself
+                scoring_metadata = [x for x in relevant_metas if x['page_id'] != page_id]
 
                 page_score = op_milvus.score(relevant_metas)
 

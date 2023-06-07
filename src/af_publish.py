@@ -44,14 +44,14 @@ def process_collection(args, op):
     print("#####################################################")
     data = op.readFromJson(args.data_folder, args.run_id, "collection.json")
 
-    data_filtered = op.post_filter(data, min_score=args.min_rating)
-
     data_scored = op.score(
-        data_filtered,
+        data,
         start_date=args.start,
         max_distance=args.max_distance)
 
-    return data_scored
+    data_filtered = op.post_filter(data_scored, min_score=args.min_rating)
+
+    return data_filtered
 
 
 def publish(args, op, data, targets):
