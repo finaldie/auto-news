@@ -209,7 +209,7 @@ class OperatorCollection(OperatorBase):
 
                 for page in pages:
                     try:
-                        title = page["title"]
+                        title = page["name"]
 
                         # Modify page source and list_name
                         page["list_name"] = [page["source"]]
