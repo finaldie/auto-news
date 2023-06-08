@@ -1260,7 +1260,7 @@ class NotionAgent:
                 "number": ranked_page["__relevant_score"]
             }})
 
-        print(f"notion ToRead: database_id: {database_id}, properties: {properties}, blocks: {blocks}")
+        print(f"notion ToRead (post-process): database_id: {database_id}, properties: {properties}, blocks: {blocks}")
 
         # Add the new page to the database
         new_page = self.api.pages.create(

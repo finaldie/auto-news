@@ -89,7 +89,7 @@ with DAG(
         '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
         '--collection-type=weekly '
-        '--min-rating={{ dag_run.conf.setdefault("min-rating", 4.5) }} '
+        '--min-rating={{ dag_run.conf.setdefault("publishing-min-rating", 4.5) }} '
     )
 
     t5 = BashOperator(

@@ -139,8 +139,8 @@ class OperatorCollection(OperatorBase):
         print("# Scoring Collection pages")
         print("#####################################################")
         start_date = kwargs.setdefault("start_date", "")
-        max_distance = kwargs.setdefault("max_distance", 0.45)
-        top_k_similar = kwargs.setdefault("top_k_similar", 3)
+        max_distance = kwargs.setdefault("max_distance", 0.5)
+        top_k_similar = kwargs.setdefault("top_k_similar", 4)
         print(f"start_date: {start_date}, top_k_similar: {top_k_similar}, max_distance: {max_distance}")
 
         op_milvus = OperatorMilvus()
@@ -223,7 +223,7 @@ class OperatorCollection(OperatorBase):
                         title = page["name"]
 
                         # Modify page source and list_name
-                        page["list_name"] = [page["source"]]
+                        page["list_name"] = page["source"]
                         page["source"] = collection_source_type
 
                         print(f"Pushing page, title: {title}, source: {page['source']}, list_name: {page['list_name']}")
