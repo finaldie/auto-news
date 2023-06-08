@@ -1066,6 +1066,7 @@ class NotionAgent:
 
         append_notion_url = kwargs.setdefault("append_notion_url", True)
 
+        # Extract the raw notion property object
         properties = copy.deepcopy(page["properties"]["properties"])
 
         # need to remove auto filled fields, e.g. last_edited_time and created_time
@@ -1073,7 +1074,8 @@ class NotionAgent:
         del properties["Read"]
         del properties["Created time"]
 
-        blocks = [block for bid, block in page["blocks"].items()]
+        # Get the raw notion block object
+        blocks = [block["__raw"] for bid, block in page["blocks"].items()]
 
         # append orginal notion url
         if append_notion_url:
