@@ -63,6 +63,9 @@ stop:
 logs:
 	cd docker && make logs topdir=$(topdir)
 
+ps:
+	cd docker && make ps topdir=$(topdir)
+
 clean:
 	docker system prune -f
 	docker volume prune

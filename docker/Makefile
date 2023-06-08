@@ -73,6 +73,9 @@ stop:
 logs:
 	docker-compose logs -f
 
+ps:
+	docker-compose ps
+
 push_dags:
 	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags
 	cd $(topdir)/dags && cp *.py $(AIRFLOW_PROJ_DIR)/dags
