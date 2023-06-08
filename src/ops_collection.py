@@ -94,6 +94,7 @@ class OperatorCollection(OperatorBase):
         # 1. filter all score >= min_score
         filtered1 = []
         for page in pages:
+            print(f"page: {page}")
             user_rating = page["user_rating"]
 
             if user_rating >= min_score:
