@@ -573,7 +573,8 @@ class NotionAgent:
             query_data["filter"]["and"].append({
                 "property": "Last edited time",
                 "date": {
-                    "on_or_after": filter_last_edited_time,
+                    # "on_or_after": filter_last_edited_time,
+                    "after": filter_last_edited_time,
                 }
             })
 
