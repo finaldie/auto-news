@@ -233,7 +233,7 @@ class OperatorCollection(OperatorBase):
 
                         topics_topk = page.get("topic") or ""
                         categories_topk = page.get("categories") or ""
-                        rating = page.get("user_rating") or -3
+                        rating = float(page.get("user_rating")) or -3
 
                         page_take_aways = notion_agent.extractRichText(page["properties"]["properties"]["Take Aways"]["rich_text"])
                         page["__take_aways"] = page_take_aways
