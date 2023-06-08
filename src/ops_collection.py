@@ -1,16 +1,10 @@
 import os
-import time
 import copy
 import traceback
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
-from notion import NotionAgent
-from llm_agent import (
-    LLMAgentCategoryAndRanking,
-    LLMAgentSummary,
-    LLMWebLoader
-)
 import utils
+from notion import NotionAgent
 from ops_base import OperatorBase
 from db_cli import DBClient
 from ops_milvus import OperatorMilvus
@@ -108,7 +102,7 @@ class OperatorCollection(OperatorBase):
         Post filter all pages with relevant score >= min_score
         """
         print("#####################################################")
-        print("# Pre-Filter Collection")
+        print("# Post-Filter Collection")
         print("#####################################################")
         k = kwargs.setdefault("k", 5)
         min_score = kwargs.setdefault("min_score", 4.5)
@@ -145,6 +139,9 @@ class OperatorCollection(OperatorBase):
         op_milvus = OperatorMilvus()
         client = DBClient()
 
+        notion_api_key = os.getenv("NOTION_TOKEN")
+        notion_agent = NotionAgent(notion_api_key)
+
         scored_list = []
 
         for page in data:
@@ -165,7 +162,7 @@ class OperatorCollection(OperatorBase):
                 # Exclude the page itself
                 scoring_metadata = [x for x in relevant_metas if x['page_id'] != page_id]
 
-                page_score = op_milvus.score(relevant_metas)
+                page_score = op_milvus.score(scoring_metadata)
 
                 scored_page = copy.deepcopy(page)
                 scored_page["__relevant_score"] = page_score
@@ -211,7 +208,6 @@ class OperatorCollection(OperatorBase):
 
                 for page in pages:
                     try:
-                        page_id = page["id"]
                         title = page["title"]
 
                         # Modify page source and list_name
