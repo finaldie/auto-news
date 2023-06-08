@@ -74,7 +74,7 @@ class OperatorCollection(OperatorBase):
                 # The api will return the pages and sort by "created time" asc
                 # format dict(<page_id, page>)
                 pages = notion_agent.queryDatabaseToRead(
-                    database_id, source, last_edited_time=start_time)
+                    database_id, source, last_edited_time=start_time.isoformat())
 
                 page_list.extend(pages)
 
