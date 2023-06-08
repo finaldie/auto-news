@@ -73,6 +73,9 @@ clean:
 info:
 	cd docker && make info topdir=$(topdir)
 
+enable_dags:
+	cd docker && make enable_dags topdir=$(topdir)
+
 push_dags:
 	cd docker && make push_dags topdir=$(topdir)
 

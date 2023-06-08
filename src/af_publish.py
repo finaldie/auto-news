@@ -28,7 +28,8 @@ parser.add_argument("--targets",
                     default="notion")
 parser.add_argument("--min-rating",
                     help="Minimum user rating to publish",
-                    default=4)
+                    type=float,
+                    default=4.5)
 parser.add_argument("--dedup", help="whether dedup item",
                     default=True)
 parser.add_argument("--collection-type", help="weekly, monthly, yearly",

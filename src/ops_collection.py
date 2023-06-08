@@ -105,13 +105,14 @@ class OperatorCollection(OperatorBase):
         print("# Post-Filter Collection")
         print("#####################################################")
         k = kwargs.setdefault("k", 5)
-        min_score = kwargs.setdefault("min_score", 4.5)
+        min_score = float(kwargs.setdefault("min_score", 4.5))
         print(f"k: {k}, input size: {len(pages)}, min_score: {min_score}")
 
         # 1. filter all score >= min_score
         filtered1 = []
         for page in pages:
             relevant_score = float(page["__relevant_score"])
+            print(f"- Relevant score: {relevant_score}, min_score: {min_score}")
 
             if relevant_score >= min_score:
                 filtered1.append(page)

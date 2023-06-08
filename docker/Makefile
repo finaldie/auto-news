@@ -55,9 +55,10 @@ deploy: post-deploy
 
 init: init-airflow push_dags
 
-
-start:
+start-services:
 	docker-compose up -d
+
+start: start-services enable_dags
 	@echo ""
 	@echo "Services started, links:"
 	@echo "- Airflow: http://`hostname`:8080"
@@ -75,6 +76,11 @@ ps:
 
 info:
 	docker-compose run airflow-cli airflow info
+
+enable_dags:
+	docker-compose run airflow-cli airflow dags unpause news_pulling
+	docker-compose run airflow-cli airflow dags unpause sync_dist
+	docker-compose run airflow-cli airflow dags unpause collection_weekly
 
 push_dags:
 	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags
