@@ -696,6 +696,8 @@ class NotionAgent:
             extracted_pages[page_id] = {
                 "id": page_id,
                 "name": page["properties"]["Name"]["title"][0]["text"]["content"],
+                # backward compatible with database page creation
+                "title": page["properties"]["Name"]["title"][0]["text"]["content"],
                 # pdt timezone
                 "created_at": page["properties"]["Created at"]["date"]["start"],
                 "created_time": page["created_time"],

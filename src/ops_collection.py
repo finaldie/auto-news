@@ -85,13 +85,19 @@ class OperatorCollection(OperatorBase):
         min_score = kwargs.setdefault("min_score", 4)
         print(f"input size: {len(pages)}, min_score: {min_score}")
 
-        # 1. filter all score >= min_score
+        notion_api_key = os.getenv("NOTION_TOKEN")
+        notion_agent = NotionAgent(notion_api_key)
+
+        # 1. filter all score >= min_score or contains take aways msg
         filtered1 = []
         for page_id, page in pages.items():
             print(f"page: {page}")
             user_rating = page["user_rating"]
 
-            if user_rating >= min_score:
+            take_aways = notion_agent.extractRichText(
+                page["properties"]["properties"]["Take Aways"]["rich_text"])
+
+            if user_rating >= min_score or take_aways:
                 filtered1.append(page)
 
         print(f"Filter output size: {len(filtered1)}")
