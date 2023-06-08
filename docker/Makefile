@@ -58,17 +58,14 @@ init: init-airflow push_dags
 
 start:
 	docker-compose up -d
-	# docker-compose up flower -d
 	@echo ""
 	@echo "Services started, links:"
 	@echo "- Airflow: http://`hostname`:8080"
 	@echo "- Milvus: http://`hostname`:9100"
 	@echo "- Adminer: http://`hostname`:8070"
-	# @echo "- Flower: http://`hostname`:5555"
 
 stop:
 	docker-compose down
-	# docker-compose stop flower
 
 logs:
 	docker-compose logs -f
