@@ -242,9 +242,6 @@ class OperatorCollection(OperatorBase):
                         categories_topk = page.get("categories") or ""
                         rating = float(page.get("user_rating")) or -3
 
-                        page_take_aways = notion_agent.extractRichText(page["properties"]["properties"]["Take Aways"]["rich_text"])
-                        page["__take_aways"] = page_take_aways
-
                         print(f"Pushing page: {page}")
 
                         notion_agent.createDatabaseItem_ToRead_Collection(
@@ -252,8 +249,7 @@ class OperatorCollection(OperatorBase):
                             page,
                             topics_topk,
                             categories_topk,
-                            rating,
-                            prop_add_take_away=True)
+                            rating)
 
                         # For collection, we don't need mark as visited
                         # self.markVisited(

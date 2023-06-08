@@ -1,5 +1,6 @@
 import os
 import time
+import copy
 import traceback
 
 from notion_client import Client
@@ -1064,22 +1065,13 @@ class NotionAgent:
         """
 
         append_notion_url = kwargs.setdefault("append_notion_url", True)
-        prop_add_take_away = kwargs.setdefault("prop_add_take_away", False)
 
-        properties = page["properties"]["properties"]
+        properties = copy.deepcopy(page["properties"]["properties"])
 
-        # if prop_add_take_away:
-        #     properties.update({
-        #         "Take Aways": {
-        #             "rich_text": [
-        #                 {
-        #                     "text": {
-        #                         "content": page["__take_aways"],
-        #                     },
-        #                 },
-        #             ]
-        #         },
-        #     })
+        # need to remove auto filled fields, e.g. last_edited_time and created_time
+        del properties["Last edited time"]
+        del properties["Read"]
+        del properties["Created time"]
 
         blocks = [block for bid, block in page["blocks"].items()]
 
