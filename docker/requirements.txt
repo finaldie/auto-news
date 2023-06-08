@@ -20,7 +20,7 @@ pytube
 
 # Vector database
 # chromadb
-pymilvus
+pymilvus===2.2.8
 pinecone-client
 
 # RSS
