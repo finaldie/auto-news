@@ -48,6 +48,8 @@ class OperatorCollection(OperatorBase):
         if collection_type == "weekly":
             start_time = now - timedelta(weeks=1)
 
+        print(f"start_time: {start_time}")
+
         # 1. prepare notion agent and db connection
         notion_api_key = os.getenv("NOTION_TOKEN")
         notion_agent = NotionAgent(notion_api_key)
@@ -76,6 +78,7 @@ class OperatorCollection(OperatorBase):
 
                 page_list.extend(pages)
 
+        print(f"Pulled total {len(page_list)} items")
         return page_list
 
     def pre_filter(self, pages, **kwargs):
