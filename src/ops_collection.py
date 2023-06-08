@@ -1,5 +1,6 @@
 import os
 import copy
+import time
 import traceback
 from datetime import datetime, timedelta
 
@@ -65,12 +66,18 @@ class OperatorCollection(OperatorBase):
             print(f"Pulling from database_id: {database_id}...")
 
             for source in sources:
+                print("Querying source: {source} ...")
                 # The api will return the pages and sort by "created time" asc
                 # format dict(<page_id, page>)
                 pages = notion_agent.queryDatabaseToRead(
                     database_id, source, last_edited_time=start_time.isoformat())
 
                 page_list.update(pages)
+
+                # Wait a moment to mitigate rate limiting
+                wait_for_secs = 5
+                print(f"Wait for a moment: {wait_for_secs}s")
+                time.sleep(wait_for_secs)
 
         print(f"Pulled total {len(page_list)} items")
         return page_list
@@ -118,7 +125,7 @@ class OperatorCollection(OperatorBase):
         filtered1 = []
         for page in pages:
             relevant_score = float(page["__relevant_score"])
-            print(f"- Relevant score: {relevant_score}, min_score: {min_score}")
+            print(f"- Relevant score: {relevant_score}, min_score: {min_score}, page title: {page.get('name') or ''}")
 
             if relevant_score >= min_score:
                 filtered1.append(page)
@@ -224,12 +231,9 @@ class OperatorCollection(OperatorBase):
 
                 for page in pages:
                     try:
-                        title = page["name"]
-
                         # Modify page source and list_name
                         page["list_name"] = page["source"]
                         page["source"] = collection_source_type
-
 
                         topics_topk = page.get("topic") or ""
                         categories_topk = page.get("categories") or ""
