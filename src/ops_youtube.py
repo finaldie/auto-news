@@ -150,10 +150,15 @@ class OperatorYoutube(OperatorBase):
                 page["__thumbnail_url"] = metadata.setdefault("thumbnail_url", "")
                 page["__publish_date"] = ""
                 if metadata.get("publish_date"):
-                    # Notes: pd is datetime object
+                    # Notes: pd is datetime object or str
                     pd = metadata["publish_date"]
-                    pd_pdt = pd.astimezone(pytz.timezone('America/Los_Angeles'))
-                    page["__publish_date"] = pd_pdt.isoformat()
+
+                    if isinstance(pd, 'str'):
+                        page["__publish_date"] = pd
+
+                    else:
+                        pd_pdt = pd.astimezone(pytz.timezone('America/Los_Angeles'))
+                        page["__publish_date"] = pd_pdt.isoformat()
 
                 page["__author"] = metadata.setdefault("author", "")
                 page["__view_count"] = metadata.setdefault("view_count", 0)
