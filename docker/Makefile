@@ -61,10 +61,10 @@ start:
 	docker-compose up flower -d
 	@echo ""
 	@echo "Services started, links:"
-	@echo "- Airflow: http://<hostname>:8080"
-	@echo "- Milvus: http://<hostname>:9100"
-	@echo "- Adminer: http://<hostname>:8070"
-	@echo "- Flower: http://<hostname>:5555"
+	@echo "- Airflow: http://`hostname`:8080"
+	@echo "- Milvus: http://`hostname`:9100"
+	@echo "- Adminer: http://`hostname`:8070"
+	@echo "- Flower: http://`hostname`:5555"
 
 stop:
 	docker-compose down
