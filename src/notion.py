@@ -1,7 +1,6 @@
 import os
 import time
 import traceback
-from datetime import date
 
 from notion_client import Client
 
@@ -1053,6 +1052,44 @@ class NotionAgent:
 
         return properties, blocks
 
+    def _createDatabaseItem_CollectionBase(self, page, **kwargs):
+        """
+        Create page properties and blocks, clone/copy the existing data
+        from page. The page is created via `extractPage()`
+        """
+
+        append_notion_url = kwargs.setdefault("append_notion_url", True)
+        prop_add_take_away = kwargs.setdefault("prop_add_take_away", False)
+
+        properties = page["properties"]["properties"]
+
+        # if prop_add_take_away:
+        #     properties.update({
+        #         "Take Aways": {
+        #             "rich_text": [
+        #                 {
+        #                     "text": {
+        #                         "content": page["__take_aways"],
+        #                     },
+        #                 },
+        #             ]
+        #         },
+        #     })
+
+        blocks = [block for bid, block in page["blocks"].items()]
+
+        # append orginal notion url
+        if append_notion_url:
+            blocks.append({
+                "type": "link_to_page",
+                "link_to_page": {
+                    "type": "page_id",
+                    "page_id": page['id']
+                }
+            })
+
+        return properties, blocks
+
     def createDatabaseItem_TwitterInbox(
         self,
         database_id,
@@ -1384,7 +1421,7 @@ class NotionAgent:
         rate_number,
         **kwargs
     ):
-        properties, blocks = self._createDatabaseItem_ArticleBase(
+        properties, blocks = self._createDatabaseItem_CollectionBase(
             page, append_notion_url=True, **kwargs)
 
         # Common fields for article, youtube, etc
