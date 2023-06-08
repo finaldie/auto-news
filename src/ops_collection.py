@@ -104,7 +104,7 @@ class OperatorCollection(OperatorBase):
         print("#####################################################")
         print("# Post-Filter Collection")
         print("#####################################################")
-        k = kwargs.setdefault("k", 5)
+        k = kwargs.setdefault("k", 3)
         min_score = float(kwargs.setdefault("min_score", 4.5))
         print(f"k: {k}, input size: {len(pages)}, min_score: {min_score}")
 

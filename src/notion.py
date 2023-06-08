@@ -875,7 +875,7 @@ class NotionAgent:
         - content    The original content (Could be very huge), notes that each block has 2000 chars limitation
         - __summary  The summary content
         """
-        summary = ranked_page["__summary"]
+        summary = ranked_page.get("__summary") or ""
         # preview_content = summary[:100] + "..."
 
         created_time_pdt = utils.convertUTC2PDT_str(ranked_page["created_time"])
