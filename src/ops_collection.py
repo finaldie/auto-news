@@ -64,7 +64,7 @@ class OperatorCollection(OperatorBase):
         db_pages = db_pages[:2]
         print(f"The latest 2 databases: {db_pages}")
 
-        page_list = []
+        page_list = {}
 
         for db_page in db_pages:
             database_id = db_page["database_id"]
@@ -76,7 +76,7 @@ class OperatorCollection(OperatorBase):
                 pages = notion_agent.queryDatabaseToRead(
                     database_id, source, last_edited_time=start_time.isoformat())
 
-                page_list.extend(pages)
+                page_list.update(pages)
 
         print(f"Pulled total {len(page_list)} items")
         return page_list
@@ -93,7 +93,7 @@ class OperatorCollection(OperatorBase):
 
         # 1. filter all score >= min_score
         filtered1 = []
-        for page in pages:
+        for page_id, page in pages.items():
             print(f"page: {page}")
             user_rating = page["user_rating"]
 
