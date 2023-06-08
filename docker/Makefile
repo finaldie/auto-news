@@ -73,6 +73,9 @@ logs:
 ps:
 	docker-compose ps
 
+info:
+	docker-compose run airflow-worker airflow info
+
 push_dags:
 	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags
 	cd $(topdir)/dags && cp *.py $(AIRFLOW_PROJ_DIR)/dags

@@ -70,6 +70,9 @@ clean:
 	docker system prune -f
 	docker volume prune
 
+info:
+	cd docker && make info topdir=$(topdir)
+
 push_dags:
 	cd docker && make push_dags topdir=$(topdir)
 
