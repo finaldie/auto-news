@@ -201,8 +201,12 @@ class OperatorCollection(OperatorBase):
         collection_source_type = f"collection_{collection_type}"
         print(f"Collection type: {collection_type}")
 
+        tot = 0
+        err = 0
+
         for target in targets:
             print(f"Pushing data to target: {target} ...")
+            tot += 1
 
             if target == "notion":
                 notion_api_key = os.getenv("NOTION_TOKEN")
@@ -226,7 +230,6 @@ class OperatorCollection(OperatorBase):
                         page["list_name"] = page["source"]
                         page["source"] = collection_source_type
 
-                        print(f"Pushing page, title: {title}, source: {page['source']}, list_name: {page['list_name']}")
 
                         topics_topk = page.get("topic") or ""
                         categories_topk = page.get("categories") or ""
@@ -234,6 +237,8 @@ class OperatorCollection(OperatorBase):
 
                         page_take_aways = notion_agent.extractRichText(page["properties"]["properties"]["Take Aways"]["rich_text"])
                         page["__take_aways"] = page_take_aways
+
+                        print(f"Pushing page: {page}")
 
                         notion_agent.createDatabaseItem_ToRead_Collection(
                             database_id,
@@ -249,8 +254,11 @@ class OperatorCollection(OperatorBase):
                         #     source=collection_source_type)
 
                     except Exception as e:
+                        err += 1
                         print(f"[ERROR]: Push to notion failed, skip: {e}")
                         traceback.print_exc()
 
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
+
+        print(f"Pushing finished, total: {tot}, errors: {err}")
