@@ -141,6 +141,8 @@ class OperatorYoutube(OperatorBase):
                     data_folder=data_folder,
                     run_id=run_id)
 
+                print(f"Pulled youtube transcipt, metadata: {metadata}")
+
                 page["__transcript"] = transcript
 
                 page["__title"] = metadata.setdefault("title", "")
