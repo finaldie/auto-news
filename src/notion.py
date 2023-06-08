@@ -643,7 +643,8 @@ class NotionAgent:
         self,
         database_id,
         source: str,
-        last_edited_time=None
+        last_edited_time=None,
+        extraction_interval=0,
     ):
         query_data = {
             "database_id": database_id,
@@ -710,6 +711,10 @@ class NotionAgent:
                 "properties": props,
                 "blocks": blocks,
             }
+
+            if extraction_interval > 0:
+                print(f"Extraction interval > 0, sleep for {extraction_interval}s")
+                time.sleep(extraction_interval)
 
         return extracted_pages
 
