@@ -149,12 +149,13 @@ class OperatorCollection(OperatorBase):
 
         for page in data:
             try:
-                title = page.get("title") or ""
                 page_id = page["id"]
 
-                # Get a summary text (at most 1024 chars)
-                score_text = f"{page['title']}. {page['summary']}"
-                score_text = score_text[:2048]
+                score_text = notion_agent.concatBlocksText(
+                    page["blocks"], separator="\n")
+                # score_text = score_text[:2048]
+
+                title = page.get("title") or ""
                 print(f"Scoring page: {title}, score_text: {score_text}")
 
                 relevant_metas = op_milvus.get_relevant(
