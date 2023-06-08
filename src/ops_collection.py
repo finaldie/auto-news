@@ -111,7 +111,7 @@ class OperatorCollection(OperatorBase):
         # 1. filter all score >= min_score
         filtered1 = []
         for page in pages:
-            relevant_score = page["__relevant_score"]
+            relevant_score = float(page["__relevant_score"])
 
             if relevant_score >= min_score:
                 filtered1.append(page)
