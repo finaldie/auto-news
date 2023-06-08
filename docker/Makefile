@@ -74,7 +74,7 @@ ps:
 	docker-compose ps
 
 info:
-	docker-compose run airflow-worker airflow info
+	docker-compose run airflow-cli airflow info
 
 push_dags:
 	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags
