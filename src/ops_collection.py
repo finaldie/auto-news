@@ -153,7 +153,12 @@ class OperatorCollection(OperatorBase):
                     page["blocks"], separator="\n")
                 # score_text = score_text[:2048]
 
-                title = page.get("title") or ""
+                take_aways = notion_agent.extractRichText(
+                    page["properties"]["properties"]["Take Aways"]["rich_text"])
+                if take_aways:
+                    score_text += f"\nTake aways: {take_aways}"
+
+                title = page.get("name") or ""
                 print(f"Scoring page: {title}, score_text: {score_text}")
 
                 relevant_metas = op_milvus.get_relevant(
