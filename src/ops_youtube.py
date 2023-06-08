@@ -153,7 +153,7 @@ class OperatorYoutube(OperatorBase):
                     # Notes: pd is datetime object or str
                     pd = metadata["publish_date"]
 
-                    if isinstance(pd, 'str'):
+                    if isinstance(pd, str):
                         page["__publish_date"] = pd
 
                     else:
