@@ -196,7 +196,7 @@ class MilvusClient:
         Returns: The stats of the Collection
         """
         collection = self.getCollection(name)
-        print(f"collection: {collection}")
+        # print(f"collection: {collection}")
 
         return {
             "name": collection.name,
