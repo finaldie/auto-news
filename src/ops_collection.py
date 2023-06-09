@@ -128,14 +128,21 @@ class OperatorCollection(OperatorBase):
         filtered1 = []
         for page in pages:
             relevant_score = float(page["__relevant_score"])
-            print(f"- Relevant score: {relevant_score}, min_score: {min_score}, page title: {page.get('name') or ''}, page source: {page['source']}")
+            print(f"- Page_source: {page['source']}, relevant_score: {relevant_score:.3f}, min_score: {min_score}, user_rating: {page['user_rating']}, page_title: {page.get('name') or ''}")
 
             if relevant_score >= min_score:
                 filtered1.append(page)
 
         # 2. get top k
         tops = sorted(filtered1, key=lambda page: page["__relevant_score"], reverse=True)
-        print(f"After sorting: {tops}")
+
+        print("After sorting:")
+        print("=====================================================")
+        seq = 0
+
+        for t in tops:
+            seq += 1
+            print(f"{seq}: Page_source: {page['source']}, relevant_score: {relevant_score:.3f}, min_score: {min_score}, user_rating: {page['user_rating']}, page_title: {page.get('name') or ''}")
 
         filtered2 = []
         for i in range(min(k, len(tops))):
