@@ -1,11 +1,9 @@
 import argparse
-import os
 from datetime import date, datetime, timedelta
 
 from dotenv import load_dotenv
 
 from ops_milvus import OperatorMilvus
-import utils
 
 
 parser = argparse.ArgumentParser()
@@ -18,6 +16,7 @@ parser.add_argument("--run-id", help="run-id",
 parser.add_argument("--job-id", help="job-id",
                     default="")
 parser.add_argument("--milvus-retention-days", help="Milvus data retention days",
+                    type=int,
                     default=3)
 
 
