@@ -280,3 +280,15 @@ class OperatorMilvus:
 
         collections = milvus_client.list_collections()
         print(f"Collections: {collections}")
+
+        for name in collections:
+            suffix = name.split("__")[1]
+            dt = date.fromisoformat(suffix.replace("_", "-"))
+            stats = milvus_client.get_stats(name)
+
+            print(f"Checking collection: {name}, stats: {stats}")
+
+            if dt <= cleanup_date:
+                print(f"- Cleanup collection {name}")
+                # milvus_client.release(name)
+                # milvus_client.drop(name)
