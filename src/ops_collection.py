@@ -128,7 +128,7 @@ class OperatorCollection(OperatorBase):
         filtered1 = []
         for page in pages:
             relevant_score = float(page["__relevant_score"])
-            print(f"- Relevant score: {relevant_score}, min_score: {min_score}, page title: {page.get('name') or ''}")
+            print(f"- Relevant score: {relevant_score}, min_score: {min_score}, page title: {page.get('name') or ''}, page source: {page['source']}")
 
             if relevant_score >= min_score:
                 filtered1.append(page)
@@ -164,18 +164,22 @@ class OperatorCollection(OperatorBase):
         for page in data:
             try:
                 page_id = page["id"]
+                title = page.get("name") or ""
+                source = page["source"]
 
-                score_text = notion_agent.concatBlocksText(
+                page_text = notion_agent.concatBlocksText(
                     page["blocks"], separator="\n")
                 # score_text = score_text[:2048]
 
                 take_aways = notion_agent.extractRichText(
                     page["properties"]["properties"]["Take Aways"]["rich_text"])
+
+                score_text = f"{title}: {page_text}"
+
                 if take_aways:
                     score_text += f"\nTake aways: {take_aways}"
 
-                title = page.get("name") or ""
-                print(f"Scoring page: {title}, score_text: {score_text}")
+                print(f"Scoring page: {title}, source: {source}, score_text: {score_text}")
 
                 relevant_metas = op_milvus.get_relevant(
                     start_date, score_text, topk=top_k_similar,
@@ -211,14 +215,13 @@ class OperatorCollection(OperatorBase):
         collection_source_type = f"collection_{collection_type}"
         print(f"Collection type: {collection_type}")
 
-        tot = 0
-        err = 0
-
         for target in targets:
             print(f"Pushing data to target: {target} ...")
-            tot += 1
 
             if target == "notion":
+                tot = 0
+                err = 0
+
                 notion_api_key = os.getenv("NOTION_TOKEN")
                 notion_agent = NotionAgent(notion_api_key)
 
@@ -234,19 +237,25 @@ class OperatorCollection(OperatorBase):
 
                 for page in pages:
                     try:
+                        tot += 1
+
                         # Modify page source and list_name
-                        page["list_name"] = page["source"]
-                        page["source"] = collection_source_type
+                        title = page["name"]
+                        source = page["source"]
 
-                        topics_topk = page.get("topic") or ""
-                        categories_topk = page.get("categories") or ""
-                        rating = float(page.get("user_rating")) or -3
+                        pushing_page = copy.deepcopy(page)
+                        pushing_page["list_name"] = source
+                        pushing_page["source"] = collection_source_type
 
-                        print(f"Pushing page: {page}")
+                        topics_topk = pushing_page.get("topic") or ""
+                        categories_topk = pushing_page.get("categories") or ""
+                        rating = float(pushing_page.get("user_rating")) or -3
+
+                        print(f"Pushing page: {title}, source: {source}, {pushing_page}")
 
                         notion_agent.createDatabaseItem_ToRead_Collection(
                             database_id,
-                            page,
+                            pushing_page,
                             topics_topk,
                             categories_topk,
                             rating)
@@ -261,7 +270,8 @@ class OperatorCollection(OperatorBase):
                         print(f"[ERROR]: Push to notion failed, skip: {e}")
                         traceback.print_exc()
 
+                print(f"Pushing to {target} finished, total: {tot}, errors: {err}")
+
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
 
-        print(f"Pushing finished, total: {tot}, errors: {err}")
