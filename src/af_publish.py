@@ -37,6 +37,9 @@ parser.add_argument("--collection-type", help="weekly, monthly, yearly",
 parser.add_argument("--max-distance",
                     help="Max distance for similarity search, range [0.0, 1.0]",
                     default=0.5)
+parser.add_argument("--top-k",
+                    help="top-k to publish",
+                    default=10)
 
 
 def process_collection(args, op):
@@ -50,7 +53,7 @@ def process_collection(args, op):
         start_date=args.start,
         max_distance=args.max_distance)
 
-    data_filtered = op.post_filter(data_scored, min_score=args.min_rating)
+    data_filtered = op.post_filter(data_scored, min_score=args.min_rating, k=args.top_k)
 
     return data_filtered
 

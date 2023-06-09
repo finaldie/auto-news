@@ -125,6 +125,7 @@ class OperatorCollection(OperatorBase):
         print(f"k: {k}, input size: {len(pages)}, min_score: {min_score}")
 
         # 1. filter all score >= min_score
+        print("Filtering...===========================================")
         filtered1 = []
         for page in pages:
             # Formula to calcualte the soring score
@@ -139,8 +140,7 @@ class OperatorCollection(OperatorBase):
         # 2. get top k
         tops = sorted(filtered1, key=lambda page: page["__relevant_score"], reverse=True)
 
-        print("After sorting:")
-        print("=====================================================")
+        print("After sorting =========================================")
         seq = 0
 
         for t in tops:
