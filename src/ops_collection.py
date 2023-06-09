@@ -142,7 +142,7 @@ class OperatorCollection(OperatorBase):
 
         for t in tops:
             seq += 1
-            print(f"{seq}: Page_source: {page['source']}, relevant_score: {relevant_score:.3f}, min_score: {min_score}, user_rating: {page['user_rating']}, page_title: {page.get('name') or ''}")
+            print(f"{seq}: Page_source: {t['source']}, relevant_score: {t['__relevant_score']:.3f}, min_score: {min_score}, user_rating: {t['user_rating']}, page_title: {t.get('name') or ''}")
 
         filtered2 = []
         for i in range(min(k, len(tops))):
