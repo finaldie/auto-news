@@ -196,6 +196,7 @@ class MilvusClient:
         Returns: The stats of the Collection
         """
         collection = self.getCollection(name)
+        print(f"collection: {collection}")
 
         return {
             "name": collection.name,
@@ -206,7 +207,7 @@ class MilvusClient:
             "primary_field": collection.primary_field,
             "partitions": collection.partitions,
             "indexes": collection.indexes,
-            "properties": collection.properties,
+            # "properties": collection.properties,
         }
 
     def list_collections(self) -> list:
