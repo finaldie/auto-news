@@ -290,5 +290,5 @@ class OperatorMilvus:
 
             if dt <= cleanup_date:
                 print(f"- Cleanup collection {name}")
-                # milvus_client.release(name)
-                # milvus_client.drop(name)
+                milvus_client.release(name)
+                milvus_client.drop(name)
