@@ -127,10 +127,13 @@ class OperatorCollection(OperatorBase):
         # 1. filter all score >= min_score
         filtered1 = []
         for page in pages:
-            relevant_score = float(page["__relevant_score"])
-            print(f"- Page_source: {page['source']}, relevant_score: {relevant_score:.3f}, min_score: {min_score}, user_rating: {page['user_rating']}, page_title: {page.get('name') or ''}")
+            # Formula to calcualte the soring score
+            score = float(page["user_rating"]) * 0.5 + float(page["__relevant_score"]) * 0.5
+            page["__sorting_score"] = score
 
-            if relevant_score >= min_score:
+            print(f"- Page_source: {page['source']}, score: {score}, min_score: {min_score}, relevant_score: {page['__relevant_score']:.3f}, user_rating: {page['user_rating']}, page_title: {page.get('name') or ''}")
+
+            if score >= min_score:
                 filtered1.append(page)
 
         # 2. get top k
@@ -142,7 +145,7 @@ class OperatorCollection(OperatorBase):
 
         for t in tops:
             seq += 1
-            print(f"{seq}: Page_source: {t['source']}, relevant_score: {t['__relevant_score']:.3f}, min_score: {min_score}, user_rating: {t['user_rating']}, page_title: {t.get('name') or ''}")
+            print(f"{seq}: Page_source: {t['source']}, score: {t['__sorting_score']:.3f}, relevant_score: {t['__relevant_score']:.3f}, min_score: {min_score}, user_rating: {t['user_rating']}, page_title: {t.get('name') or ''}")
 
         filtered2 = []
         for i in range(min(k, len(tops))):
@@ -281,4 +284,3 @@ class OperatorCollection(OperatorBase):
 
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
-
