@@ -128,7 +128,7 @@ class OperatorCollection(OperatorBase):
         filtered1 = []
         for page in pages:
             # Formula to calcualte the soring score
-            score = float(page["user_rating"]) * 0.5 + float(page["__relevant_score"]) * 0.5
+            score = float(page["user_rating"]) * 0.6 + float(page["__relevant_score"]) * 0.4
             page["__sorting_score"] = score
 
             print(f"- Page_source: {page['source']}, score: {score}, min_score: {min_score}, relevant_score: {page['__relevant_score']:.3f}, user_rating: {page['user_rating']}, page_title: {page.get('name') or ''}")
