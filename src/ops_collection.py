@@ -132,7 +132,7 @@ class OperatorCollection(OperatorBase):
             score = float(page["user_rating"]) * 0.8 + float(page["__relevant_score"]) * 0.2
             page["__sorting_score"] = score
 
-            print(f"- Page_source: {page['source']}, score: {score}, min_score: {min_score}, relevant_score: {page['__relevant_score']:.3f}, user_rating: {page['user_rating']}, page_title: {page.get('name') or ''}")
+            print(f"- Page_source: {page['source']}, score: {score}, min_score: {min_score}, user_rating: {page['user_rating']}, relevant_score: {page['__relevant_score']:.3f}, page_title: {page.get('name') or ''}")
 
             if score >= min_score:
                 filtered1.append(page)
@@ -145,7 +145,7 @@ class OperatorCollection(OperatorBase):
 
         for t in tops:
             seq += 1
-            print(f"{seq}: Page_source: {t['source']}, score: {t['__sorting_score']:.3f}, relevant_score: {t['__relevant_score']:.3f}, min_score: {min_score}, user_rating: {t['user_rating']}, page_title: {t.get('name') or ''}")
+            print(f"{seq}: Page_source: {t['source']}, score: {t['__sorting_score']:.3f}, user_rating: {t['user_rating']}, relevant_score: {t['__relevant_score']:.3f}, min_score: {min_score}, page_title: {t.get('name') or ''}")
 
         filtered2 = []
         for i in range(min(k, len(tops))):
