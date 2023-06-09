@@ -21,6 +21,11 @@ deploy-airflow: deploy-code
 	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs plugins run data
 	@echo "Airflow deployment finished"
 
+deploy-postgres:
+	@echo "Assembling Postgres ..."
+	mkdir -p $(POSTGRES_PROJ_DIR)/data
+	@echo "Postgres deployment finished"
+
 deploy-redis:
 	@echo "Assembling Redis ..."
 	mkdir -p $(REDIS_PROJ_DIR)/data
@@ -49,7 +54,7 @@ init-airflow:
 build:
 	docker compose build
 
-deploy: deploy-airflow deploy-redis deploy-mysql deploy-milvus
+deploy: deploy-airflow deploy-postgres deploy-redis deploy-mysql deploy-milvus
 deploy: post-deploy
 
 
@@ -58,7 +63,7 @@ init: init-airflow push_dags
 start-services:
 	docker-compose up -d
 
-start: start-services enable_dags
+start: start-services
 	@echo ""
 	@echo "Services started, links:"
 	@echo "- Airflow: http://`hostname`:8080"
@@ -69,13 +74,14 @@ stop:
 	docker-compose down
 
 logs:
-	docker-compose logs -f
+	docker-compose logs -n 1000
 
 ps:
 	docker-compose ps
 
 info:
 	docker-compose run airflow-cli airflow info
+	docker-compose run airflow-cli airflow dags list
 
 enable_dags:
 	docker-compose run airflow-cli airflow dags unpause news_pulling
@@ -87,4 +93,5 @@ push_dags:
 	cd $(topdir)/dags && cp *.py $(AIRFLOW_PROJ_DIR)/dags
 
 .PHONY: help deploy init start stop
-.PHONY: init-airflow post-deploy deploy-code
+.PHONY: init-airflow post-deploy deploy-code logs info ps push_dags
+.PHONY: enable_dags deploy-postgres
