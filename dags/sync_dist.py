@@ -91,6 +91,16 @@ with DAG(
     )
 
     t5 = BashOperator(
+        task_id='clean',
+        bash_command='cd ~/airflow/run/auto-news/src && python3 af_clean.py '
+        '--start {{ ds }} '
+        '--prefix=./run '
+        '--run-id={{ run_id }} '
+        '--job-id={{ ti.job_id }} '
+        '--milvus-retention-days={{ dag_run.conf.setdefault("--milvus-retention-days", 3) }} '
+    )
+
+    t6 = BashOperator(
         task_id='finish',
         depends_on_past=False,
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_end.py '
@@ -98,4 +108,4 @@ with DAG(
         '--prefix=./run ',
     )
 
-    t0 >> t1 >> t2 >> t3 >> t4 >> t5
+    t0 >> t1 >> t2 >> t3 >> t4 >> t5 >> t6

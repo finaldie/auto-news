@@ -271,3 +271,12 @@ class OperatorMilvus:
         client = db_client or DBClient()
         client.set_milvus_perf_data_item_id(
             source, dt, page_id, expired_time=key_ttl)
+
+    def clear(self, cleanup_date):
+        """
+        Clean up all collections on or before the clean date
+        """
+        milvus_client = MilvusClient()
+
+        collections = milvus_client.list_collections()
+        print(f"Collections: {collections}")
