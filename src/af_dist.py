@@ -36,7 +36,7 @@ parser.add_argument("--dedup", help="whether dedup item",
                     default=True)
 parser.add_argument("--past-days",
                     help="How many days in the past to process",
-                    default=15)
+                    default=30)
 
 
 def process_twitter(args, folders):
