@@ -1,3 +1,4 @@
+import os
 import traceback
 
 from langchain import LLMChain
@@ -204,7 +205,17 @@ class LLMAgentSummary(LLMAgentBase):
 
     def init_prompt(self, map_prompt=None, combine_prompt=None):
         self.map_prompt = map_prompt
-        self.combine_prompt = combine_prompt or llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2
+        self.combine_prompt = combine_prompt
+
+        if not self.combine_prompt:
+            translation_lang = os.getenv("TRANSLATION_LANG")
+            print(f"[LLMAgentSummary] translation language: {translation_lang}")
+
+            prompt_no_translation = llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT
+            prompt_with_translation = llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2 + llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2_SUFFIX.format(translation_lang, translation_lang)
+
+            prompt_tpl = prompt_with_translation if translation_lang else prompt_no_translation
+            self.combine_prompt = prompt_tpl
 
         self.combine_prompt_tpl = PromptTemplate(
             template=self.combine_prompt,

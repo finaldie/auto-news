@@ -55,11 +55,14 @@ NUMBERED LIST SUMMARY:
 """
 
 
-# With translation
+# With translation (Notes: use with suffix together)
 LLM_PROMPT_SUMMARY_COMBINE_PROMPT2 = """
 Write a concise summary of the following text delimited by triple backquotes.
 Return your response in numbered list which covers the key points of the text and ensure that a 5 year old would understand.
 
 ```{text}```
-NUMBERED LIST SUMMARY IN BOTH ENGLISH AND CHINESE, AFTER FINISHING ALL ENGLISH PART, THEN FOLLOW BY CHINESE PART:
+"""
+
+LLM_PROMPT_SUMMARY_COMBINE_PROMPT2_SUFFIX = """
+NUMBERED LIST SUMMARY IN BOTH ENGLISH AND {}, AFTER FINISHING ALL ENGLISH PART, THEN FOLLOW BY {} PART:
 """
