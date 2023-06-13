@@ -4,7 +4,8 @@ from pymilvus import (
     CollectionSchema,
     DataType,
     Collection,
-    utility
+    utility,
+    exceptions
 )
 
 
@@ -136,15 +137,33 @@ class MilvusClient:
         self,
         name: str,  # collection name
         text: str,
-        topk=1
+        topk=1,
+        fallback=None,
     ):
-        emb = self.emb_agent.create(text)
-        collection = self.getCollection(name)
+        collection = None
+
+        try:
+            collection = self.getCollection(name)
+
+        except exceptions.SchemaNotReadyException as e:
+            print(f"[ERROR] Schema {name} is not ready yet: {e}")
+
+            if fallback:
+                print(f"Using fallback collection: {fallback}")
+                return self.get(fallback, text, topk=topk)
+            else:
+                return []
+
+        except Exception as e:
+            print(f"[ERROR] Failed to get collection: {e}")
+            return []
 
         search_params = {
             "metrics_type": "IP",
             "params": {"nprobe": 8},
         }
+
+        emb = self.emb_agent.create(text)
 
         result = collection.search(
             [emb], "embeddings", search_params, topk,

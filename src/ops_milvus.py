@@ -1,7 +1,7 @@
 import json
 import copy
 import traceback
-from datetime import date
+from datetime import date, timedelta
 
 from db_cli import DBClient
 from notion import NotionAgent
@@ -116,7 +116,8 @@ class OperatorMilvus:
         text: str,
         topk: int = 2,
         max_distance: float = 0.45,
-        db_client=None
+        db_client=None,
+        fallback=None
     ):
         """
         @param max_distance - filter out if distance > max_distance
@@ -138,7 +139,17 @@ class OperatorMilvus:
         client = db_client or DBClient()
         milvus_client = MilvusClient(emb_agent=emb_agent)
 
-        response_arr = milvus_client.get(collection_name, text, topk=topk)
+        # get a fallback collection name
+        if not fallback:
+            yesterday = (date.fromisoformat(start_date) - timedelta(days=1)).isoformat()
+            fallback = emb_agent.getname(yesterday)
+
+        print(f"[get_relevant] Fallback collection name: {fallback}")
+
+        response_arr = milvus_client.get(
+            collection_name, text, topk=topk,
+            fallback=fallback)
+
         res = []
 
         for response in response_arr:
