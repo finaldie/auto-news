@@ -10,6 +10,7 @@ placeholder: image for high-level architecture
 ## Hardware Requirement
 
 | Component | Requirement |
+| --------- | ----------- |
 | Memory    | 6GB         |
 | Disk      | 20GB+       |
 
@@ -37,6 +38,8 @@ After 2 minutes, the services would be started, then enable DAGs:
 make enable_dags
 ```
 
+Now, the services are up and running, it will pull sources every hour.
+
 ## Set up Notion database views
 Go to Notion, and create the database views for different source, e.g. Tweets, Article, Youtube, RSS, etc
 
@@ -44,5 +47,6 @@ Go to Notion, and create the database views for different source, e.g. Tweets, A
 For troubleshooting, we can use the URLs below to access the services and check the logs and data
 
 | Service | Responsibility  | Panel URL             |
+| ---     | ---             | ---                   |
 | Airflow | Orchestration   | http://localhost:8080 |
 | Milvus  | Vector Database | http://localhost:9100 |
