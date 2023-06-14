@@ -1,9 +1,7 @@
 import os
-import traceback
 
 from langchain import LLMChain
 from langchain.text_splitter import (
-    CharacterTextSplitter,
     RecursiveCharacterTextSplitter
 )
 from langchain.prompts import PromptTemplate
@@ -156,7 +154,22 @@ class LLMAgentBase:
         print(f"Initialized prompt: {prompt_tpl}")
         self.prompt_tpl = prompt_tpl
 
-    def init_llm(self, model_name="gpt-3.5-turbo", temperature=0):
+    def init_llm(
+        self,
+        provider=None,
+        model_name=None,
+        temperature=0
+    ):
+        provider = provider or os.getenv("LLM_PROVIDER", "openai")
+
+        # TODO: support non-openAI llm
+        if provider == "openai":
+            model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+
+        else:
+            print(f"[ERROR] Non-supported LLM provider: {provider}")
+            raise
+
         llm = ChatOpenAI(
             # model_name="text-davinci-003"
             model_name=model_name,
@@ -166,7 +179,7 @@ class LLMAgentBase:
 
         self.llm = llm
         self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
-        print(f"LLM chain initalized, model_name: {model_name}, temperature: {temperature}")
+        print(f"LLM chain initalized, provider: {provider}, model_name: {model_name}, temperature: {temperature}")
 
     def get_num_tokens(self, text):
         return self.llm.get_num_tokens(text)
@@ -225,11 +238,21 @@ class LLMAgentSummary(LLMAgentBase):
 
     def init_llm(
         self,
-        model_name="gpt-3.5-turbo",
+        provider=None,
+        model_name=None,
         temperature=0,
         chain_type="map_reduce",
         verbose=False
     ):
+        provider = provider or os.getenv("LLM_PROVIDER", "openai")
+
+        # TODO: support non-openAI llm
+        if provider == "openai":
+            model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+        else:
+            print(f"[ERROR] Non-supported LLM provider: {provider}")
+            raise
+
         llm = ChatOpenAI(
             # model_name="text-davinci-003"
             model_name=model_name,
@@ -244,15 +267,18 @@ class LLMAgentSummary(LLMAgentBase):
             chain_type=chain_type,
             verbose=verbose)
 
-        print(f"[LLMAgentSummary] LLM chain initalized, model_name: {model_name}, temperature: {temperature}, chain_type: {chain_type}")
+        print(f"[LLMAgentSummary] LLM chain initalized, provider: {provider}, model_name: {model_name}, temperature: {temperature}, chain_type: {chain_type}")
 
     def run(
         self,
         text: str,
-        chunk_size=2048,
-        chunk_overlap=256,
+        chunk_size=None,
+        chunk_overlap=None,
     ):
-        print(f"[LLM] input text ({len(text)} chars)")
+        chunk_size = chunk_size or os.getenv("TEXT_CHUNK_SIZE", 2048)
+        chunk_overlap = chunk_overlap or os.getenv("TEXT_CHUNK_OVERLAP", 256)
+
+        print(f"[LLM] input text ({len(text)} chars), chunk_size: {chunk_size}, chunk_overlap: {chunk_overlap}")
 
         if not text:
             print("[LLM] Empty input text, return empty summary")
