@@ -275,8 +275,8 @@ class LLMAgentSummary(LLMAgentBase):
         chunk_size=None,
         chunk_overlap=None,
     ):
-        chunk_size = chunk_size or os.getenv("TEXT_CHUNK_SIZE", 2048)
-        chunk_overlap = chunk_overlap or os.getenv("TEXT_CHUNK_OVERLAP", 256)
+        chunk_size = chunk_size or int(os.getenv("TEXT_CHUNK_SIZE", 2048))
+        chunk_overlap = chunk_overlap or int(os.getenv("TEXT_CHUNK_OVERLAP", 256))
 
         print(f"[LLM] input text ({len(text)} chars), chunk_size: {chunk_size}, chunk_overlap: {chunk_overlap}")
 
