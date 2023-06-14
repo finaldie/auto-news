@@ -158,7 +158,7 @@ def splitSummaryTranslation(text):
     summary = res[0]
     translation = ""
     for i in range(1, len(res)):
-        translation += res[i]
+        translation += res[i] + "\n"
 
     return summary, translation
 
