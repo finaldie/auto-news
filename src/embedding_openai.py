@@ -18,16 +18,36 @@ class EmbeddingOpenAI(Embedding):
     def getname(self, start_date, prefix="news"):
         return f"{prefix}_embedding__{start_date}".replace("-", "_")
 
-    def create(self, text: str, model_name="text-embedding-ada-002"):
+    def create(
+        self,
+        text: str,
+        model_name="text-embedding-ada-002",
+        num_retries=3
+    ):
         """
         It creates the embedding with 1536 dimentions by default
         """
         api_key = os.getenv("OPENAI_API_KEY")
+        emb = None
 
-        emb = openai.Embedding.create(
-            input=[text],
-            api_key=api_key,
-            model=model_name)
+        for i in range(1, num_retries + 1):
+            try:
+                emb = openai.Embedding.create(
+                    input=[text],
+                    api_key=api_key,
+                    model=model_name)
+
+            except openai.error.RateLimitError as e:
+                print(f"[ERROR] RateLimit error during embedding: {e}")
+
+                if i == num_retries:
+                    raise
+
+            except openai.error.APIError as e:
+                print(f"[ERROR] Failed during embedding: {e}")
+
+                if i == num_retries:
+                    raise
 
         return emb["data"][0]["embedding"]
 
