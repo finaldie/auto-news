@@ -19,12 +19,15 @@ See this [Blog post](https://finaldie.com/blog/?p=871) for more details.
 ![image](https://github.com/finaldie/auto-news/assets/1088543/623eb6e8-3430-4b52-be3a-b9c61b516d8f)
 
 
-## Hardware Requirement
+## Hardware Requirements
 
 | Component | Requirement |
 | --------- | ----------- |
 | Memory    | 6GB         |
 | Disk      | 20GB+       |
+
+## System Requirements
+- [x] Linux 
 
 # Installation
 ## Preparison
