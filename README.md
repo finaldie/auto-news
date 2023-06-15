@@ -26,10 +26,10 @@ The Auto-News was born for the following goals:
 
 # Installation
 ## Preparison
-* Notion token (Required)
-* Notion web clipper browser extension
-* Docker (Required)
-* Twitter token (optional)
+* [Required] Notion token
+* [Required] Docker
+* [Optional] Notion web clipper browser extension
+* [Optional] Twitter token
 
 Copy `.env.template` to `build/.env`, and fill up the environment vars:
 * `NOTION_TOKEN`
