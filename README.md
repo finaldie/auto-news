@@ -4,6 +4,7 @@ A personal news aggregator to pull information from multi-sources + LLM (ChatGPT
 ## Why need it?
 In the world of this information explosion, we live with noise every day, it becomes even worse after the generative AI was born. Time is the precious resource for each of us, How to use our time more efficiently? It becomes more challenging than ever. Think about how much time we spent on pulling/searching/filtering content from different sources, how many times we put the article/paper or long video as a side tab, but never got a chance to look at, and how many efforts to organize the information we have read. We need a better way to get rid of the noises, and focus on reading the information efficient based on the interests, and stay on the track of the goals we defined.
 
+## Goals
 The Auto-News was born for the following goals:
 - Automatically pull feed sources, including RSS, Tweets.
 - Support clip content from source directly, later generate summary and translation (nice to have), including random web articles, YouTube videos
