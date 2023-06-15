@@ -35,6 +35,7 @@ The Auto-News was born for the following goals:
 # Installation
 ## Preparison
 * [Required] Notion token
+* [Required] OpenAI token
 * [Required] Docker
 * [Optional] Notion web clipper browser extension
 * [Optional] Twitter token
