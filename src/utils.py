@@ -155,10 +155,10 @@ def splitSummaryTranslation(text):
 
     res = text.split("===")
 
-    summary = res[0]
+    summary = res[0].strip()
     translation = ""
     for i in range(1, len(res)):
-        translation += res[i] + "\n"
+        translation += res[i].strip() + "\n"
 
     return summary, translation
 
