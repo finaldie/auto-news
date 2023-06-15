@@ -1,5 +1,8 @@
-# auto-news
-News from multi-sources + LLM (ChatGPT) to help us reading efficiently without noise
+# Auto News
+A personal news aggregator to pull information from multi-sources + LLM (ChatGPT) to help us reading efficiently with less noises, the sources includes: Tweets, RSS, YouTube, Article.
+
+## Why need it?
+In the world of this information explosion, we live with noise every day, it becomes even worse after the generative AI was born. Think about how much time we spent on pulling/searching/filtering content from different sources, how many times we put the article/paper or long video as a side tab, but never got a chance to look at, and how many efforts to organize the information we have read. We need a better way to get rid of the noises, and focus on reading the information efficient based on the interests, and stay on the track of the goals we defined.
 
 placeholder: image for notion ui
 
