@@ -13,10 +13,11 @@ The Auto-News was born for the following goals:
 
 See this [Blog post]([https://finaldie.com/blog/?p=871](https://finaldie.com/blog/auto-news-an-automated-news-aggregator-with-llm/)) for more details.
 
-![image](https://github.com/finaldie/auto-news/assets/1088543/0808ba60-f6cf-4c1b-9de1-c616fa07b565)
+![image](https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639)
 
 ## Architecture
-![image](https://github.com/finaldie/auto-news/assets/1088543/623eb6e8-3430-4b52-be3a-b9c61b516d8f)
+![image](https://github.com/finaldie/auto-news/assets/1088543/d1923ea8-6e4f-46b8-a654-45e21372438e)
+
 
 
 ## Hardware Requirements
