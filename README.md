@@ -11,7 +11,7 @@ The Auto-News was born for the following goals:
 - A unified/central reading experience (e.g. RSS reader)
 - Weekly/Monthly top-k aggregations (nice to have)
 
-See this [Blog post](https://finaldie.com/blog/?p=871) for more details.
+See this [Blog post]([https://finaldie.com/blog/?p=871](https://finaldie.com/blog/auto-news-an-automated-news-aggregator-with-llm/)) for more details.
 
 ![image](https://github.com/finaldie/auto-news/assets/1088543/0808ba60-f6cf-4c1b-9de1-c616fa07b565)
 
