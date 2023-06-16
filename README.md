@@ -1,4 +1,4 @@
-# Auto-News: An Automated News Aggregator with LLM
+# Auto-News: An Automatic News Aggregator with LLM
 A personal news aggregator to pull information from multi-sources + LLM (ChatGPT) to help us reading efficiently with less noises, the sources includes: Tweets, RSS, YouTube, Article.
 
 ## Why need it?
