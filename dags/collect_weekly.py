@@ -14,7 +14,7 @@ from airflow.utils.dates import days_ago
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'email': ['hyzwowtools@gmail.com'],
+    'email': [''],
     'email_on_failure': True,
     'email_on_retry': False,
     'retries': 1,
