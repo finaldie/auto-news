@@ -144,7 +144,7 @@ services:
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
-      airflow-init:
+      airflow-init-user:
         condition: service_completed_successfully
 
   airflow-scheduler:
@@ -159,7 +159,7 @@ services:
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
-      airflow-init:
+      airflow-init-user:
         condition: service_completed_successfully
 
   airflow-worker:
@@ -181,7 +181,7 @@ services:
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
-      airflow-init:
+      airflow-init-user:
         condition: service_completed_successfully
 
   airflow-triggerer:
@@ -196,7 +196,7 @@ services:
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
-      airflow-init:
+      airflow-init-user:
         condition: service_completed_successfully
 
   airflow-init:
@@ -289,6 +289,35 @@ services:
       - bash
       - -c
       - airflow
+
+  airflow-init-user:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    # yamllint disable rule:line-length
+    command:
+      - -c
+      - |
+        echo "Apply Database patches..."
+        python3 ${BOT_HOME}/src/db_patches.py
+        echo "Apply Database patches finished"
+        echo "----"
+        echo "Creating notion entry pages"
+        python3 ${BOT_HOME}/src/notion_init.py
+        echo "Creating notion entry pages finished"
+        echo "----"
+        echo "Enable DAGs..."
+        airflow dags unpause news_pulling
+        airflow dags unpause sync_dist
+        airflow dags unpause collection_weekly
+        echo "Enable DAGs finished"
+    environment:
+      <<: *airflow-common-env
+  depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_healthy
 
   # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
   # or by explicitly targeted on the command line e.g. docker-compose up flower.
@@ -417,7 +446,6 @@ services:
     restart: always
     depends_on:
       - "milvus-standalone"
-
 
 
 networks:
