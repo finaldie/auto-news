@@ -31,6 +31,7 @@ The Auto-News was born for the following goals:
 ## System Requirements
 - Backend
   - [x] Linux
+  - [ ] MacOS
 - UI
   - [x] Cross-platform (Web browser, iOS/Android app)  
 
