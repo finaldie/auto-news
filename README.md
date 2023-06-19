@@ -49,9 +49,14 @@ Copy `.env.template` to `build/.env`, and fill up the environment vars:
 * `OPENAI_API_KEY`
 * [Optional] Vars with `TWITTER_` prefix
 
+## Build Services
+```bash
+sudo make deps
+make build
+```
+
 ## Start Services
 ```bash
-make build
 make start
 ```
 
