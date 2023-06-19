@@ -32,8 +32,8 @@ The Auto-News was born for the following goals:
 - Backend
   - [x] Linux
   - [ ] MacOS
-- UI
-  - [x] Cross-platform (Web browser, iOS/Android app)  
+- UI (Notion)
+  - [x] Cross-platform (Web browser, iOS/Android app)
 
 # Installation
 ## Preparison
@@ -68,7 +68,7 @@ make enable_dags
 
 Now, the services are up and running, it will pull sources every hour.
 
-## Set up Notion database views
+## [UI] Set up Notion database views
 Go to Notion, and create the database views for different sources, e.g. Tweets, Articles, YouTube, RSS, etc
 
 ## Control Panel
