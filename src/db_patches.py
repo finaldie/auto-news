@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from mysql_cli import MySQLClient
 
 
@@ -49,4 +50,5 @@ def apply_database_patches():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     apply_database_patches()
