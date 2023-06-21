@@ -20,7 +20,7 @@ class MySQLClient:
         self.passwd = passwd or os.getenv("MYSQL_PASSWORD")
         self.db = db or os.getenv("MYSQL_DATABASE")
 
-        print("MySQL client initialization finished")
+        print(f"MySQL client initialization finished, host: {self.host}, port: {self.port}, user: {self.user}, passwd: {self.passwd}")
 
     def connect(self):
         return mysql.connector.connect(
