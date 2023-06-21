@@ -365,7 +365,7 @@ class NotionAgent:
                     "page_id": page_id,
                     "database_id": database_id,
                     "twitter_id": page["properties"]["id"]["title"][0]["text"]["content"],
-                    "name": page["properties"]["Name"]["rich_text"][0]["text"]["content"],
+                    "name": self.extractRichText(page["properties"]["Name"]["rich_text"]),
                     "created_time": page["created_time"],
                     "last_edited_time": page["last_edited_time"],
                 })

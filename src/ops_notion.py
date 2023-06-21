@@ -114,7 +114,7 @@ class OperatorNotion:
 
             agent.createDatabaseItem_Index(
                 index_inbox_db["id"],
-                index_rss_list_db["id"],
+                index_tweets_list_db["id"],
                 source="Twitter",
                 description="Twitter List Database"
             )
