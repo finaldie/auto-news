@@ -20,7 +20,7 @@ class MySQLClient:
         self.passwd = passwd or os.getenv("MYSQL_PASSWORD")
         self.db = db or os.getenv("MYSQL_DATABASE")
 
-        print(f"MySQL client initialization finished, host: {self.host}, port: {self.port}, user: {self.user}, passwd: {self.passwd}")
+        print(f"MySQL client initialization finished, host: {self.host}, port: {self.port}, user: {self.user}")
 
     def connect(self):
         return mysql.connector.connect(
@@ -104,7 +104,7 @@ class MySQLClient:
         c = conn.cursor()
         c.execute(f"use {self.db}")
 
-        sql = "INSERT INTO index_pages (catetory, name, index_id) VALUES (%s, %s, %s)"
+        sql = "INSERT INTO index_pages (category, name, index_id) VALUES (%s, %s, %s)"
         val = (category, name, index_id)
         c.execute(sql, val)
         conn.commit()

@@ -13,7 +13,7 @@ def patch_0(db_cli):
 # DB patches: table creation, alter column/index, insert data, etc
 DATABASE_PATCHES = [
     {
-        "name": "init",
+        "name": "init_notion",
         "order_id": 0,
         "function": patch_0,
     },
@@ -39,6 +39,7 @@ def apply_database_patches():
 
         if order_id in applied_orders:
             print(f"2 order_id {order_id} has been applied, skip")
+            continue
 
         ok, msg = func(db_cli)
 
