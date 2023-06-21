@@ -34,7 +34,7 @@ def apply_database_patches():
     for patch in DATABASE_PATCHES:
         name = patch["name"]
         order_id = patch["order_id"]
-        func = patch["fucntion"]
+        func = patch["function"]
         print(f"2 Checking order {order_id}")
 
         if order_id in applied_orders:
