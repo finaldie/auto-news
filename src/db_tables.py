@@ -9,3 +9,16 @@ CREATE TABLE IF NOT EXISTS `patch` (
   UNIQUE KEY `order_id` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 """
+
+
+SQL_TABLE_CREATION_INDEX_PAGES = """
+CREATE TABLE IF NOT EXISTS `index_pages` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `category` varchar(256) NOT NULL,
+  `name` varchar(256) NOT NULL,
+  `index_id` varchar(256) NOT NULL,
+  `created_at` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+"""

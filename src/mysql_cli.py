@@ -24,9 +24,9 @@ class MySQLClient:
         )
 
     def init_tables(self):
-        self._init_table_patch()
+        self._create_table_patch()
 
-    def _init_table_patch(self):
+    def _create_table_patch(self):
         conn = self.connect()
         c = conn.cursor()
         c.execute(f"use {self.db}")
@@ -63,3 +63,42 @@ class MySQLClient:
         c.execute(sql, val)
         conn.commit()
         print(f"Patch table insertion: name {name}, order_id {order_id}")
+
+    def create_table_index_pages(self):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute(f"use {self.db}")
+        c.execute(db_tables.SQL_TABLE_CREATION_INDEX_PAGES)
+        print("Table index_pages created")
+
+    def index_pages_table_load(self):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute(f"use {self.db}")
+
+        c.execute("select * from index_pages")
+        rows = c.fetchall()
+        ret = {}
+
+        for row in rows:
+            category = row[1]
+
+            ret[category] = {
+                "name": row[2],
+                "index_id": row[3],
+                "created_at": row[4],
+                "updated_at": row[5],
+            }
+
+        return ret
+
+    def index_pages_table_insert(self, category, name, index_id):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute(f"use {self.db}")
+
+        sql = "INSERT INTO path (catetory, name, index_id) VALUES (%s, %s, %s)"
+        val = (category, name, index_id)
+        c.execute(sql, val)
+        conn.commit()
+        print(f"Index_pages table insertion: category: {category}, name: {name}, index_id {index_id}")

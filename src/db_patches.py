@@ -2,6 +2,10 @@ from mysql_cli import MySQLClient
 
 
 def patch_0(db_cli):
+    """
+    Create Notion metadata table
+    """
+    db_cli.create_table_index_pages()
     return True, "OK"
 
 

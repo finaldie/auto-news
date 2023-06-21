@@ -16,6 +16,7 @@ import utils
 from ops_base import OperatorBase
 from db_cli import DBClient
 from ops_milvus import OperatorMilvus
+from ops_notion import OperatorNotion
 
 import feedparser
 
@@ -109,9 +110,12 @@ class OperatorRSS(OperatorBase):
         # 1. prepare notion agent and db connection
         notion_api_key = os.getenv("NOTION_TOKEN")
         notion_agent = NotionAgent(notion_api_key)
+        op_notion = OperatorNotion()
 
         # 2. get inbox database indexes
-        db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
+        # db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
+        db_index_id = op_notion.get_index_inbox_dbid()
+
         db_pages = utils.get_notion_database_pages_inbox(
             notion_agent, db_index_id, "RSS")
         print(f"The database pages founded: {db_pages}")
@@ -409,9 +413,12 @@ class OperatorRSS(OperatorBase):
             if target == "notion":
                 notion_api_key = os.getenv("NOTION_TOKEN")
                 notion_agent = NotionAgent(notion_api_key)
+                op_notion = OperatorNotion()
 
                 # Get the latest toread database id from index db
-                db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+                # db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+                db_index_id = op_notion.get_index_toread_dbid()
+
                 database_id = utils.get_notion_database_id_toread(
                     notion_agent, db_index_id)
                 print(f"Latest ToRead database id: {database_id}")
