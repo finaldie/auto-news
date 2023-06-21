@@ -80,6 +80,6 @@ push_dags:
 	cd docker && make push_dags topdir=$(topdir)
 
 test:
-	cd docker && docker-compose run airflow-init-user 
+	cd docker && docker-compose run airflow-init-user
 
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags
