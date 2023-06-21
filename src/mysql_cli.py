@@ -89,9 +89,10 @@ class MySQLClient:
 
         for row in rows:
             category = row[1]
+            name = row[2],
+            ret[category] = ret.get(category) or {}
 
-            ret[category] = {
-                "name": row[2],
+            ret[category][name] = {
                 "index_id": row[3],
                 "created_at": row[4],
                 "updated_at": row[5],

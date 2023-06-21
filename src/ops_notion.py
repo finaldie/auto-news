@@ -16,7 +16,7 @@ class OperatorNotion:
         print(f"loaded notion indexes: {notion_indexes}")
 
         total_expected_keys = 7
-        if len(notion_indexes) == total_expected_keys:
+        if notion_indexes and len(notion_indexes) == total_expected_keys:
             print("[INFO] Notion index pages have been created, skip")
             return True
 
