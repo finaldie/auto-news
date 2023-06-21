@@ -1413,13 +1413,13 @@ class NotionAgent:
             }
         }
 
-        return self.createPage(parent, props, {})
+        return self.createPage(parent, props, None)
 
     def createPage(self, parent, props, blocks):
         new_page = self.api.pages.create(
-            parent=parent or {"type": "workspace", "workspace": True},
-            properties=props or {},
-            children=blocks or {})
+            parent=parent,
+            properties=props,
+            children=blocks)
 
         return new_page
 
