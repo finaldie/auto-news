@@ -150,7 +150,7 @@ class OperatorMilvus:
         embedding = emb_agent.get_or_create(
             text,
             source="default",
-            page_id=utils.hashcode_md5(text),
+            page_id=utils.hashcode_md5(text.encode('utf-8')),
             db_client=client,
             key_ttl=key_ttl)
 
