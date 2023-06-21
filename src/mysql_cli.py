@@ -17,7 +17,7 @@ class MySQLClient:
         self.host = host or os.getenv("MYSQL_HOST")
         self.port = port or os.getenv("MYSQL_PORT")
         self.user = user or os.getenv("MYSQL_USER")
-        self.passwd = passwd or os.getnenv("MYSQL_PASSWORD")
+        self.passwd = passwd or os.getenv("MYSQL_PASSWORD")
         self.db = db or os.getenv("MYSQL_DATABASE")
 
         print("MySQL client initialization finished")
