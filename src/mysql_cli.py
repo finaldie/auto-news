@@ -65,7 +65,7 @@ class MySQLClient:
         c = conn.cursor()
         c.execute(f"use {self.db}")
 
-        sql = "INSERT INTO path (name, order_id) VALUES (%s, %s)"
+        sql = "INSERT INTO patch (name, order_id) VALUES (%s, %s)"
         val = (name, order_id)
         c.execute(sql, val)
         conn.commit()
@@ -104,7 +104,7 @@ class MySQLClient:
         c = conn.cursor()
         c.execute(f"use {self.db}")
 
-        sql = "INSERT INTO path (catetory, name, index_id) VALUES (%s, %s, %s)"
+        sql = "INSERT INTO index_pages (catetory, name, index_id) VALUES (%s, %s, %s)"
         val = (category, name, index_id)
         c.execute(sql, val)
         conn.commit()
