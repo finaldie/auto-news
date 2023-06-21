@@ -89,7 +89,7 @@ class MySQLClient:
 
         for row in rows:
             category = row[1]
-            name = row[2],
+            name = row[2]
             ret[category] = ret.get(category) or {}
 
             ret[category][name] = {
