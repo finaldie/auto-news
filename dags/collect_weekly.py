@@ -35,6 +35,29 @@ default_args = {
 }
 
 
+def should_run(**kwargs):
+    """
+    The pipeline should only runs on Saturday
+
+    :param dict kwargs: Context
+    :return: Id of the task to run
+    :rtype: str
+    """
+    next_exec_date = kwargs['next_execution_date']
+    force_to_run = kwargs["dag_run"].conf.setdefault("force_to_run", False)
+
+    print('---- weekday: {}, force_to_run: {}, context {}'.format(next_exec_date.weekday(), force_to_run, kwargs))
+
+    if force_to_run:
+        return "start"
+
+    # check weekday is Saturday, aka weekday() == 5
+    if next_exec_date.weekday() == 5:
+        return "start"
+    else:
+        return "finish"
+
+
 # Important Notes: This DAG must be executed before others, since it
 # will create the new embedding table first, then other DAGs can be
 # consumed later
@@ -42,9 +65,9 @@ with DAG(
     'collection_weekly',
     default_args=default_args,
     max_active_runs=1,
-    description='Collect weekly best content. config: {"sources": "Twitter,Article,Youtube,RSS", "targets": "notion", "dedup": true, "min-rating": 4}',
+    description='Collect weekly best content. config: {"sources": "Twitter,Article,Youtube,RSS", "targets": "notion", "dedup": true, "min-rating": 4, "force_to_run": true}',
     # schedule_interval=timedelta(minutes=60),
-    schedule_interval="30 2 * */1 *",  # At 02:30 weekly
+    schedule_interval="30 2 */1 * *",  # At 02:30 everyday
     # schedule_interval=None,
     start_date=days_ago(0, hour=1),
     tags=['NewsBot'],
@@ -53,6 +76,12 @@ with DAG(
     t0 = BashOperator(
         task_id='git_pull',
         bash_command='cd ~/airflow/run/auto-news && git pull && git log -1',
+    )
+
+    br = BranchPythonOperator(
+        task_id='condition',
+        python_callable=should_run,
+        dag=dag,
     )
 
     t1 = BashOperator(
@@ -100,4 +129,6 @@ with DAG(
         '--prefix=./run ',
     )
 
-    t0 >> t1 >> t2 >> t3 >> t4 >> t5
+    t0 >> br
+    br >> t1 >> t2 >> t3 >> t4 >> t5
+    br >> t5
