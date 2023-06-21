@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from ops_notion import OperatorNotion
 
 
@@ -9,4 +10,5 @@ def init():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     init()
