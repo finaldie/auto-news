@@ -1394,31 +1394,10 @@ class NotionAgent:
     #################################################################
     # Create and Maintain notion metadata
     #################################################################
-    def createWorkspacePage(self, title):
-        parent = {"type": "workspace", "workspace": True}
-        props = {
-            "Title": {
-                "id": "title",
-                "type": "title",
-                "title": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": title,
-                        },
-
-                        "plain_text": title,
-                    }
-                ]
-            }
-        }
-
-        return self.createPage(parent, props, {})
-
     def createPageOfPage(self, parent_page_id, title):
         parent = {"type": "page_id", "page_id": parent_page_id}
         props = {
-            "Title": {
+            "title": {
                 "id": "title",
                 "type": "title",
                 "title": [

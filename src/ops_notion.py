@@ -24,8 +24,7 @@ class OperatorNotion:
         agent = NotionAgent(notion_api_key)
 
         try:
-            entry_page = agent.createWorkspacePage("Readings")
-            entry_page_id = entry_page["id"]
+            entry_page_id = os.getenv("NOTION_ENTRY_PAGE_ID")
             db_cli.index_pages_table_insert(
                 "notion", "entry_page_id", entry_page_id)
 
