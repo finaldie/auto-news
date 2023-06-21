@@ -30,9 +30,9 @@ class OperatorNotion:
                 "notion", "entry_page_id", entry_page_id)
 
             # create 3 sub pages: inbox, index, toread
-            inbox_page = agent.createPageOfPage(entry_page_id, "inbox")
-            index_page = agent.createPageOfPage(entry_page_id, "index")
-            toread_page = agent.createPageOfPage(entry_page_id, "toread")
+            inbox_page = agent.createPageOfPage(entry_page_id, "Inbox")
+            index_page = agent.createPageOfPage(entry_page_id, "Index")
+            toread_page = agent.createPageOfPage(entry_page_id, "ToRead")
 
             db_cli.index_pages_table_insert(
                 "notion", "inbox_page_id", inbox_page["id"])
