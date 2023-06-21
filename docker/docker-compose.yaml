@@ -299,6 +299,9 @@ services:
       - |
         echo "PWD: `pwd`"
         echo "Apply Database patches..."
+        echo "pip packages:"
+        pip list
+        echo "----"
         python3 ~/airflow/run/auto-news/src/db_patches.py
         echo "Apply Database patches finished"
         echo "----"
@@ -313,6 +316,7 @@ services:
         echo "Enable DAGs finished"
     environment:
       <<: *airflow-common-env
+    user: "${AIRFLOW_UID:-50000}:0"
     depends_on:
       airflow-init:
         condition: service_completed_successfully

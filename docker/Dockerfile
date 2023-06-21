@@ -55,6 +55,11 @@ RUN set -ex; \
 # switch to airflow user in order to install python packages
 USER airflow
 
+# create a soft link ~/airflow -> /opt/airflow
+# create a symbol link for airflow user as well
+RUN set -ex; \
+  ln -snf /opt/airflow ~/airflow
+
 ADD requirements.txt .
 
 # Install deps

@@ -6,7 +6,14 @@ import db_tables
 
 
 class MySQLClient:
-    def __init__(self, host, port, user, passwd, db):
+    def __init__(
+        self,
+        host=None,
+        port=None,
+        user=None,
+        passwd=None,
+        db=None
+    ):
         self.host = host or os.getenv("MYSQL_HOST")
         self.port = port or os.getenv("MYSQL_PORT")
         self.user = user or os.getenv("MYSQL_USER")
