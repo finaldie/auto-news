@@ -312,8 +312,7 @@ services:
         echo "Enable DAGs finished"
     environment:
       <<: *airflow-common-env
-  depends_on:
-      <<: *airflow-common-depends-on
+    depends_on:
       airflow-init:
         condition: service_completed_successfully
       mysql:
