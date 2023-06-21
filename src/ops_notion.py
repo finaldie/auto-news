@@ -98,7 +98,7 @@ class OperatorNotion:
                 "ToRead", toread_page["id"])
 
             agent.createDatabaseItem_Index(
-                index_inbox_db["id"],
+                index_toread_db["id"],
                 inbox_toread_db["id"],
                 source="ToRead",
                 description="ToRead Inbox Database"
@@ -135,8 +135,7 @@ class OperatorNotion:
             if category != "notion":
                 continue
 
-            if metadata["name"] == "index_inbox_db_id":
-                return metadata["index_id"]
+            return metadata["index_inbox_db_id"]["index_id"]
 
         print("[WARN] Cannot find database id for index - inbox")
         return ""
@@ -153,8 +152,7 @@ class OperatorNotion:
             if category != "notion":
                 continue
 
-            if metadata["name"] == "index_toread_db_id":
-                return metadata["index_id"]
+            return metadata["index_toread_db_id"]["index_id"]
 
-        print("[WARN] Cannot find database id for index - inbox")
+        print("[WARN] Cannot find database id for index - toread")
         return ""
