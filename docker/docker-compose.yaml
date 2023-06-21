@@ -297,12 +297,13 @@ services:
     command:
       - -c
       - |
+        echo "PWD: `pwd`"
         echo "Apply Database patches..."
-        python3 ${BOT_HOME}/src/db_patches.py
+        python3 ~/airflow/run/auto-news/src/db_patches.py
         echo "Apply Database patches finished"
         echo "----"
         echo "Creating notion entry pages"
-        python3 ${BOT_HOME}/src/notion_init.py
+        python3 ~/airflow/run/auto-news/src/notion_init.py
         echo "Creating notion entry pages finished"
         echo "----"
         echo "Enable DAGs..."
