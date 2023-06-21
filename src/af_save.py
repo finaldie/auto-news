@@ -66,7 +66,7 @@ def process_twitter(args):
         start_date=args.start,
         max_distance=args.max_distance)
 
-    data_filtered = op.filter(data_scored, min_score=4.5)
+    data_filtered = op.filter(data_scored, min_score=4)
 
     data_ranked = op.rank(data_filtered, min_score=args.min_score_to_rank)
 
