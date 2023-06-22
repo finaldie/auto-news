@@ -161,4 +161,4 @@ cython_debug/
 #.idea/
 
 # Workspace
-./workspace
+workspace/**
