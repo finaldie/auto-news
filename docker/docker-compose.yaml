@@ -144,7 +144,7 @@ services:
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
-      airflow-init-user:
+      airflow-init:
         condition: service_completed_successfully
 
   airflow-scheduler:
@@ -159,7 +159,7 @@ services:
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
-      airflow-init-user:
+      airflow-init:
         condition: service_completed_successfully
 
   airflow-worker:
@@ -181,7 +181,7 @@ services:
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
-      airflow-init-user:
+      airflow-init:
         condition: service_completed_successfully
 
   airflow-triggerer:
@@ -196,7 +196,7 @@ services:
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
-      airflow-init-user:
+      airflow-init:
         condition: service_completed_successfully
 
   airflow-init:
@@ -318,6 +318,10 @@ services:
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+      airflow-scheduler:
+        condition: service_healthy
+      airflow-triggerer:
+        condition: service_healthy
       mysql:
         condition: service_healthy
 
