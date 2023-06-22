@@ -86,8 +86,8 @@ x-airflow-common:
     # - ${OBSIDIAN_DIR:-.}:${OBSIDIAN_DIR}
     # - /var/run/docker.sock:/var/run/docker.sock
     # - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
-  user: "${AIRFLOW_UID:-50000}:0"
-  # user: "${AIRFLOW_UID:-0}:0"
+  # user: "${AIRFLOW_UID:-50000}:0"
+  user: "${AIRFLOW_UID:-0}:0"
   depends_on:
     &airflow-common-depends-on
     redis:
@@ -319,8 +319,6 @@ services:
       airflow-init:
         condition: service_completed_successfully
       airflow-scheduler:
-        condition: service_healthy
-      airflow-triggerer:
         condition: service_healthy
       mysql:
         condition: service_healthy
