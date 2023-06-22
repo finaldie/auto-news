@@ -7,9 +7,8 @@ deploy-code:
 	mkdir -p $(AIRFLOW_PROJ_DIR)
 	if [ ! -d $(BOT_HOME) ]; then \
 		mkdir -p $(AIRFLOW_PROJ_DIR)/run; \
-		cp -r $(topdir) $(BOT_HOME); \
+		cd $(AIRFLOW_PROJ_DIR)/run && git clone https://github.com/finaldie/auto-news.git; \
 	fi
-	cd $(BOT_HOME) && rm -rf build
 	echo "Deploying code done"
 
 # Airflow operations
@@ -54,7 +53,7 @@ deploy: deploy-airflow deploy-postgres deploy-redis deploy-mysql deploy-milvus
 deploy: post-deploy
 
 
-init: init-airflow push_dags
+init: push_dags
 
 start-services:
 	docker-compose up -d

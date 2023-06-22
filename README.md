@@ -56,8 +56,7 @@ Copy `.env.template` to `build/.env`, and fill up the environment vars:
 
 ## Build Services
 ```bash
-sudo make deps
-make build
+make deps && make build && make deploy && make init
 ```
 
 ## Start Services
@@ -98,3 +97,11 @@ For troubleshooting, we can use the URLs below to access the services and check 
 | ---     | ---             | ---                   |
 | Airflow | Orchestration   | http://localhost:8080 |
 | Milvus  | Vector Database | http://localhost:9100 |
+
+## Stop/Restart Services
+In case need to stop or restart, use one of the following command
+
+```bash
+make stop
+make stop && make start
+```

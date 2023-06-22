@@ -84,10 +84,10 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/run:/opt/airflow/run
     - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
     # - ${OBSIDIAN_DIR:-.}:${OBSIDIAN_DIR}
-    - /var/run/docker.sock:/var/run/docker.sock
-    - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
-  # user: "${AIRFLOW_UID:-50000}:0"
-  user: "${AIRFLOW_UID:-0}:0"
+    # - /var/run/docker.sock:/var/run/docker.sock
+    # - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+  user: "${AIRFLOW_UID:-50000}:0"
+  # user: "${AIRFLOW_UID:-0}:0"
   depends_on:
     &airflow-common-depends-on
     redis:
@@ -299,8 +299,6 @@ services:
       - |
         echo "PWD: `pwd`"
         echo "Apply Database patches..."
-        echo "pip packages:"
-        pip list
         echo "----"
         python3 ~/airflow/run/auto-news/src/db_patches.py
         echo "Apply Database patches finished"
