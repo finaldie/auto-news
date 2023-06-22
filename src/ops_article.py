@@ -15,6 +15,7 @@ from llm_agent import (
 import utils
 from ops_base import OperatorBase
 from db_cli import DBClient
+from ops_notion import OperatorNotion
 
 
 class OperatorArticle(OperatorBase):
@@ -48,7 +49,11 @@ class OperatorArticle(OperatorBase):
             last_created_time = (datetime.now() - timedelta(days=1)).isoformat()
 
         # 2. get inbox database indexes
-        db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
+        op_notion = OperatorNotion()
+
+        # db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_INBOX")
+        db_index_id = op_notion.get_index_inbox_dbid()
+
         db_pages = utils.get_notion_database_pages_inbox(
             notion_agent, db_index_id, "Article")
         print(f"The database pages founded: {db_pages}")
@@ -274,9 +279,11 @@ class OperatorArticle(OperatorBase):
             if target == "notion":
                 notion_api_key = os.getenv("NOTION_TOKEN")
                 notion_agent = NotionAgent(notion_api_key)
+                op_notion = OperatorNotion()
 
                 # Get the latest toread database id from index db
-                db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+                # db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+                db_index_id = op_notion.get_index_toread_dbid()
                 database_id = utils.get_notion_database_id_toread(
                     notion_agent, db_index_id)
                 print(f"Latest ToRead database id: {database_id}")

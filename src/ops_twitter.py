@@ -14,6 +14,7 @@ import utils
 from ops_base import OperatorBase
 from db_cli import DBClient
 from ops_milvus import OperatorMilvus
+from ops_notion import OperatorNotion
 
 
 class OperatorTwitter(OperatorBase):
@@ -27,17 +28,33 @@ class OperatorTwitter(OperatorBase):
     - ranking
     - publish
     """
-
     def pull(self, pulling_count, pulling_interval):
         print("#####################################################")
         print("# Pulling Twitter")
         print("#####################################################")
-        screen_names_famous = os.getenv("TWITTER_LIST_FAMOUS", "")
-        screen_names_ai = os.getenv("TWITTER_LIST_AI", "")
+        # Get twitter lists
+        notion_api_key = os.getenv("NOTION_TOKEN")
+        notion_agent = NotionAgent(notion_api_key)
 
-        print(f"screen name famous: {screen_names_famous}")
-        print(f"screen name ai: {screen_names_ai}")
+        op_notion = OperatorNotion()
+        db_index_id = op_notion.get_index_inbox_dbid()
 
+        db_pages = utils.get_notion_database_pages_inbox(
+            notion_agent, db_index_id, "Twitter")
+        print(f"The database pages founded: {db_pages}")
+
+        screen_names = {}  # <list_name, []>
+
+        for db_page in db_pages:
+            database_id = db_page["database_id"]
+
+            # <list_name, [...]>
+            name_dict = notion_agent.queryDatabase_TwitterList(
+                database_id)
+
+            screen_names.update(name_dict)
+
+        # Use twitter agent to pull tweets
         api_key = os.getenv("TWITTER_API_KEY")
         api_key_secret = os.getenv("TWITTER_API_KEY_SECRET")
         access_token = os.getenv("TWITTER_ACCESS_TOKEN")
@@ -45,12 +62,40 @@ class OperatorTwitter(OperatorBase):
 
         agent = TwitterAgent(api_key, api_key_secret, access_token, access_token_secret)
 
-        agent.subscribe("Famous", screen_names_famous.split(","), pulling_count)
-        agent.subscribe("AI", screen_names_ai.split(","), pulling_count)
+        for list_name, screen_names in screen_names.items():
+            print(f"list_name: {list_name}, screen_names: {screen_names}")
+            name_list = [x['twitter_id'] for x in screen_names]
+            print(f"name_list: {name_list}")
+
+            agent.subscribe(list_name, name_list, pulling_count)
 
         data = agent.pull(pulling_interval_sec=pulling_interval)
         print(f"Pulled from twitter: {data}")
         return data
+
+    # def pull(self, pulling_count, pulling_interval):
+    #     print("#####################################################")
+    #     print("# Pulling Twitter")
+    #     print("#####################################################")
+    #     screen_names_famous = os.getenv("TWITTER_LIST_FAMOUS", "")
+    #     screen_names_ai = os.getenv("TWITTER_LIST_AI", "")
+
+    #     print(f"screen name famous: {screen_names_famous}")
+    #     print(f"screen name ai: {screen_names_ai}")
+
+    #     api_key = os.getenv("TWITTER_API_KEY")
+    #     api_key_secret = os.getenv("TWITTER_API_KEY_SECRET")
+    #     access_token = os.getenv("TWITTER_ACCESS_TOKEN")
+    #     access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+
+    #     agent = TwitterAgent(api_key, api_key_secret, access_token, access_token_secret)
+
+    #     agent.subscribe("Famous", screen_names_famous.split(","), pulling_count)
+    #     agent.subscribe("AI", screen_names_ai.split(","), pulling_count)
+
+    #     data = agent.pull(pulling_interval_sec=pulling_interval)
+    #     print(f"Pulled from twitter: {data}")
+    #     return data
 
     def dedup(self, tweets, target="toread"):
         """
@@ -66,20 +111,27 @@ class OperatorTwitter(OperatorBase):
 
         client = DBClient()
         tweets_deduped = {}
+        tot = 0
+        dup = 0
+        cnt = 0
 
         for list_name, data in tweets.items():
             tweets_list = tweets_deduped.setdefault(list_name, [])
 
             for tweet in data:
                 tweet_id = tweet["tweet_id"]
+                tot += 1
 
                 if client.get_notion_toread_item_id(
                         "twitter", list_name, tweet_id):
+                    dup += 1
                     print(f"Duplicated tweet found, tweet_id: {tweet_id}, skip")
+
                 else:
+                    cnt += 1
                     tweets_list.append(tweet)
 
-        print(f"tweets_deduped ({len(tweets_deduped)}): {tweets_deduped}")
+        print(f"tweets_deduped (total: {tot}, duplicated: {dup}, new: {cnt}): {tweets_deduped}")
         return tweets_deduped
 
     def rank(self, data, **kwargs):
@@ -203,11 +255,16 @@ class OperatorTwitter(OperatorBase):
             print(f"Pushing data to target: {target} ...")
 
             if target == "notion":
+                tot = 0
+                err = 0
+
                 notion_api_key = os.getenv("NOTION_TOKEN")
                 notion_agent = NotionAgent(notion_api_key)
+                op_notion = OperatorNotion()
 
                 # Get the latest toread database id from index db
-                db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+                # db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+                db_index_id = op_notion.get_index_toread_dbid()
                 database_id = utils.get_notion_database_id_toread(
                     notion_agent, db_index_id)
                 print(f"Latest ToRead database id: {database_id}")
@@ -218,6 +275,8 @@ class OperatorTwitter(OperatorBase):
 
                 for list_name, tweets in data.items():
                     for ranked_tweet in tweets:
+                        tot += 1
+
                         try:
                             self._push_to_read_notion(
                                 notion_agent,
@@ -229,10 +288,13 @@ class OperatorTwitter(OperatorBase):
 
                         except Exception as e:
                             print(f"[ERROR]: Push to notion failed, skip: {e}")
+                            err += 1
                             traceback.print_exc()
 
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
+
+            print(f"Push Tweets to notion finished, total: {tot}, err: {err}")
 
     def score(self, data, **kwargs):
         print("#####################################################")
@@ -249,6 +311,7 @@ class OperatorTwitter(OperatorBase):
 
         for list_name, tweets in data.items():
             scored_list = scored_pages.setdefault(list_name, [])
+            print(f"Scoring list {list_name}, total {len(tweets)} tweets")
 
             for tweet in tweets:
                 try:

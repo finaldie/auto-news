@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import utils
 from db_cli import DBClient
 from notion import NotionAgent
+from ops_notion import OperatorNotion
 
 
 class OperatorBase:
@@ -23,7 +24,11 @@ class OperatorBase:
         notion_api_key = os.getenv("NOTION_TOKEN")
         notion_agent = NotionAgent(notion_api_key)
 
-        db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+        op_notion = OperatorNotion()
+
+        # db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
+        db_index_id = op_notion.get_index_toread_dbid()
+
         db_pages = utils.get_notion_database_pages_toread(
             notion_agent, db_index_id)
 

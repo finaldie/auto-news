@@ -139,6 +139,7 @@ class MilvusClient:
         text: str,
         topk=1,
         fallback=None,
+        emb=None
     ):
         collection = None
 
@@ -150,7 +151,7 @@ class MilvusClient:
 
             if fallback:
                 print(f"Using fallback collection: {fallback}")
-                return self.get(fallback, text, topk=topk)
+                return self.get(fallback, text, topk=topk, emb=emb)
             else:
                 return []
 
@@ -163,7 +164,7 @@ class MilvusClient:
             "params": {"nprobe": 8},
         }
 
-        emb = self.emb_agent.create(text)
+        emb = emb or self.emb_agent.create(text)
 
         result = collection.search(
             [emb], "embeddings", search_params, topk,

@@ -38,13 +38,13 @@ class EmbeddingOpenAI(Embedding):
                     model=model_name)
 
             except openai.error.RateLimitError as e:
-                print(f"[ERROR] RateLimit error during embedding: {e}")
+                print(f"[ERROR] RateLimit error during embedding ({i}/{num_retries}): {e}")
 
                 if i == num_retries:
                     raise
 
             except openai.error.APIError as e:
-                print(f"[ERROR] Failed during embedding: {e}")
+                print(f"[ERROR] Failed during embedding ({i}/{num_retries}): {e}")
 
                 if i == num_retries:
                     raise

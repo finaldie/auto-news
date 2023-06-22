@@ -328,6 +328,50 @@ class NotionAgent:
 
         return extracted_pages
 
+    def queryDatabase_TwitterList(self, database_id):
+        query_data = {
+            "database_id": database_id,
+            "sorts": [
+                {
+                    "property": "Created time",
+                    "direction": "descending",
+                },
+            ],
+
+            "filter": {
+                "and": [
+                    {
+                        "property": "Enabled",
+                        "checkbox": {
+                            "equals": True,
+                        },
+                    },
+                ]
+            }
+        }
+
+        pages = self.api.databases.query(**query_data).get("results")
+        extracted_pages = {}
+
+        for page in pages:
+            print(f"result: page id: {page['id']}")
+            page_id = page["id"]
+            list_names = self.extractMultiSelect(page["properties"]["List Name"])
+
+            for list_name in list_names:
+                page_list = extracted_pages.setdefault(list_name, [])
+
+                page_list.append({
+                    "page_id": page_id,
+                    "database_id": database_id,
+                    "twitter_id": page["properties"]["id"]["title"][0]["text"]["content"],
+                    "name": self.extractRichText(page["properties"]["Name"]["rich_text"]),
+                    "created_time": page["created_time"],
+                    "last_edited_time": page["last_edited_time"],
+                })
+
+        return extracted_pages
+
     def queryDatabaseIndex_Inbox(self, database_id, source):
         query_data = {
             "database_id": database_id,
@@ -393,112 +437,6 @@ class NotionAgent:
             })
 
         return extracted_pages
-
-    def createDatabaseItem_Index_ToRead(
-        self,
-        database_id,
-        to_read_db_id,
-        title
-    ):
-        properties = {
-            "id": {
-                "title": [
-                    {
-                        "text": {
-                            "content": to_read_db_id
-                        }
-                    }
-                ]
-            },
-
-            "Title": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": title,
-                        },
-                    },
-                ]
-            },
-        }
-
-        # Add the new page to the database
-        new_page = self.api.pages.create(
-            parent={"database_id": database_id},
-            properties=properties)
-
-        return new_page
-
-    def createDatabase_ToRead(self, name, parent_page_id):
-        """
-        Create a database for ToRead, Collection, etc
-        """
-        title = [
-            {
-                "type": "text",
-                "text": {
-                    "content": name,
-                }
-            }
-        ]
-
-        # Set the properties of the new database
-        new_database_properties = {
-            "Name": {
-                "title": {}
-            },
-            "To": {
-                "rich_text": {}
-            },
-            "Created at": {
-                "date": {}
-            },
-            "Topic": {
-                "multi_select": {}
-            },
-            "Category": {
-                "multi_select": {}
-            },
-            "Rating": {
-                "number": {}
-            },
-            "Read": {
-                "checkbox": {}
-            },
-            "Created time": {
-                "created_time": {}
-            },
-            "List Name": {
-                "multi_select": {}
-            },
-            "Last edited time": {
-                "last_edited_time": {}
-            },
-            "User Rating": {
-                "select": {}
-            },
-            "Relevant Score": {
-                "number": {}
-            },
-            "Tags": {
-                "multi_select": {}
-            },
-            "Source": {
-                "select": {}
-            },
-            "Take Aways": {
-                "rich_text": {}
-            },
-        }
-
-        # Create the new database under the specified page
-        new_database = self.api.databases.create(
-            parent={"type": "page_id", "page_id": parent_page_id},
-            title=title,
-            properties=new_database_properties
-        )
-
-        return new_database
 
     def queryDatabaseInbox_Twitter(self, database_id, created_time=None):
         query_data = {
@@ -1452,3 +1390,306 @@ class NotionAgent:
 
         print(f"Created a new comment: {comment_text}, new_comment object: {new_comment}")
         return new_comment
+
+    #################################################################
+    # Create and Maintain notion metadata
+    #################################################################
+    def createPageOfPage(self, parent_page_id, title):
+        parent = {"type": "page_id", "page_id": parent_page_id}
+        props = {
+            "title": {
+                "id": "title",
+                "type": "title",
+                "title": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": title,
+                        },
+
+                        "plain_text": title,
+                    }
+                ]
+            }
+        }
+
+        return self.createPage(parent, props, None)
+
+    def createPage(self, parent, props, blocks):
+        new_page = self.api.pages.create(
+            parent=parent,
+            properties=props,
+            children=blocks)
+
+        return new_page
+
+    def createDatabase_Inbox(self, name, parent_page_id):
+        """
+        Create a database for Inbox
+        """
+        title = [
+            {
+                "type": "text",
+                "text": {
+                    "content": name,
+                }
+            }
+        ]
+
+        # Set the properties of the new database
+        new_database_properties = {
+            "Name": {
+                "title": {}
+            },
+            "Created time": {
+                "created_time": {}
+            },
+            "URL": {
+                "url": {}
+            },
+        }
+
+        # Create the new database under the specified page
+        new_database = self.api.databases.create(
+            parent={"type": "page_id", "page_id": parent_page_id},
+            title=title,
+            properties=new_database_properties
+        )
+
+        return new_database
+
+    def createDatabase_Index(self, name, parent_page_id):
+        """
+        Create a database for Inbox
+        """
+        title = [
+            {
+                "type": "text",
+                "text": {
+                    "content": name,
+                }
+            }
+        ]
+
+        # Set the properties of the new database
+        new_database_properties = {
+            "id": {
+                "title": {}
+            },
+            "Source": {
+                "select": {}
+            },
+            "Created time": {
+                "created_time": {}
+            },
+            "Description": {
+                "rich_text": {}
+            },
+        }
+
+        # Create the new database under the specified page
+        new_database = self.api.databases.create(
+            parent={"type": "page_id", "page_id": parent_page_id},
+            title=title,
+            properties=new_database_properties
+        )
+
+        return new_database
+
+    def createDatabase_RSS_List(self, name, parent_page_id):
+        """
+        Create a database for Inbox
+        """
+        title = [
+            {
+                "type": "text",
+                "text": {
+                    "content": name,
+                }
+            }
+        ]
+
+        # Set the properties of the new database
+        new_database_properties = {
+            "Name": {
+                "title": {}
+            },
+            "URL": {
+                "url": {}
+            },
+            "Created time": {
+                "created_time": {}
+            },
+            "Enabled": {
+                "checkbox": {}
+            },
+            "Notes": {
+                "rich_text": {}
+            },
+        }
+
+        # Create the new database under the specified page
+        new_database = self.api.databases.create(
+            parent={"type": "page_id", "page_id": parent_page_id},
+            title=title,
+            properties=new_database_properties
+        )
+
+        return new_database
+
+    def createDatabase_Tweets_List(self, name, parent_page_id):
+        """
+        Create a database for Inbox
+        """
+        title = [
+            {
+                "type": "text",
+                "text": {
+                    "content": name,
+                }
+            }
+        ]
+
+        # Set the properties of the new database
+        new_database_properties = {
+            "id": {
+                "title": {}
+            },
+            "Name": {
+                "rich_text": {}
+            },
+            "List Name": {
+                "multi_select": {}
+            },
+            "Created time": {
+                "created_time": {}
+            },
+            "Last edited time": {
+                "last_edited_time": {}
+            },
+            "Enabled": {
+                "checkbox": {}
+            },
+        }
+
+        # Create the new database under the specified page
+        new_database = self.api.databases.create(
+            parent={"type": "page_id", "page_id": parent_page_id},
+            title=title,
+            properties=new_database_properties
+        )
+
+        return new_database
+
+    def createDatabase_ToRead(self, name, parent_page_id):
+        """
+        Create a database for ToRead, Collection, etc
+        """
+        title = [
+            {
+                "type": "text",
+                "text": {
+                    "content": name,
+                }
+            }
+        ]
+
+        # Set the properties of the new database
+        new_database_properties = {
+            "Name": {
+                "title": {}
+            },
+            "To": {
+                "rich_text": {}
+            },
+            "Created at": {
+                "date": {}
+            },
+            "Topic": {
+                "multi_select": {}
+            },
+            "Category": {
+                "multi_select": {}
+            },
+            "Rating": {
+                "number": {}
+            },
+            "Read": {
+                "checkbox": {}
+            },
+            "Created time": {
+                "created_time": {}
+            },
+            "List Name": {
+                "multi_select": {}
+            },
+            "Last edited time": {
+                "last_edited_time": {}
+            },
+            "User Rating": {
+                "select": {}
+            },
+            "Relevant Score": {
+                "number": {}
+            },
+            "Tags": {
+                "multi_select": {}
+            },
+            "Source": {
+                "select": {}
+            },
+            "Take Aways": {
+                "rich_text": {}
+            },
+        }
+
+        # Create the new database under the specified page
+        new_database = self.api.databases.create(
+            parent={"type": "page_id", "page_id": parent_page_id},
+            title=title,
+            properties=new_database_properties
+        )
+
+        return new_database
+
+    def createDatabaseItem_Index(
+        self,
+        database_id,
+        ref_db_id,
+        source: str = "",
+        description: str = "",
+    ):
+        properties = {
+            "id": {
+                "title": [
+                    {
+                        "text": {
+                            "content": ref_db_id
+                        }
+                    }
+                ]
+            },
+
+            "Source": {
+                "select": {
+                    "name": source,
+                }
+            },
+
+            "Description": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": description,
+                        },
+                    },
+                ]
+            },
+        }
+
+        # Add the new page to the database
+        new_page = self.api.pages.create(
+            parent={"database_id": database_id},
+            properties=properties)
+
+        return new_page

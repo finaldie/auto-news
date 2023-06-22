@@ -8,7 +8,7 @@ help:
 topdir := $(shell pwd)
 build_dir := $(topdir)/build
 
-include $(build_dir)/install.env
+include install.env
 
 docker-network:
 	@echo "creating docker network for bot..."
@@ -43,9 +43,6 @@ build:
 deploy-airflow:
 	cd docker && make deploy topdir=$(topdir) build_dir=$(build_dir)
 
-deploy-obsidian:
-	cd docker && make deploy-obsidian obsidian_dir=$(obsidian_dir)
-
 deploy-env:
 	cp $(build_dir)/.env $(BOT_HOME)/src
 
@@ -78,5 +75,8 @@ enable_dags:
 
 push_dags:
 	cd docker && make push_dags topdir=$(topdir)
+
+test:
+	cd docker && docker-compose run airflow-init-user
 
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags

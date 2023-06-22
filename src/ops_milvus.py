@@ -146,9 +146,17 @@ class OperatorMilvus:
 
         print(f"[get_relevant] Fallback collection name: {fallback}")
 
+        key_ttl = 86400 * 30  # 30 days
+        embedding = emb_agent.get_or_create(
+            text,
+            source="default",
+            page_id=utils.hashcode_md5(text.encode('utf-8')),
+            db_client=client,
+            key_ttl=key_ttl)
+
         response_arr = milvus_client.get(
             collection_name, text, topk=topk,
-            fallback=fallback)
+            fallback=fallback, emb=embedding)
 
         res = []
 
