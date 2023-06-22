@@ -37,49 +37,49 @@ The Auto-News was born for the following goals:
 
 # Installation
 ## Preparison
-* [Required] Notion token ([Integration](https://www.notion.so/my-integrations))
-* [Required] OpenAI token
-* [Required] Docker
-* [Optional] Notion web clipper browser extension
-* [Optional] Twitter token
+* [Required] [Notion token](https://www.notion.so/my-integrations)
+* [Required] [OpenAI token](https://openai.com/blog/openai-api)
+* [Required] [Docker](https://www.docker.com/)
+* [Optional] [Notion Web Clipper](https://chrome.google.com/webstore/detail/notion-web-clipper/knheggckgoiihginacbkhaalnibhilkk)
+* [Optional] [Twitter Developer Tokens](https://developer.twitter.com/en)
 
-## Create Notion Entry Page
+## [UI] Create Notion Entry Page
 
-Go to [Notion](https://www.notion.so/), create a page (For example `Readings`) and enable notion `Integration` for this page
+Go to [Notion](https://www.notion.so/), create a page as the main entry (For example `Readings` page), and enable Notion `Integration` for this page
 
-## Create Environment File
-Copy `.env.template` to `build/.env`, and fill up the environment vars:
-* `NOTION_TOKEN`: The `Integration` token
-* `NOTION_ENTRY_PAGE_ID`: Notion page id
+## [Backend] Create Environment File
+Checkout the repo and copy `.env.template` to `build/.env`, then fill up the environment vars:
+* `NOTION_TOKEN`
+* `NOTION_ENTRY_PAGE_ID`
 * `OPENAI_API_KEY`
 * [Optional] Vars with `TWITTER_` prefix
 
-## Build Services
+## [Backend] Build Services
 ```bash
 make deps && make build && make deploy && make init
 ```
 
-## Start Services
+## [Backend] Start Services
 ```bash
 make start
 ```
 
 Now, the services are up and running, it will pull sources every hour.
 
-## Set up Notion Tweet and RSS list
+## [UI] Set up Notion Tweet and RSS list
 
-Go to notion page we created before, we would see the following folder structure has been created automatically:
+Go to Notion entry page we created before, and we will see the following folder structure has been created automatically:
 ```bash
-Reading
-├── inbox
-│   ├── Inbox-Article
-│   └── Inbox-YouTube
-├── index
-│   ├── Index-Inbox
-│   ├── Index-ToRead
+Readings
+├── Inbox
+│   ├── Inbox - Article
+│   └── Inbox - YouTube
+├── Index
+│   ├── Index - Inbox
+│   ├── Index - ToRead
 │   ├── RSS_List
 │   └── Tweet_List
-└── toread
+└── ToRead
     └── ToRead
 ```
 
@@ -88,9 +88,11 @@ Reading
 
 
 ## [UI] Set up Notion database views
-Go to Notion, and create the database views for different sources, e.g. Tweets, Articles, YouTube, RSS, etc
+Go to Notion `ToRead` database page, all the data will flow into this database later on, create the database views for different sources to help us organize flows easier. E.g. Tweets, Articles, YouTube, RSS, etc
 
-## Control Panel
+Now, enjoy and have fun.
+
+## [Monitoring] Control Panel
 For troubleshooting, we can use the URLs below to access the services and check the logs and data
 
 | Service | Role            | Panel URL             |
@@ -99,8 +101,8 @@ For troubleshooting, we can use the URLs below to access the services and check 
 | Milvus  | Vector Database | http://localhost:9100 |
 | Adminer | DB accessor     | http://localhost:8070 |
 
-## Stop/Restart Services
-In case need to stop or restart, use one of the following command
+## [Operation] Stop/Restart Services
+In case we need to stop or restart services, use one of the following commands
 
 ```bash
 make stop
