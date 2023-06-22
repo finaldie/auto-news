@@ -22,7 +22,7 @@ include install.env
 
 docker-network:
 	@echo "creating docker network for bot..."
-ifeq ($(shell docker network ls -f name=$(BOT_NETWORK_NAME) -q | wc -l), 0)
+ifeq ($(shell docker network ls -f name=$(BOT_NETWORK_NAME) -q | wc -l | awk '{$1=$1;print}'), 0)
 	docker network create $(BOT_NETWORK_NAME)
 else
 	@echo "docker network $(BOT_NETWORK_NAME) already exist, skip"
