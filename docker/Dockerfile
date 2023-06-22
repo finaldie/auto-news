@@ -1,4 +1,4 @@
-FROM apache/airflow:2.6.1-python3.10
+FROM apache/airflow:2.6.2-python3.10
 
 # keep them same as docker-compose volume path
 VOLUME /opt/airflow
@@ -32,8 +32,6 @@ RUN set -ex; \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /root/.cache/*
 
-# The tradingbot will be placed at /opt/airflow/run/tradingbot,
-# add it to git safe.directory first, so root user can operate as well
 RUN set -ex; \
   git config --global --add safe.directory /opt/airflow/run/auto-news \
   && git config --global pull.ff only
@@ -54,6 +52,10 @@ RUN set -ex; \
 
 # switch to airflow user in order to install python packages
 USER airflow
+
+RUN set -ex; \
+  git config --global --add safe.directory /opt/airflow/run/auto-news \
+  && git config --global pull.ff only
 
 # create a soft link ~/airflow -> /opt/airflow
 # create a symbol link for airflow user as well

@@ -1,22 +1,28 @@
 help:
 	@echo "Usage:"
+	@echo "\_ make deps"
+	@echo "\_ make build"
+	@echo "\_ make deploy"
+	@echo "\_ make init"
 	@echo "\_ make start"
 	@echo "\_ make stop"
+	@echo "\_ make push_dags"
+	@echo "\_ make enable_dags"
+	@echo "\_ make test"
 	@echo "\_ make logs"
+	@echo "\_ make ps"
+	@echo "\_ make info"
 	@echo "\_ make clean"
 
 topdir := $(shell pwd)
 build_dir := $(topdir)/build
 
+export WORKSPACE=$(topdir)/workspace
 include install.env
 
 docker-network:
-	@echo "creating docker network for bot..."
-ifeq ($(shell docker network ls -f name=$(BOT_NETWORK_NAME) -q | wc -l), 0)
-	docker network create $(BOT_NETWORK_NAME)
-else
-	@echo "docker network $(BOT_NETWORK_NAME) already exist, skip"
-endif
+	@echo "creating docker network: $(BOT_NETWORK_NAME)..."
+	docker network inspect $(BOT_NETWORK_NAME) >/dev/null 2>&1 || docker network create $(BOT_NETWORK_NAME)
 
 prepare-env:
 	@echo "**************************************************************"
@@ -24,12 +30,15 @@ prepare-env:
 	@echo "**************************************************************"
 	@echo "topdir: $(topdir)"
 	@echo "creating building folder: $(build_dir)"
+	@echo "WORKSPACE: $(WORKSPACE)"
 	mkdir -p $(build_dir)
 	mkdir -p $(WORKSPACE)
 	chmod -R 777 $(WORKSPACE)
 	@echo "creating environment files..."
-	cp .env.template $(build_dir)/.env
-	echo "HOSTNAME=`hostname`" >> $(build_dir)/.env
+	if [ ! -f $(build_dir)/.env ]; then \
+		cp .env.template $(build_dir)/.env; \
+		echo "HOSTNAME=`hostname`" >> $(build_dir)/.env; \
+	fi
 	chmod -R 777 $(build_dir)
 
 

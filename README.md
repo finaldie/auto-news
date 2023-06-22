@@ -31,7 +31,7 @@ The Auto-News was born for the following goals:
 ## System Requirements
 - Backend
   - [x] Linux
-  - [ ] MacOS
+  - [x] MacOS
 - UI (Notion)
   - [x] Cross-platform (Web browser, iOS/Android app)
 
@@ -56,8 +56,7 @@ Copy `.env.template` to `build/.env`, and fill up the environment vars:
 
 ## Build Services
 ```bash
-sudo make deps
-make build
+make deps && make build && make deploy && make init
 ```
 
 ## Start Services
@@ -94,7 +93,16 @@ Go to Notion, and create the database views for different sources, e.g. Tweets, 
 ## Control Panel
 For troubleshooting, we can use the URLs below to access the services and check the logs and data
 
-| Service | Responsibility  | Panel URL             |
+| Service | Role            | Panel URL             |
 | ---     | ---             | ---                   |
 | Airflow | Orchestration   | http://localhost:8080 |
 | Milvus  | Vector Database | http://localhost:9100 |
+| Adminer | DB accessor     | http://localhost:8070 |
+
+## Stop/Restart Services
+In case need to stop or restart, use one of the following command
+
+```bash
+make stop
+make stop && make start
+```
