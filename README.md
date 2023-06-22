@@ -36,16 +36,20 @@ The Auto-News was born for the following goals:
 
 # Installation
 ## Preparison
-* [Required] Notion token
+* [Required] Notion token ([Integration](https://www.notion.so/my-integrations))
 * [Required] OpenAI token
 * [Required] Docker
 * [Optional] Notion web clipper browser extension
 * [Optional] Twitter token
 
+## Create Notion Entry Page
+
+Go to [Notion](https://www.notion.so/), create a page (For example `Readings`) and enable notion `Integration` for this page
+
+## Create Environment File
 Copy `.env.template` to `build/.env`, and fill up the environment vars:
-* `NOTION_TOKEN`
-* `NOTION_DATABASE_ID_INDEX_INBOX`
-* `NOTION_DATABASE_ID_INDEX_TOREAD`
+* `NOTION_TOKEN`: The `Integration` token
+* `NOTION_ENTRY_PAGE_ID`: Notion page id
 * `OPENAI_API_KEY`
 * [Optional] Vars with `TWITTER_` prefix
 
@@ -55,12 +59,28 @@ make build
 make start
 ```
 
-After 2 minutes, the services would be started, then enable DAGs:
+Now, the services are up and running, it will pull sources every hour.
+
+## Set up Notion Tweet and RSS list
+
+Go to notion page we created before, we would see the following folder structure has been created automatically:
 ```bash
-make enable_dags
+Reading
+├── inbox
+│   ├── Inbox-Article
+│   └── Inbox-YouTube
+├── index
+│   ├── Index-Inbox
+│   ├── Index-ToRead
+│   ├── RSS_List
+│   └── Tweet_List
+└── toread
+    └── ToRead
 ```
 
-Now, the services are up and running, it will pull sources every hour.
+- Go to `RSS_List` page, and fill the RSS name and URL
+- Go to `Tweet_List` page, and fill the Tweet screen names
+
 
 ## Set up Notion database views
 Go to Notion, and create the database views for different sources, e.g. Tweets, Articles, YouTube, RSS, etc

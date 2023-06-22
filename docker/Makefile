@@ -41,10 +41,6 @@ deploy-milvus:
 	mkdir -p $(MILVUS_PROJ_DIR)/volumes
 	@echo "Milvus deployment finished"
 
-deploy-obsidian:
-	@echo "Create link for obsidian folder"
-	ln -snf $(obsidian_dir) $(AIRFLOW_PROJ_DIR)/data/obsidian
-
 post-deploy:
 
 init-airflow:
