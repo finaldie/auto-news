@@ -344,16 +344,29 @@ class OperatorTwitter(OperatorBase):
         print("#####################################################")
         print("# Filter Tweets (After Scoring)")
         print("#####################################################")
-        min_score = kwargs.setdefault("min_score", 3.5)
-        print(f"Min_score: {min_score}")
+        default_min_score = kwargs.setdefault("min_score", 3.5)
+        print(f"Default min_score: {default_min_score}")
 
         # 1. filter all score >= min_score
         filtered = {}
         tot = 0
         cnt = 0
 
+        min_score_param: str = os.getenv("TWITTER_FILTER_MIN_SCORES")
+        min_scores: list = min_score_param.split(",")
+
+        min_scores_dict: dict = {}
+        for data in min_scores:
+            list_name = data.split(":")[0]
+            min_score = data.split(":")[1]
+
+            min_scores_dict[list_name] = min_score
+            print(f"Parsed min_score: list_name: {list_name}, min_score: {min_score}")
+
         for list_name, tweets in pages.items():
             filtered_pages = filtered.setdefault(list_name, [])
+            min_score = min_scores_dict.get(list_name) or default_min_score
+            print(f"Filter list_name: {list_name}, min_score: {min_score}")
 
             for page in tweets:
                 relevant_score = page["__relevant_score"]
