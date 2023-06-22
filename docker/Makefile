@@ -8,6 +8,7 @@ deploy-code:
 	if [ ! -d $(BOT_HOME) ]; then \
 		mkdir -p $(AIRFLOW_PROJ_DIR)/run; \
 		cd $(AIRFLOW_PROJ_DIR)/run && git clone https://github.com/finaldie/auto-news.git; \
+		chmod -R 777 $(BOT_HOME); \
 	fi
 	echo "Deploying code done"
 
@@ -18,6 +19,7 @@ deploy-airflow: deploy-code
 	@echo "Assembling Airflow ..."
 	mkdir -p $(AIRFLOW_PROJ_DIR)
 	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs plugins run data
+	cd $(AIRFLOW_PROJ_DIR) && chmod -R 777 run/ data/
 	@echo "Airflow deployment finished"
 
 deploy-postgres:
