@@ -69,7 +69,7 @@ with DAG(
     # schedule_interval=timedelta(minutes=60),
     schedule_interval="30 2 */1 * *",  # At 02:30 everyday
     # schedule_interval=None,
-    start_date=days_ago(0, hour=1),
+    start_date=days_ago(1),
     tags=['NewsBot'],
 ) as dag:
 
