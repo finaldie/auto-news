@@ -47,7 +47,7 @@ with DAG(
     # schedule_interval="1 * * * *",  # At minute 01 every hour
     schedule_interval=None,
     # schedule_interval='@hourly',
-    # start_date=days_ago(0, hour=1),
+    start_date=days_ago(1),
     tags=['NewsBot'],
 ) as dag:
 

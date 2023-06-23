@@ -87,6 +87,7 @@ enable_dags:
 	docker-compose run airflow-cli airflow dags unpause news_pulling
 	docker-compose run airflow-cli airflow dags unpause sync_dist
 	docker-compose run airflow-cli airflow dags unpause collection_weekly
+	docker-compose run airflow-cli airflow dags unpause upgrade
 
 push_dags:
 	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags

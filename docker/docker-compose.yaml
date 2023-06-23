@@ -312,6 +312,7 @@ services:
         airflow dags unpause news_pulling
         airflow dags unpause sync_dist
         airflow dags unpause collection_weekly
+        airflow dags unpause upgrade
         echo "Enable DAGs finished"
     environment:
       <<: *airflow-common-env
