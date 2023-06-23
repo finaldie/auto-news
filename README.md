@@ -120,5 +120,5 @@ make stop && make init && make start
 
 ### Upgrade to the latest code
 ```bash
-make stop && make upgrade && make init && make start
+make upgrade && make stop && make init && make start
 ```
