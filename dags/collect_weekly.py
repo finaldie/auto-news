@@ -129,6 +129,6 @@ with DAG(
         '--prefix=./run ',
     )
 
-    t0 >> br
+    # t0 >> br
     br >> t1 >> t2 >> t3 >> t4 >> t5
     br >> t5

@@ -307,6 +307,7 @@ services:
         python3 ~/airflow/run/auto-news/src/notion_init.py
         echo "Creating notion entry pages finished"
         echo "----"
+        sleep 5
         echo "Enable DAGs..."
         airflow dags unpause news_pulling
         airflow dags unpause sync_dist

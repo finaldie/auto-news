@@ -101,10 +101,24 @@ For troubleshooting, we can use the URLs below to access the services and check 
 | Milvus  | Vector Database | http://localhost:9100 |
 | Adminer | DB accessor     | http://localhost:8070 |
 
-## [Operation] Stop/Restart Services
-In case we need to stop or restart services, use one of the following commands
+## Operations
+In case we want, apply the follow commands from the codebase folder
 
+### Stop/Restart Services
 ```bash
+# stop
 make stop
+
+# restart
 make stop && make start
+```
+
+### Redeploy `.env` and DAGs
+```bash
+make stop && make init && make start
+```
+
+### Upgrade to the latest code
+```bash
+make stop && make upgrade && make init && make start
 ```

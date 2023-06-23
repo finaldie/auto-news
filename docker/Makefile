@@ -80,6 +80,9 @@ info:
 	docker-compose run airflow-cli airflow info
 	docker-compose run airflow-cli airflow dags list
 
+upgrade:
+	docker-compose run airflow-cli airflow dags trigger upgrade
+
 enable_dags:
 	docker-compose run airflow-cli airflow dags unpause news_pulling
 	docker-compose run airflow-cli airflow dags unpause sync_dist
