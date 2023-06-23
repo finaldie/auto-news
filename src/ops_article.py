@@ -138,7 +138,7 @@ class OperatorArticle(OperatorBase):
             content = page["content"]
             source_url = page["source_url"]
             print(f"Summarying page, title: {title}")
-            print(f"Page content ({len(content)} chars): {content}")
+            print(f"Page content ({len(content)} chars): {content[:200]}...")
 
             st = time.time()
 
