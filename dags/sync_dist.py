@@ -51,11 +51,6 @@ with DAG(
     tags=['NewsBot'],
 ) as dag:
 
-    t0 = BashOperator(
-        task_id='git_pull',
-        bash_command='cd ~/airflow/run/auto-news && git pull && git log -1',
-    )
-
     t1 = BashOperator(
         task_id='start',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_start.py --start {{ ds }} --prefix=./run',
@@ -109,5 +104,4 @@ with DAG(
         '--prefix=./run ',
     )
 
-    # t0 >> t1 >> t2 >> t3 >> t4 >> t5 >> t6
     t1 >> t2 >> t3 >> t4 >> t5 >> t6
