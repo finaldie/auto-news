@@ -358,7 +358,7 @@ class OperatorTwitter(OperatorBase):
         min_scores_dict: dict = {}
         for data in min_scores:
             list_name = data.split(":")[0]
-            min_score = data.split(":")[1]
+            min_score = float(data.split(":")[1])
 
             min_scores_dict[list_name] = min_score
             print(f"Parsed min_score: list_name: {list_name}, min_score: {min_score}")
