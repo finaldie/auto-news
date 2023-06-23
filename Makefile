@@ -92,7 +92,14 @@ test:
 	cd docker && docker-compose run airflow-init-user
 
 upgrade:
+	@echo "###########################"
+	@echo "[ops] Upgrading started"
+	@echo "###########################"
 	cd docker && make upgrade topdir=$(topdir)
+	sleep 10
+	@echo "###########################"
+	@echo "[ops] Upgrading completed"
+	@echo "###########################"
 
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags
 .PHONY: test upgrade enable_dags info ps help prepare-env docker-network
