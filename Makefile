@@ -6,9 +6,12 @@ help:
 	@echo "\_ make init"
 	@echo "\_ make start"
 	@echo "\_ make stop"
+	@echo "\_ make upgrade"
+	@echo "\_ make deploy-env"
 	@echo "\_ make push_dags"
 	@echo "\_ make enable_dags"
 	@echo "\_ make test"
+	@echo "\_ make docker-network"
 	@echo "\_ make logs"
 	@echo "\_ make ps"
 	@echo "\_ make info"
@@ -57,7 +60,7 @@ deploy-env:
 
 deploy: deploy-airflow deploy-env
 
-init:
+init: deploy-env
 	cd docker && make init topdir=$(topdir)
 
 start: docker-network
@@ -88,4 +91,15 @@ push_dags:
 test:
 	cd docker && docker-compose run airflow-init-user
 
+upgrade:
+	@echo "###########################"
+	@echo "[ops] Upgrading started"
+	@echo "###########################"
+	cd docker && make upgrade topdir=$(topdir)
+	sleep 10
+	@echo "###########################"
+	@echo "[ops] Upgrading completed"
+	@echo "###########################"
+
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags
+.PHONY: test upgrade enable_dags info ps help prepare-env docker-network

@@ -285,6 +285,7 @@ services:
       <<: *airflow-common-env
       CONNECTION_CHECK_MAX_COUNT: "0"
     # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
+    user: "${AIRFLOW_UID:-50000}:0"
     command:
       - bash
       - -c
@@ -307,10 +308,12 @@ services:
         python3 ~/airflow/run/auto-news/src/notion_init.py
         echo "Creating notion entry pages finished"
         echo "----"
+        sleep 5
         echo "Enable DAGs..."
         airflow dags unpause news_pulling
         airflow dags unpause sync_dist
         airflow dags unpause collection_weekly
+        airflow dags unpause upgrade
         echo "Enable DAGs finished"
     environment:
       <<: *airflow-common-env
