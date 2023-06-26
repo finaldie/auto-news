@@ -10,9 +10,9 @@ See this [Blog post](https://finaldie.com/blog/auto-news-an-automated-news-aggre
 The Auto-News was born for the following goals:
 - Automatically pull feed sources, including RSS and Tweets.
 - Support clip content from source directly, later generate summary and translation, including random web articles, YouTube videos
-- Filter content based on personal interests and remove noises
+- Filter content based on personal interests and remove 80%+ noises
 - A unified/central reading experience (e.g., RSS reader-like style, Notion based)
-- Weekly/Monthly top-k aggregations (nice to have)
+- Weekly/Monthly top-k aggregations
 
 
 ![image](https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639)
