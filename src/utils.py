@@ -162,7 +162,7 @@ def splitSummaryTranslation(text):
     # the translation content may be separated by \n\n instead of ===
     chunks = summary.split("\n\n")
     if len(chunks) > 1:
-        summary = chunks[0]
+        summary = chunks[0].strip()
 
         for i in range(1, len(chunks)):
             translation += chunks[i].strip() + "\n"
