@@ -157,8 +157,19 @@ def splitSummaryTranslation(text):
 
     summary = res[0].strip()
     translation = ""
-    for i in range(1, len(res)):
-        translation += res[i].strip() + "\n"
+
+    # Notes: LLM may not be reliable for separating chunks, sometimes
+    # the translation content may be separated by \n\n instead of ===
+    chunks = summary.split("\n\n")
+    if len(chunks) > 1:
+        summary = chunks[0].strip()
+
+        for i in range(1, len(chunks)):
+            translation += chunks[i].strip() + "\n"
+
+    if not translation:
+        for i in range(1, len(res)):
+            translation += res[i].strip() + "\n"
 
     return summary, translation
 
