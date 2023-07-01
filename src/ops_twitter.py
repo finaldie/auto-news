@@ -15,6 +15,7 @@ from ops_base import OperatorBase
 from db_cli import DBClient
 from ops_milvus import OperatorMilvus
 from ops_notion import OperatorNotion
+from ops_stats import OpsStats
 
 
 class OperatorTwitter(OperatorBase):
@@ -251,6 +252,8 @@ class OperatorTwitter(OperatorBase):
         print(f"Targets: {targets}")
         print(f"input data: {data}")
 
+        stats = {}
+
         for target in targets:
             print(f"Pushing data to target: {target} ...")
 
@@ -274,8 +277,11 @@ class OperatorTwitter(OperatorBase):
                     break
 
                 for list_name, tweets in data.items():
+                    stat = stats.setdefault(list_name, {"total": 0, "error": 0})
+
                     for ranked_tweet in tweets:
                         tot += 1
+                        stat["total"] += 1
 
                         try:
                             self._push_to_read_notion(
@@ -289,12 +295,14 @@ class OperatorTwitter(OperatorBase):
                         except Exception as e:
                             print(f"[ERROR]: Push to notion failed, skip: {e}")
                             err += 1
+                            stat["error"] += 1
                             traceback.print_exc()
 
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
 
             print(f"Push Tweets to notion finished, total: {tot}, err: {err}")
+            return stats
 
     def score(self, data, **kwargs):
         print("#####################################################")
@@ -459,3 +467,34 @@ class OperatorTwitter(OperatorBase):
 
             for key, count in rank_stats[list_name].items():
                 print(f"{list_name} - {key}: {count}")
+
+    def createStats(
+        self,
+        data_input,
+        data_deduped=None,
+        data_scored=None,
+        data_filtered=None,
+        data_ranked=None,
+        pushed_stats=None
+    ):
+        stats = {}
+
+        data_dict = {
+            "total_input": data_input,
+            "post_deduping": data_deduped,
+            "post_scoring": data_scored,
+            "post_filtering": data_filtered,
+            "total_pushed": data_ranked,
+        }
+
+        for list_name, items in data_input.items():
+            stats[list_name] = OpsStats("Twitter", list_name)
+
+        for counter_name, data in data_dict.items():
+            for list_name, items in data.items():
+                stats[list_name].getCounter(counter_name).set(len(items))
+
+        for list_name, stat in pushed_stats.items():
+            stats[list_name].getCounter("total_pushed").set(stat["total"])
+
+        return [stats[x] for x in stats]

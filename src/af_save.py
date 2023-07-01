@@ -68,11 +68,18 @@ def process_twitter(args):
 
     data_filtered = op.filter(data_scored, min_score=4)
 
-    data_ranked = op.rank(data_filtered, min_score=args.min_score_to_rank)
+    data_ranked = op.rank(
+        data_filtered, min_score=args.min_score_to_rank)
 
     targets = args.targets.split(",")
-    op.push(data_ranked, targets, args.topics_top_k, args.categories_top_k)
+    pushed_stats = op.push(
+        data_ranked, targets, args.topics_top_k, args.categories_top_k)
+
+    # Print and create stats
     op.printStats("Twitter", data, data_deduped, data_ranked)
+    return op.createStats(
+        data, data_deduped, data_scored, data_filtered, data_ranked,
+        pushed_stats)
 
 
 def process_article(args):
@@ -87,7 +94,16 @@ def process_article(args):
     data_ranked = op.rank(data_summarized)
 
     targets = args.targets.split(",")
-    op.push(data_ranked, targets)
+    pushed_stats = op.push(data_ranked, targets)
+
+    return op.createStats(
+        "Article",
+        "",
+        data,
+        data_deduped=data_deduped,
+        data_summarized=data_summarized,
+        data_ranked=data_ranked,
+        pushed_stats=pushed_stats)
 
 
 def process_youtube(args):
@@ -108,7 +124,16 @@ def process_youtube(args):
     data_ranked = op.rank(data_summarized)
 
     targets = args.targets.split(",")
-    op.push(data_ranked, targets)
+    pushed_stats = op.push(data_ranked, targets)
+
+    return op.createStats(
+        "YouTube",
+        "",
+        data,
+        data_deduped=data_deduped,
+        data_summarized=data_summarized,
+        data_ranked=data_ranked,
+        pushed_stats=pushed_stats)
 
 
 def process_rss(args):
@@ -136,28 +161,45 @@ def process_rss(args):
     data_summarized = op.summarize(data_filtered)
 
     targets = args.targets.split(",")
-    op.push(data_summarized, targets)
+    pushed_stats = op.push(data_summarized, targets)
+
+    return op.createStats(
+        "RSS",
+        "",
+        data,
+        data_deduped=data_deduped,
+        data_scored=data_scored,
+        data_filtered=data_filtered,
+        data_summarized=data_summarized,
+        pushed_stats=pushed_stats)
 
 
 def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
+    stats = []
 
     for source in sources:
         print(f"Pushing data for source: {source} ...")
 
         # Notes: For twitter we don't need summary step
         if source == "Twitter":
-            process_twitter(args)
+            stat = process_twitter(args)
 
         elif source == "Article":
-            process_article(args)
+            stat = process_article(args)
 
         elif source == "Youtube":
-            process_youtube(args)
+            stat = process_youtube(args)
 
         elif source == "RSS":
-            process_rss(args)
+            stat = process_rss(args)
+
+        stats.extend(stat)
+
+    # Print stats
+    for stat in stats:
+        stat.print()
 
 
 if __name__ == "__main__":

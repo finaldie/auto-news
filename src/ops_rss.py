@@ -406,6 +406,10 @@ class OperatorRSS(OperatorBase):
         print(f"Targets: {targets}")
         print(f"Top-K: {topk}")
         print(f"input data: {pages}")
+        stat = {
+            "total": 0,
+            "error": 0,
+        }
 
         for target in targets:
             print(f"Pushing data to target: {target} ...")
@@ -428,6 +432,8 @@ class OperatorRSS(OperatorBase):
                     break
 
                 for page in pages:
+                    stat["total"] += 1
+
                     try:
                         page_id = page["id"]
                         list_name = page["list_name"]
@@ -453,7 +459,10 @@ class OperatorRSS(OperatorBase):
 
                     except Exception as e:
                         print(f"[ERROR]: Push to notion failed, skip: {e}")
+                        stat["error"] += 1
                         traceback.print_exc()
 
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
+
+        return stat

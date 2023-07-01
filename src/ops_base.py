@@ -5,6 +5,7 @@ import utils
 from db_cli import DBClient
 from notion import NotionAgent
 from ops_notion import OperatorNotion
+from ops_stats import OpsStats
 
 
 class OperatorBase:
@@ -254,3 +255,38 @@ class OperatorBase:
                 source, list_name, last_edited_time, overwrite=True)
 
             print(f"Update Last edited time curr: {curr_edited_time}, set to {last_edited_time}")
+
+    def createStats(
+        self,
+        source: str,
+        category: str,
+        data_input: dict,
+        data_deduped=None,
+        data_summarized=None,
+        data_scored=None,
+        data_filtered=None,
+        data_ranked=None,
+        pushed_stats=None
+    ):
+        data_dict = {
+            "total_input": data_input,
+            "post_deduping": data_deduped,
+            "post_summary": data_summarized,
+            "post_scoring": data_scored,
+            "post_filtering": data_filtered,
+            "total_pushed": data_ranked,
+        }
+
+        stat = OpsStats(source, category)
+
+        for counter_name, data in data_dict.items():
+            if not data:
+                continue
+
+            if isinstance(data, dict):
+                stat.getCounter(counter_name).set(len(data.keys()))
+            elif isinstance(data, list):
+                stat.getCounter(counter_name).set(len(data))
+
+        stat.getCounter("total_pushed").set(pushed_stats["total"])
+        return [stat]

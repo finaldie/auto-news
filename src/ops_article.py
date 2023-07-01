@@ -273,6 +273,11 @@ class OperatorArticle(OperatorBase):
         print(f"Top-K: {topk}")
         print(f"input data: {ranked_data}")
 
+        stat = {
+            "total": 0,
+            "error": 0,
+        }
+
         for target in targets:
             print(f"Pushing data to target: {target} ...")
 
@@ -293,6 +298,8 @@ class OperatorArticle(OperatorBase):
                     break
 
                 for ranked_page in ranked_data:
+                    stat["total"] += 1
+
                     try:
                         page_id = ranked_page["id"]
                         title = ranked_page["title"]
@@ -338,6 +345,9 @@ class OperatorArticle(OperatorBase):
                     except Exception as e:
                         print(f"[ERROR]: Push to notion failed, skip: {e}")
                         traceback.print_exc()
+                        stat["error"] += 1
 
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
+
+        return stat
