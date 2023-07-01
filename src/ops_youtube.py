@@ -333,6 +333,10 @@ class OperatorYoutube(OperatorBase):
         print(f"Targets: {targets}")
         print(f"Top-K: {topk}")
         print(f"input data: {ranked_data}")
+        stat = {
+            "total": 0,
+            "error": 0,
+        }
 
         for target in targets:
             print(f"Pushing data to target: {target} ...")
@@ -355,6 +359,8 @@ class OperatorYoutube(OperatorBase):
                     break
 
                 for ranked_page in ranked_data:
+                    stat["total"] += 1
+
                     try:
                         page_id = ranked_page["id"]
                         title = ranked_page.get("__title") or ranked_page["title"]
@@ -384,7 +390,10 @@ class OperatorYoutube(OperatorBase):
 
                     except Exception as e:
                         print(f"[ERROR]: Push to notion failed, skip: {e}")
+                        stat["error"] += 1
                         traceback.print_exc()
 
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
+
+        return stat
