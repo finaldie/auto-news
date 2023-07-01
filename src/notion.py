@@ -1386,7 +1386,20 @@ class NotionAgent:
                 "object": "block",
                 "type": "paragraph",
                 "paragraph": {
-                    "rich_text": self._createBlock_RichText(content),
+                    "rich_text": {
+                        "type": "text",
+                        "text": {
+                            "content": content,
+                        },
+                        "annotations": {
+                            "bold": True,
+                            "italic": False,
+                            "strikethrough": False,
+                            "underline": False,
+                            "code": False,
+                            "color": "default",
+                        },
+                    }
                 }
             })
 
@@ -1400,13 +1413,26 @@ class NotionAgent:
                 })
 
         # Weekly take aways
-        take_away_content = "\nTake Aways:"
+        take_away_title = "Take Aways:"
 
         blocks.append({
             "object": "block",
             "type": "paragraph",
             "paragraph": {
-                "rich_text": self._createBlock_RichText(take_away_content),
+                "rich_text": {
+                    "type": "text",
+                    "text": {
+                        "content": take_away_title,
+                    },
+                    "annotations": {
+                        "bold": True,
+                        "italic": False,
+                        "strikethrough": False,
+                        "underline": False,
+                        "code": False,
+                        "color": "default",
+                    },
+                }
             }
         })
 
