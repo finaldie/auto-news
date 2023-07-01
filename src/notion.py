@@ -1400,7 +1400,7 @@ class NotionAgent:
                 })
 
         # Weekly take aways
-        take_away_content = "Take aways:"
+        take_away_content = "\nTake Aways:"
 
         blocks.append({
             "object": "block",
@@ -1422,13 +1422,14 @@ class NotionAgent:
                 }
             })
 
-            blocks.append({
-                "type": "link_to_page",
-                "link_to_page": {
-                    "type": "page_id",
-                    "page_id": page['id'],
-                }
-            })
+            # Uncomment below if need append the link
+            # blocks.append({
+            #     "type": "link_to_page",
+            #     "link_to_page": {
+            #         "type": "page_id",
+            #         "page_id": page['id'],
+            #     }
+            # })
 
         return self.createPage(
             {"database_id": database_id},
