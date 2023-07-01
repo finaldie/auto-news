@@ -293,8 +293,7 @@ class OperatorCollection(OperatorBase):
                     collection_source_type,
                     pushing_pages,
                     list(set(topics)),
-                    list(set(categories)),
-                    rating)
+                    list(set(categories)))
 
                 # For collection, we don't need mark as visited,
                 # since we specify the [start, end] range to collect
