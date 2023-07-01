@@ -996,34 +996,47 @@ class NotionAgent:
 
         return properties, blocks
 
-    def _createDatabaseItem_CollectionBase(self, page, **kwargs):
-        """
-        Create page properties and blocks, clone/copy the existing data
-        from page. The page is created via `extractPage()`
-        """
+    def _createDatabaseItem_CollectionBase(
+        self,
+        title,
+        source,
+        topics,
+        categories,
+        **kwargs
+    ):
+        # assemble topics
+        topics_list = [{"name": t} for t in topics]
 
-        append_notion_url = kwargs.setdefault("append_notion_url", True)
+        # assemble category (multi-select)
+        categories_list = [{"name": c} for c in categories]
 
-        # Extract the raw notion property object
-        properties = copy.deepcopy(page["properties"]["properties"])
+        properties = {
+            "Name": {
+                "title": [
+                    {
+                        "text": {
+                            "content": title
+                        }
+                    }
+                ]
+            },
 
-        # need to remove auto filled fields, e.g. last_edited_time and created_time
-        del properties["Last edited time"]
-        del properties["Read"]
-        del properties["Created time"]
-
-        # Get the raw notion block object
-        blocks = [block["__raw"] for bid, block in page["blocks"].items()]
-
-        # append orginal notion url
-        if append_notion_url:
-            blocks.append({
-                "type": "link_to_page",
-                "link_to_page": {
-                    "type": "page_id",
-                    "page_id": page['id']
+            "Source": {
+                "select": {
+                    "name": source,
                 }
-            })
+            },
+
+            "Topic": {
+                "multi_select": topics_list,
+            },
+
+            "Category": {
+                "multi_select": categories_list,
+            },
+        }
+
+        blocks = []
 
         return properties, blocks
 
@@ -1351,27 +1364,103 @@ class NotionAgent:
 
     def createDatabaseItem_ToRead_Collection(
         self,
-        database_id,
-        page,
+        database_id: str,
+        title: str,
+        source: str,
+        pushing_pages: dict,
         topics: list,
         categories: list,
-        rate_number,
+        takeaway_pages: list,
         **kwargs
     ):
-        properties, blocks = self._createDatabaseItem_CollectionBase(
-            page, append_notion_url=True, **kwargs)
+        print(f"[Notion.createDatabaseItem_ToRead_Collection] topics: {topics}, categories: {categories}")
 
-        # Common fields for article, youtube, etc
-        return self._postprocess_ToRead(
+        properties, blocks = self._createDatabaseItem_CollectionBase(
+            title, source, topics, categories, **kwargs)
+
+        # Weekly collections
+        for source, pages in pushing_pages.items():
+            content = f"{source}"
+
+            blocks.append({
+                "object": "block",
+                "type": "heading_3",
+                "heading_3": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": content,
+                        },
+                        "annotations": {
+                            "bold": True,
+                            "italic": False,
+                            "strikethrough": False,
+                            "underline": False,
+                            "code": False,
+                            "color": "blue",
+                        },
+                    }],
+                }
+            })
+
+            for page in pages:
+                blocks.append({
+                    "type": "link_to_page",
+                    "link_to_page": {
+                        "type": "page_id",
+                        "page_id": page['id'],
+                    }
+                })
+
+        # Weekly take aways
+        take_away_title = "Take Aways"
+
+        blocks.append({
+            "object": "block",
+            "type": "heading_3",
+            "heading_3": {
+                "rich_text": [{
+                    "type": "text",
+                    "text": {
+                        "content": take_away_title,
+                    },
+                    "annotations": {
+                        "bold": True,
+                        "italic": False,
+                        "strikethrough": False,
+                        "underline": False,
+                        "code": False,
+                        "color": "blue",
+                    },
+                }],
+            }
+        })
+
+        for page in takeaway_pages:
+            take_aways = self.extractRichText(
+                page["properties"]["properties"]["Take Aways"]["rich_text"])
+
+            blocks.append({
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": self._createBlock_RichText(take_aways),
+                }
+            })
+
+            # Uncomment below if need append the link
+            # blocks.append({
+            #     "type": "link_to_page",
+            #     "link_to_page": {
+            #         "type": "page_id",
+            #         "page_id": page['id'],
+            #     }
+            # })
+
+        return self.createPage(
+            {"database_id": database_id},
             properties,
-            blocks,
-            database_id,
-            page,
-            topics,
-            categories,
-            rate_number,
-            list_names=[page["list_name"]]
-        )
+            blocks)
 
     def createPageComment(
         self,
