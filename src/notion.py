@@ -1386,7 +1386,7 @@ class NotionAgent:
                 "object": "block",
                 "type": "paragraph",
                 "paragraph": {
-                    "rich_text": {
+                    "rich_text": [{
                         "type": "text",
                         "text": {
                             "content": content,
@@ -1399,7 +1399,7 @@ class NotionAgent:
                             "code": False,
                             "color": "default",
                         },
-                    }
+                    }],
                 }
             })
 
@@ -1419,7 +1419,7 @@ class NotionAgent:
             "object": "block",
             "type": "paragraph",
             "paragraph": {
-                "rich_text": {
+                "rich_text": [{
                     "type": "text",
                     "text": {
                         "content": take_away_title,
@@ -1432,7 +1432,7 @@ class NotionAgent:
                         "code": False,
                         "color": "default",
                     },
-                }
+                }],
             }
         })
 
