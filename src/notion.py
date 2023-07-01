@@ -1372,6 +1372,8 @@ class NotionAgent:
         categories: list,
         **kwargs
     ):
+        print(f"[Notion.createDatabaseItem_ToRead_Collection] topics: {topics}, categories: {categories}")
+
         properties, blocks = self._createDatabaseItem_CollectionBase(
             title, source, topics, categories, **kwargs)
 
