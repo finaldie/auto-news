@@ -1380,12 +1380,12 @@ class NotionAgent:
 
         # Weekly collections
         for source, pages in pushing_pages.items():
-            content = f"{source}:"
+            content = f"{source}"
 
             blocks.append({
                 "object": "block",
-                "type": "paragraph",
-                "paragraph": {
+                "type": "heading_3",
+                "heading_3": {
                     "rich_text": [{
                         "type": "text",
                         "text": {
@@ -1397,7 +1397,7 @@ class NotionAgent:
                             "strikethrough": False,
                             "underline": False,
                             "code": False,
-                            "color": "default",
+                            "color": "blue",
                         },
                     }],
                 }
@@ -1413,12 +1413,12 @@ class NotionAgent:
                 })
 
         # Weekly take aways
-        take_away_title = "Take Aways:"
+        take_away_title = "Take Aways"
 
         blocks.append({
             "object": "block",
-            "type": "paragraph",
-            "paragraph": {
+            "type": "heading_3",
+            "heading_3": {
                 "rich_text": [{
                     "type": "text",
                     "text": {
@@ -1430,7 +1430,7 @@ class NotionAgent:
                         "strikethrough": False,
                         "underline": False,
                         "code": False,
-                        "color": "default",
+                        "color": "blue",
                     },
                 }],
             }
