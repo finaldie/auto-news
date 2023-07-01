@@ -55,10 +55,12 @@ def process_collection(args, op):
 
     data_filtered = op.post_filter(data_scored, min_score=args.min_rating, k=args.top_k)
 
-    return data_filtered
+    takeaway_pages = op.get_takeaway_pages(data)
+
+    return data_filtered, takeaway_pages
 
 
-def publish(args, op, data, targets):
+def publish(args, op, data, takeaway_pages, targets):
     """
     Push to targets
     """
@@ -66,7 +68,7 @@ def publish(args, op, data, targets):
     print(f"# Data publish, target: {targets}, start_date: {args.start}")
     print("#####################################################")
 
-    op.push(data, targets, collection_type=args.collection_type, start_date=args.start)
+    op.push(data, takeaway_pages, targets, collection_type=args.collection_type, start_date=args.start)
 
 
 def run(args):
@@ -80,8 +82,8 @@ def run(args):
     print(f"sources: {sources}, targets: {targets}, exec_date: {exec_date}, workdir: {workdir}, dedup: {dedup}")
 
     op = OperatorCollection()
-    data_scored = process_collection(args, op)
-    publish(args, op, data_scored, targets)
+    data_scored, takeaway_pages = process_collection(args, op)
+    publish(args, op, data_scored, takeaway_pages, targets)
 
 
 if __name__ == "__main__":

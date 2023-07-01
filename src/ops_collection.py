@@ -117,6 +117,22 @@ class OperatorCollection(OperatorBase):
         print(f"Filter output size: {len(filtered1)}")
         return filtered1
 
+    def get_takeaway_pages(self, pages, **kwargs):
+        notion_api_key = os.getenv("NOTION_TOKEN")
+        notion_agent = NotionAgent(notion_api_key)
+        takeaway_pages = []
+
+        for page in pages:
+            take_aways = notion_agent.extractRichText(
+                page["properties"]["properties"]["Take Aways"]["rich_text"])
+
+            if not take_aways:
+                continue
+
+            takeaway_pages.append(page)
+
+        return takeaway_pages
+
     def post_filter(self, pages, **kwargs):
         """
         Post filter all pages with relevant score >= min_score
@@ -217,11 +233,12 @@ class OperatorCollection(OperatorBase):
         print(f"Scored_pages ({len(scored_list)}): {scored_list}")
         return scored_list
 
-    def push(self, pages, targets, **kwargs):
+    def push(self, pages, takeaway_pages, targets, **kwargs):
         print("#####################################################")
         print("# Push Collection Pages")
         print("#####################################################")
         print(f"Number of pages: {len(pages)}")
+        print(f"Number of takeaway pages: {len(takeaway_pages)}")
         print(f"Targets: {targets}")
         print(f"Input data: {pages}")
 
@@ -255,7 +272,7 @@ class OperatorCollection(OperatorBase):
                     break
 
                 # collect metadata from pages
-                pushing_pages = []
+                pushing_pages = {}
                 topics = []
                 categories = []
 
@@ -276,7 +293,9 @@ class OperatorCollection(OperatorBase):
                         rating = float(pushing_page.get("user_rating")) or -3
 
                         print(f"Pushing page: {title}, source: {source}, {pushing_page}, user rating: {rating}")
-                        pushing_pages.append(pushing_page)
+                        pushing_pages.setdefault(source, [])
+
+                        pushing_pages[source].append(pushing_page)
                         topics.extend(topics_topk)
                         categories.extend(categories_topk)
 
@@ -293,7 +312,8 @@ class OperatorCollection(OperatorBase):
                     collection_source_type,
                     pushing_pages,
                     list(set(topics)),
-                    list(set(categories)))
+                    list(set(categories)),
+                    takeaway_pages)
 
                 # For collection, we don't need mark as visited,
                 # since we specify the [start, end] range to collect

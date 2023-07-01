@@ -1367,9 +1367,10 @@ class NotionAgent:
         database_id: str,
         title: str,
         source: str,
-        pages: list,
+        pushing_pages: dict,
         topics: list,
         categories: list,
+        takeaway_pages: list,
         **kwargs
     ):
         print(f"[Notion.createDatabaseItem_ToRead_Collection] topics: {topics}, categories: {categories}")
@@ -1377,8 +1378,50 @@ class NotionAgent:
         properties, blocks = self._createDatabaseItem_CollectionBase(
             title, source, topics, categories, **kwargs)
 
-        # Fill additional blocks
-        for page in pages:
+        # Weekly collections
+        for source, pages in pushing_pages.items():
+            content = f"{source}:"
+
+            blocks.append({
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": self._createBlock_RichText(content),
+                }
+            })
+
+            for page in pages:
+                blocks.append({
+                    "type": "link_to_page",
+                    "link_to_page": {
+                        "type": "page_id",
+                        "page_id": page['id'],
+                    }
+                })
+
+        # Weekly take aways
+        take_away_content = "Take aways:"
+
+        blocks.append({
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": self._createBlock_RichText(take_away_content),
+            }
+        })
+
+        for page in takeaway_pages:
+            take_aways = self.extractRichText(
+                page["properties"]["properties"]["Take Aways"]["rich_text"])
+
+            blocks.append({
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": self._createBlock_RichText(take_aways),
+                }
+            })
+
             blocks.append({
                 "type": "link_to_page",
                 "link_to_page": {
