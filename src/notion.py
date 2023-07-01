@@ -1036,7 +1036,7 @@ class NotionAgent:
             },
         }
 
-        blocks = {}
+        blocks = []
 
         return properties, blocks
 
