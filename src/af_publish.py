@@ -66,7 +66,7 @@ def publish(args, op, data, targets):
     print(f"# Data publish, target: {targets}, start_date: {args.start}")
     print("#####################################################")
 
-    op.push(data, targets, collection_type=args.collection_type)
+    op.push(data, targets, collection_type=args.collection_type, start_date=args.start)
 
 
 def run(args):
