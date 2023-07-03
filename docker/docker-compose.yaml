@@ -164,7 +164,27 @@ services:
 
   airflow-worker:
     <<: *airflow-common
-    command: celery worker
+    # command: celery worker
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        echo "User: `id`"
+        echo "PWD: `pwd`"
+        echo "=================================================="
+        echo "Upgrade pip packages from requirements-local.txt  "
+        echo "=================================================="
+        if [ -f ~/airflow/run/requirements-local.txt ]; then
+          echo "[pip] Found requirements-local.txt, installing ..."
+          echo "[pip] langchain version (before): `pip list | grep langchain`"
+          pip install --upgrade -r ~/airflow/run/requirements-local.txt
+          echo "[pip] Installation finished"
+          echo "[pip] langchain version (after): `pip list | grep langchain`"
+        fi
+        echo "=================================================="
+        echo "Start airflow worker ...  "
+        echo "=================================================="
+        airflow celery worker
     healthcheck:
       test:
         - "CMD-SHELL"
@@ -179,6 +199,7 @@ services:
       # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
     restart: always
+    user: "${AIRFLOW_UID:-50000}:0"
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -316,16 +337,6 @@ services:
         airflow dags unpause collection_weekly
         airflow dags unpause upgrade
         echo "Enable DAGs finished"
-        echo "=================================================="
-        echo "Upgrade pip packages from requirements-local.txt  "
-        echo "=================================================="
-        if [ -f ~/airflow/run/requirements-local.txt ]; then
-          echo "[pip] Found requirements-local.txt, installing ..."
-          echo "[pip] langchain version (before): `pip list | grep langchain`"
-          pip install --upgrade -r ~/airflow/run/requirements-local.txt
-          echo "[pip] Installation finished"
-          echo "[pip] langchain version (after): `pip list | grep langchain`"
-        fi
     environment:
       <<: *airflow-common-env
     user: "${AIRFLOW_UID:-50000}:0"
