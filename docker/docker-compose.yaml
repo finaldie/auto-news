@@ -298,6 +298,7 @@ services:
     command:
       - -c
       - |
+        echo "User: `id`"
         echo "PWD: `pwd`"
         echo "Apply Database patches..."
         echo "----"
@@ -315,6 +316,16 @@ services:
         airflow dags unpause collection_weekly
         airflow dags unpause upgrade
         echo "Enable DAGs finished"
+        echo "=================================================="
+        echo "Upgrade pip packages from requirements-local.txt  "
+        echo "=================================================="
+        if [ -f ~/airflow/run/requirements-local.txt ]; then
+          echo "[pip] Found requirements-local.txt, installing ..."
+          echo "[pip] langchain version (before): `pip list | grep langchain`"
+          pip install --upgrade -r ~/airflow/run/requirements-local.txt
+          echo "[pip] Installation finished"
+          echo "[pip] langchain version (after): `pip list | grep langchain`"
+        fi
     environment:
       <<: *airflow-common-env
     user: "${AIRFLOW_UID:-50000}:0"
