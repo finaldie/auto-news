@@ -229,7 +229,7 @@ class OperatorTwitter(OperatorBase):
                 else:
                     ranked_tweet["__topics"] = [(x["topic"], x.get("score") or 1) for x in category_and_rank["topics"]]
                     ranked_tweet["__categories"] = [(x["category"], x.get("score") or 1) for x in category_and_rank["topics"]]
-                    ranked_tweet["__rate"] = category_and_rank["overall_score"]
+                    ranked_tweet["__rate"] = category_and_rank["overall_score"] or -0.01
                     ranked_tweet["__feedback"] = category_and_rank.get("feedback") or ""
                     rank += 1
 
