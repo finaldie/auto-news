@@ -1,5 +1,6 @@
 import argparse
 import os
+import traceback
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -41,6 +42,7 @@ def pull_twitter(args, op):
 
     except Exception as e:
         print(f"[ERROR]: Failed in pulling tweets: {e}")
+        traceback.print_exc()
 
     return data
 
@@ -70,6 +72,7 @@ def pull_article(args, op):
 
     except Exception as e:
         print(f"[ERROR]: Failed in pulling articles: {e}")
+        traceback.print_exc()
 
     return data
 
@@ -96,6 +99,7 @@ def pull_youtube(args, op):
 
     except Exception as e:
         print(f"[ERROR]: Failed in pulling YouTube videos: {e}")
+        traceback.print_exc()
 
     print(f"Pulled {len(data.keys())} youtube videos")
     return data
@@ -123,6 +127,7 @@ def pull_rss(args, op):
 
     except Exception as e:
         print(f"[ERROR]: Failed in pulling RSS: {e}")
+        traceback.print_exc()
 
     return data
 
