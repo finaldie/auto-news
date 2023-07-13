@@ -198,6 +198,9 @@ def run(args):
         stats.extend(stat)
 
     # Print stats
+    print("#####################################################")
+    print("# Stats")
+    print("#####################################################")
     for stat in stats:
         stat.print()
 
