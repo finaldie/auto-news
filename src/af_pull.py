@@ -34,7 +34,14 @@ def pull_twitter(args, op):
     print("# Pull from Twitter")
     print("######################################################")
     print(f"environment: {os.environ}")
-    data = op.pull(args.pulling_count, args.pulling_interval)
+    data = {}
+
+    try:
+        data = op.pull(args.pulling_count, args.pulling_interval)
+
+    except Exception as e:
+        print(f"[ERROR]: Failed in pulling tweets: {e}")
+
     return data
 
 
@@ -56,8 +63,14 @@ def pull_article(args, op):
     print("# Pull from Inbox - Articles")
     print("######################################################")
     print(f"environment: {os.environ}")
+    data = {}
 
-    data = op.pull()
+    try:
+        data = op.pull()
+
+    except Exception as e:
+        print(f"[ERROR]: Failed in pulling articles: {e}")
+
     return data
 
 
@@ -76,8 +89,13 @@ def pull_youtube(args, op):
     print("# Pull from Inbox - Youtube")
     print("######################################################")
     print(f"environment: {os.environ}")
+    data = {}
 
-    data = op.pull(data_folder=args.data_folder, run_id=args.run_id)
+    try:
+        data = op.pull(data_folder=args.data_folder, run_id=args.run_id)
+
+    except Exception as e:
+        print(f"[ERROR]: Failed in pulling YouTube videos: {e}")
 
     print(f"Pulled {len(data.keys())} youtube videos")
     return data
@@ -98,8 +116,14 @@ def pull_rss(args, op):
     print("# Pull from RSS")
     print("######################################################")
     print(f"environment: {os.environ}")
+    data = {}
 
-    data = op.pull()
+    try:
+        data = op.pull()
+
+    except Exception as e:
+        print(f"[ERROR]: Failed in pulling RSS: {e}")
+
     return data
 
 
