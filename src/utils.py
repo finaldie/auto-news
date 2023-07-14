@@ -1,6 +1,7 @@
 import os
 import json
 import hashlib
+import traceback
 import subprocess
 from datetime import datetime
 from operator import itemgetter
@@ -231,3 +232,12 @@ def hashcode_md5(data: bytes):
     hash_obj = hashlib.md5()
     hash_obj.update(data)
     return hash_obj.hexdigest()
+
+
+def prun(func):
+    try:
+        return func()
+
+    except Exception as e:
+        print(f"[ERROR] Exception from prun: {e}")
+        traceback.print_exc()
