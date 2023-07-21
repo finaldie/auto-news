@@ -140,7 +140,7 @@ class OperatorNotion:
 
         index_page_id = notion_indexes["index_page_id"]
         index_inbox_db_id = notion_indexes["index_inbox_db_id"]
-        reddit_list_db_id = notion_indexes["index_reddit_list_db_id"]
+        reddit_list_db_id = notion_indexes.get("index_reddit_list_db_id")
 
         if reddit_list_db_id:
             print(f"[INFO] Reddit list database is already created {reddit_list_db_id}, skip")
