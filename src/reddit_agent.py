@@ -11,7 +11,7 @@ class RedditAgent:
     AUTH_URL = 'https://www.reddit.com/api/v1/access_token'
     SUBREDDIT_NEW_URL = "https://oauth.reddit.com/r/{}/new"
 
-    def __init__(self, client_id, client_secret):
+    def __init__(self, client_id=None, client_secret=None):
         self.client_id = client_id or os.getenv("REDDIT_CLIENT_ID")
         self.client_secret = client_secret or os.getenv("REDDIT_CLIENT_SECRET")
         self.app_id = os.getenv("REDDIT_APP_ID") or f"app_{str(uuid.uuid4())}"
