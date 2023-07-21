@@ -142,22 +142,29 @@ class OperatorNotion:
         index_inbox_db_id = notion_indexes["index_inbox_db_id"]
         reddit_list_db_id = notion_indexes.get("index_reddit_list_db_id")
 
+        print(f"index_page_id: {index_page_id}")
+        print(f"index_inbox_db_id: {index_inbox_db_id}")
+        print(f"reddit_list_db_id: {reddit_list_db_id}")
+
         if reddit_list_db_id:
             print(f"[INFO] Reddit list database is already created {reddit_list_db_id}, skip")
             return
 
+        print("[notion] Creating Reddit list inbox database ...")
         index_reddit_list_db = agent.createDatabase_Reddit_List(
             "Reddit_List", index_page_id)
 
-        db_cli.index_pages_table_insert(
-            "notion", "index_reddit_list_db_id", index_reddit_list_db["id"])
-
+        print("[notion] Update Inbox mapping ...")
         agent.createDatabaseItem_Index(
             index_inbox_db_id,
             index_reddit_list_db["id"],
             source="Reddit",
             description="Reddit List Database"
         )
+
+        print("[MySQL] Update Reddit list inbox database ...")
+        db_cli.index_pages_table_insert(
+            "notion", "index_reddit_list_db_id", index_reddit_list_db["id"])
 
     def get_index_inbox_dbid(self):
         """
