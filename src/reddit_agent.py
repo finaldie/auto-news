@@ -106,10 +106,6 @@ class RedditAgent:
         return ret
 
     def _save_ratelimit_info(self, response=None):
-        prev_ratelimit_remaining = self.ratelimit_remaining
-        prev_ratelimit_used = self.ratelimit_used
-        prev_ratelimit_reset = self.ratelimit_reset
-
         if not response:
             # Set default values (600 / 10mins) according to Reddit wiki
             self.ratelimit_remaining = 600
@@ -120,6 +116,10 @@ class RedditAgent:
         if response.status_code != 200:
             print(f"[ERROR] Failure in response: headers: {response.headers}, body: {response.text}")
             return
+
+        prev_ratelimit_remaining = self.ratelimit_remaining
+        prev_ratelimit_used = self.ratelimit_used
+        prev_ratelimit_reset = self.ratelimit_reset
 
         # Extract rate limit info from response
         headers = response.headers
