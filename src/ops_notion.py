@@ -138,8 +138,8 @@ class OperatorNotion:
         notion_indexes = indexes.get("notion")
         print(f"loaded notion indexes: {notion_indexes}")
 
-        index_page_id = notion_indexes["index_page_id"]
-        index_inbox_db_id = notion_indexes["index_inbox_db_id"]
+        index_page_id = notion_indexes["index_page_id"]["index_id"]
+        index_inbox_db_id = notion_indexes["index_inbox_db_id"]["index_id"]
         reddit_list_db_id = notion_indexes.get("index_reddit_list_db_id")
 
         print(f"index_page_id: {index_page_id}")
