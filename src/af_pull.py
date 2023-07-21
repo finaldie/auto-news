@@ -130,7 +130,7 @@ def pull_reddit(args, op):
 
     def run():
         pulling_count = os.getenv("REDDIT_PULLING_COUNT", 25)
-        return op.pull(pulling_count=pulling_count, 0)
+        return op.pull(pulling_count=pulling_count, pulling_interval=0)
 
     return utils.prun(run) or {}
 
