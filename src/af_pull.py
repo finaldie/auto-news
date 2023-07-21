@@ -129,7 +129,8 @@ def pull_reddit(args, op):
     print(f"environment: {os.environ}")
 
     def run():
-        return op.pull(30, 0)
+        pulling_count = os.getenv("REDDIT_PULLING_COUNT", 25)
+        return op.pull(pulling_count=pulling_count, 0)
 
     return utils.prun(run) or {}
 
