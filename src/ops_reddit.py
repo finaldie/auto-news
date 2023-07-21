@@ -5,7 +5,7 @@ import traceback
 from operator import itemgetter
 from collections import Counter
 
-from tweets import TwitterAgent
+from reddit_agent import RedditAgent
 from notion import NotionAgent
 from llm_agent import (
     LLMAgentCategoryAndRanking
@@ -18,7 +18,7 @@ from ops_notion import OperatorNotion
 from ops_stats import OpsStats
 
 
-class OperatorTwitter(OperatorBase):
+class OperatorReddit(OperatorBase):
     """
     An Operator to handle:
     - pulling data from source
@@ -29,96 +29,110 @@ class OperatorTwitter(OperatorBase):
     - ranking
     - publish
     """
+    def __init__(self):
+        notion_api_key = os.getenv("NOTION_TOKEN")
+        self.notion_agent = NotionAgent(notion_api_key)
+        self.reddit_agent = RedditAgent()
+        self.op_notion = OperatorNotion()
+    
     def pull(self, pulling_count, pulling_interval):
         print("#####################################################")
-        print("# Pulling Twitter")
+        print("# Pulling Reddit")
         print("#####################################################")
-        # Get twitter lists
-        notion_api_key = os.getenv("NOTION_TOKEN")
-        notion_agent = NotionAgent(notion_api_key)
+        print(f"pulling_count: {pulling_count}")
+        print(f"pulling_interval: {pulling_interval}")
 
-        op_notion = OperatorNotion()
-        db_index_id = op_notion.get_index_inbox_dbid()
+        # Get reddit lists
+        db_index_id = self.op_notion.get_index_inbox_dbid()
 
         db_pages = utils.get_notion_database_pages_inbox(
-            notion_agent, db_index_id, "Twitter")
+            self.notion_agent, db_index_id, "Reddit")
         print(f"The database pages founded: {db_pages}")
 
-        screen_names = {}  # <list_name, []>
+        subreddit_names = {}  # <list_name, []>
 
         for db_page in db_pages:
             database_id = db_page["database_id"]
 
             # <list_name, [...]>
-            name_dict = notion_agent.queryDatabase_TwitterList(
+            name_dict = self.notion_agent.queryDatabase_RedditList(
                 database_id)
 
-            screen_names.update(name_dict)
+            subreddit_names.update(name_dict)
 
-        # Use twitter agent to pull tweets
-        api_key = os.getenv("TWITTER_API_KEY")
-        api_key_secret = os.getenv("TWITTER_API_KEY_SECRET")
-        access_token = os.getenv("TWITTER_ACCESS_TOKEN")
-        access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+        # pull subreddit posts
+        data = {}
 
-        agent = TwitterAgent(api_key, api_key_secret, access_token, access_token_secret)
-
-        for list_name, screen_names in screen_names.items():
-            print(f"list_name: {list_name}, screen_names: {screen_names}")
-            name_list = [x['twitter_id'] for x in screen_names]
+        for list_name, subreddit_names in subreddit_names.items():
+            print(f"list_name: {list_name}, subreddit_names: {subreddit_names}")
+            name_list = [x['subreddit'] for x in subreddit_names]
             print(f"name_list: {name_list}")
 
-            agent.subscribe(list_name, name_list, pulling_count)
+            # pull all the subreddits in this list
 
-        data = agent.pull(pulling_interval_sec=pulling_interval)
-        print(f"Pulled from twitter: {data}")
+            list_posts = data.setdefault(list_name, [])
+
+            for subreddit in name_list:
+                print(f"Pulling subreddit {subreddit}...")
+
+                posts = self.reddit_agent.get_subreddit_posts(
+                    subreddit, limit=pulling_count)
+
+                list_posts.extend(posts)
+            
+                if pulling_interval > 0:
+                    print(f"sleep {pulling_interval}s ...")
+                    time.sleep(pulling_interval)
+
+        print(f"Pulled from Reddit: {data}")
         return data
 
-    def dedup(self, tweets, target="toread"):
+    def dedup(self, posts, target="toread"):
         """
-        tweets: {
+        posts: {
             "list_name1": [...],
             "list_name2": [...],
         }
         """
         print("#####################################################")
-        print("# Dedup Twitter")
+        print("# Dedup Reddit Posts")
         print("#####################################################")
         print(f"Target: {target}")
 
         client = DBClient()
-        tweets_deduped = {}
+        reddit_deduped = {}
         tot = 0
         dup = 0
         cnt = 0
 
-        for list_name, data in tweets.items():
-            tweets_list = tweets_deduped.setdefault(list_name, [])
+        for list_name, data in posts.items():
+            reddit_list = reddit_deduped.setdefault(list_name, [])
 
-            for tweet in data:
-                tweet_id = tweet["tweet_id"]
+            for post in data:
+                post_hash_id = post["hash_id"]
+                post_long_id = post["long_id"]
                 tot += 1
 
                 if client.get_notion_toread_item_id(
-                        "twitter", list_name, tweet_id):
+                        "reddit", list_name, post_hash_id):
                     dup += 1
-                    print(f"Duplicated tweet found, tweet_id: {tweet_id}, skip")
+                    print(f"Duplicated post found, post_hash_id: {post_hash_id}, long_id: {post_long_id}, skip it")
 
                 else:
                     cnt += 1
-                    tweets_list.append(tweet)
+                    reddit_list.append(post)
 
-        print(f"tweets_deduped (total: {tot}, duplicated: {dup}, new: {cnt}): {tweets_deduped}")
-        return tweets_deduped
+        print(f"reddit_deduped (total: {tot}, duplicated: {dup}, new: {cnt}): {reddit_deduped}")
+        return reddit_deduped
 
     def rank(self, data, **kwargs):
         """
-        Rank tweets (not the entire content)
+        Rank Reddit Post (not the entire content)
 
-        data: deduped tweets from dedup()
+        data: deduped post from dedup()
         """
         print("#####################################################")
-        print("# Rank Tweets")
+        print("# Rank Reddit Post")
         print("#####################################################")
         min_score = kwargs.setdefault("min_score", 4)
         print(f"Minimum score to rank: {min_score}")
@@ -133,36 +147,35 @@ class OperatorTwitter(OperatorBase):
         skipped = 0
         err = 0
         rank = 0
-
         ranked = {}
 
-        for list_name, tweets in data.items():
+        for list_name, posts in data.items():
             ranked_list = ranked.setdefault(list_name, [])
 
-            for tweet in tweets:
+            for post in posts:
                 tot += 1
-                relevant_score = tweet.get("__relevant_score")
+                relevant_score = post.get("__relevant_score")
+                title = post["title"]
+                text = post["text"]
+                post_hash_id = post["hash_id"]
 
-                # Assemble tweet content
-                text = ""
-                if tweet["reply_text"]:
-                    text += f"{tweet['reply_to_name']}: {tweet['reply_text']}"
-                text += f"{tweet['name']}: {tweet['text']}"
+                # Assemble ranking content
+                content = f"{title}: {text}"
 
-                print(f"Ranking tweet: {text}")
+                print(f"Ranking post: {content}")
                 print(f"Relevant score: {relevant_score}")
 
-                ranked_tweet = copy.deepcopy(tweet)
+                ranked_post = copy.deepcopy(post)
 
                 if relevant_score and relevant_score >= 0 and relevant_score < min_score:
-                    print("Skip the low score tweet to rank")
+                    print(f"Skip the low score {relevant_score} to rank")
                     skipped += 1
 
-                    ranked_tweet["__topics"] = []
-                    ranked_tweet["__categories"] = []
-                    ranked_tweet["__rate"] = -0.02
+                    ranked_post["__topics"] = []
+                    ranked_post["__categories"] = []
+                    ranked_post["__rate"] = -0.02
 
-                    ranked_list.append(ranked_tweet)
+                    ranked_list.append(ranked_post)
                     continue
 
                 # Let LLM to category and rank, for:
@@ -171,7 +184,7 @@ class OperatorTwitter(OperatorBase):
                 st = time.time()
 
                 llm_ranking_resp = client.get_notion_ranking_item_id(
-                    "twitter", list_name, tweet["tweet_id"])
+                    "reddit", list_name, post_hash_id)
 
                 category_and_rank_str = None
 
@@ -179,9 +192,9 @@ class OperatorTwitter(OperatorBase):
                     print("Not found category_and_rank_str in cache, fallback to llm_agent to rank")
                     category_and_rank_str = llm_agent.run(text)
 
-                    print(f"Cache llm response for {redis_key_expire_time}s, tweet_id: {tweet['tweet_id']}")
+                    print(f"Cache llm response for {redis_key_expire_time}s, hash_id: {post_hash_id}")
                     client.set_notion_ranking_item_id(
-                        "twitter", list_name, tweet["tweet_id"],
+                        "reddit", list_name, post_hash_id,
                         category_and_rank_str,
                         expired_time=int(redis_key_expire_time))
 
@@ -189,7 +202,7 @@ class OperatorTwitter(OperatorBase):
                     print("Found category_and_rank_str from cache")
                     category_and_rank_str = llm_ranking_resp
 
-                print(f"Used {time.time() - st:.3f}s, Category and Rank: text: {text}, rank_resp: {category_and_rank_str}")
+                print(f"Used {time.time() - st:.3f}s, Category and Rank: text: {content}, rank_resp: {category_and_rank_str}")
 
                 category_and_rank = utils.fix_and_parse_json(category_and_rank_str)
                 print(f"LLM ranked result (json parsed): {category_and_rank}")
@@ -197,33 +210,33 @@ class OperatorTwitter(OperatorBase):
                 # Parse LLM response and assemble category and rank
                 if not category_and_rank:
                     print("[ERROR] Cannot parse json string, assign default rating -0.01")
-                    ranked_tweet["__topics"] = []
-                    ranked_tweet["__categories"] = []
-                    ranked_tweet["__rate"] = -0.01
+                    ranked_post["__topics"] = []
+                    ranked_post["__categories"] = []
+                    ranked_post["__rate"] = -0.01
                     err += 1
 
                 else:
-                    ranked_tweet["__topics"] = [(x["topic"], x.get("score") or 1) for x in category_and_rank["topics"]]
-                    ranked_tweet["__categories"] = [(x["category"], x.get("score") or 1) for x in category_and_rank["topics"]]
-                    ranked_tweet["__rate"] = category_and_rank["overall_score"] or -0.01
-                    ranked_tweet["__feedback"] = category_and_rank.get("feedback") or ""
+                    ranked_post["__topics"] = [(x["topic"], x.get("score") or 1) for x in category_and_rank["topics"]]
+                    ranked_post["__categories"] = [(x["category"], x.get("score") or 1) for x in category_and_rank["topics"]]
+                    ranked_post["__rate"] = category_and_rank["overall_score"] or -0.01
+                    ranked_post["__feedback"] = category_and_rank.get("feedback") or ""
                     rank += 1
 
-                ranked_list.append(ranked_tweet)
+                ranked_list.append(ranked_post)
 
-        print(f"Ranked tweets: {ranked}")
+        print(f"Ranked reddit posts: {ranked}")
         print(f"Total {tot}, ranked: {rank}, skipped: {skipped}, errors: {err}")
         return ranked
 
     def push(self, data, targets, topics_topk=3, categories_topk=3):
         """
-        data is the ranked tweets
+        data is the ranked reddit posts
 
-        data: {list_name1: [ranked_tweet1, ranked_tweet2, ...],
+        data: {list_name1: [ranked_post1, ranked_post2, ...],
                list_name2: [...], ...}
         """
         print("#####################################################")
-        print("# Push Tweets")
+        print("# Push Reddit Posts")
         print("#####################################################")
         print(f"Targets: {targets}")
         print(f"input data: {data}")
@@ -237,34 +250,29 @@ class OperatorTwitter(OperatorBase):
                 tot = 0
                 err = 0
 
-                notion_api_key = os.getenv("NOTION_TOKEN")
-                notion_agent = NotionAgent(notion_api_key)
-                op_notion = OperatorNotion()
-
                 # Get the latest toread database id from index db
-                # db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
-                db_index_id = op_notion.get_index_toread_dbid()
+                db_index_id = self.op_notion.get_index_toread_dbid()
                 database_id = utils.get_notion_database_id_toread(
-                    notion_agent, db_index_id)
+                    self.notion_agent, db_index_id)
                 print(f"Latest ToRead database id: {database_id}")
 
                 if not database_id:
                     print("[ERROR] no index db pages found... skip")
                     break
 
-                for list_name, tweets in data.items():
+                for list_name, posts in data.items():
                     stat = stats.setdefault(list_name, {"total": 0, "error": 0})
 
-                    for ranked_tweet in tweets:
+                    for ranked_post in posts:
                         tot += 1
                         stat["total"] += 1
 
                         try:
                             self._push_to_read_notion(
-                                notion_agent,
+                                self.notion_agent,
                                 database_id,
                                 list_name,
-                                ranked_tweet,
+                                ranked_post,
                                 topics_topk,
                                 categories_topk)
 
@@ -277,12 +285,12 @@ class OperatorTwitter(OperatorBase):
             else:
                 print(f"[ERROR]: Unknown target {target}, skip")
 
-            print(f"Push Tweets to notion finished, total: {tot}, err: {err}")
+            print(f"Push Reddit posts to notion finished, total: {tot}, err: {err}")
             return stats
 
     def score(self, data, **kwargs):
         print("#####################################################")
-        print("# Score Tweets")
+        print("# Score Reddit Posts")
         print("#####################################################")
         start_date = kwargs.setdefault("start_date", "")
         max_distance = kwargs.setdefault("max_distance", 0.45)
@@ -293,29 +301,28 @@ class OperatorTwitter(OperatorBase):
 
         scored_pages = {}
 
-        for list_name, tweets in data.items():
+        for list_name, posts in data.items():
             scored_list = scored_pages.setdefault(list_name, [])
-            print(f"Scoring list {list_name}, total {len(tweets)} tweets")
+            print(f"Scoring list {list_name}, total {len(posts)} reddit posts")
 
-            for tweet in tweets:
+            for post in posts:
                 try:
-                    text = ""
-                    if tweet["reply_text"]:
-                        text += f"{tweet['reply_to_name']}: {tweet['reply_text']}"
-                    text += f"{tweet['name']}: {tweet['text']}"
+                    title = post["title"]
+                    text = post["text"]
+                    content = f"{title}: {text}"
 
                     # Notes: k = 10 looks too noisy, tune k = 2
                     relevant_metas = op_milvus.get_relevant(
-                        start_date, text, topk=2,
+                        start_date, content, topk=2,
                         max_distance=max_distance, db_client=client)
 
                     page_score = op_milvus.score(relevant_metas)
 
-                    scored_page = copy.deepcopy(tweet)
+                    scored_page = copy.deepcopy(post)
                     scored_page["__relevant_score"] = page_score
 
                     scored_list.append(scored_page)
-                    print(f"Tweet scored {page_score}")
+                    print(f"Reddit post scored {page_score}")
 
                 except Exception as e:
                     print(f"[ERROR]: Score page failed, skip: {e}")
@@ -326,7 +333,7 @@ class OperatorTwitter(OperatorBase):
 
     def filter(self, pages, **kwargs):
         print("#####################################################")
-        print("# Filter Tweets (After Scoring)")
+        print("# Filter Reddit Posts (After Scoring)")
         print("#####################################################")
         default_min_score = kwargs.setdefault("min_score", 3.5)
         print(f"Default min_score: {default_min_score}")
@@ -336,7 +343,7 @@ class OperatorTwitter(OperatorBase):
         tot = 0
         cnt = 0
 
-        min_score_param: str = os.getenv("TWITTER_FILTER_MIN_SCORES")
+        min_score_param: str = os.getenv("REDDIT_FILTER_MIN_SCORES")
         min_scores: list = min_score_param.split(",")
 
         min_scores_dict: dict = {}
@@ -347,19 +354,19 @@ class OperatorTwitter(OperatorBase):
             min_scores_dict[list_name] = min_score
             print(f"Parsed min_score: list_name: {list_name}, min_score: {min_score}")
 
-        for list_name, tweets in pages.items():
+        for list_name, posts in pages.items():
             filtered_pages = filtered.setdefault(list_name, [])
             min_score = min_scores_dict.get(list_name) or default_min_score
             print(f"Filter list_name: {list_name}, min_score: {min_score}")
 
-            for page in tweets:
-                relevant_score = page["__relevant_score"]
+            for post in posts:
+                relevant_score = post["__relevant_score"]
                 tot += 1
 
                 if relevant_score < 0 or relevant_score >= min_score:
-                    filtered_pages.append(page)
+                    filtered_pages.append(post)
                     cnt += 1
-                    print(f"Valid tweet with relevant score: {relevant_score}")
+                    print(f"Valid Reddit post with relevant score: {relevant_score}")
 
         print(f"Filter output size: {cnt} / {tot}")
         return filtered
@@ -379,34 +386,34 @@ class OperatorTwitter(OperatorBase):
         notion_agent,
         database_id,
         list_name,
-        ranked_tweet,
+        ranked_post,
         topics_top_k,
         categories_top_k
     ):
         # topics: [(name, score), ...]
-        topics = self._get_top_items(ranked_tweet["__topics"], topics_top_k)
-        print(f"Original topics: {ranked_tweet['__topics']}, top-k: {topics}")
+        topics = self._get_top_items(ranked_post["__topics"], topics_top_k)
+        print(f"Original topics: {ranked_post['__topics']}, top-k: {topics}")
 
         # Notes: notion doesn't accept comma in the selection type
         # fix it first
         topics_topk = [x[0].replace(",", " ")[:20] for x in topics]
 
         # categories: [(name, score), ...]
-        categories = self._get_top_items(ranked_tweet["__categories"], categories_top_k)
-        print(f"Original categories: {ranked_tweet['__categories']}, top-k: {categories}")
+        categories = self._get_top_items(ranked_post["__categories"], categories_top_k)
+        print(f"Original categories: {ranked_post['__categories']}, top-k: {categories}")
         categories_topk = [x[0].replace(",", " ")[:20] for x in categories]
 
         # The __rate is [0, 1], scale to [0, 100]
-        rate = ranked_tweet["__rate"] * 100
+        rate = ranked_post["__rate"] * 100
 
-        notion_agent.createDatabaseItem_ToRead(
-            database_id, [list_name], ranked_tweet,
+        notion_agent.createDatabaseItem_ToRead_Reddit(
+            database_id, [list_name], ranked_post,
             topics_topk, categories_topk, rate)
 
         print("Inserted one tweet into ToRead database")
         self.markVisited(
-            ranked_tweet["tweet_id"],
-            source="twitter",
+            ranked_post["hash_id"],
+            source="reddit",
             list_name=list_name)
 
     def printStats(self, source, data, inbox_data_deduped, data_ranked):
@@ -425,8 +432,8 @@ class OperatorTwitter(OperatorBase):
             print(f"{list_name}: Ranked data count: {len(items)}")
             rank_stats[list_name] = Counter()
 
-            for ranked_tweet in items:
-                rating = ranked_tweet["__rate"]
+            for ranked_post in items:
+                rating = ranked_post["__rate"]
 
                 if rating <= 0.5:
                     rank_stats[list_name]["below_0.5"] += 1
@@ -464,7 +471,7 @@ class OperatorTwitter(OperatorBase):
         }
 
         for list_name, items in data_input.items():
-            stats[list_name] = OpsStats("Twitter", list_name)
+            stats[list_name] = OpsStats("Reddit", list_name)
 
         for counter_name, data in data_dict.items():
             for list_name, items in data.items():

@@ -9,6 +9,7 @@ from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
 from ops_rss import OperatorRSS
+from ops_reddit import OperatorReddit
 
 
 parser = argparse.ArgumentParser()
@@ -174,6 +175,49 @@ def process_rss(args):
         pushed_stats=pushed_stats)
 
 
+def process_reddit(args):
+    """
+    Reddit has tons of posts to process, apply embedding-based algo
+    to calcuate the candidates and merge/select into final data_ranked
+
+    The score is based on user_rating field: [1, 5], ideally
+    >= 4 will be a good rating
+
+    cold start: user is still filing GPT ranked score
+    warm/hot start: user can filter the new relevant score, e.g.
+                    filter score >= 4
+    """
+    print("#####################################################")
+    print("# Process Reddit")
+    print("#####################################################")
+    op = OperatorReddit()
+    data = op.readFromJson(args.data_folder, args.run_id, "reddit.json")
+    data_deduped = op.dedup(data, target="toread")
+
+    # To save LLM tokens, do score on all deduped posts, then
+    # do rank for score >= 4 posts
+    data_scored = op.score(
+        data_deduped,
+        start_date=args.start,
+        max_distance=args.max_distance)
+
+    data_filtered = op.filter(data_scored, min_score=4)
+
+    data_ranked = op.rank(
+        data_filtered, min_score=args.min_score_to_rank)
+
+    targets = args.targets.split(",")
+    pushed_stats = op.push(
+        data_ranked, targets, args.topics_top_k, args.categories_top_k)
+
+    # Print and create stats
+    op.printStats("Reddit", data, data_deduped, data_ranked)
+
+    return op.createStats(
+        data, data_deduped, data_scored, data_filtered, data_ranked,
+        pushed_stats)
+
+
 def run(args):
     print(f"environment: {os.environ}")
     sources = args.sources.split(",")
@@ -194,6 +238,9 @@ def run(args):
 
         elif source == "RSS":
             stat = process_rss(args)
+
+        elif source == "Reddit":
+            stat = process_reddit(args)
 
         stats.extend(stat)
 

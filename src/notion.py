@@ -372,6 +372,49 @@ class NotionAgent:
 
         return extracted_pages
 
+    def queryDatabase_RedditList(self, database_id):
+        query_data = {
+            "database_id": database_id,
+            "sorts": [
+                {
+                    "property": "Created time",
+                    "direction": "descending",
+                },
+            ],
+
+            "filter": {
+                "and": [
+                    {
+                        "property": "Enabled",
+                        "checkbox": {
+                            "equals": True,
+                        },
+                    },
+                ]
+            }
+        }
+
+        pages = self.api.databases.query(**query_data).get("results")
+        extracted_pages = {}
+
+        for page in pages:
+            print(f"result: page id: {page['id']}")
+            page_id = page["id"]
+            list_names = self.extractMultiSelect(page["properties"]["List Name"])
+
+            for list_name in list_names:
+                page_list = extracted_pages.setdefault(list_name, [])
+
+                page_list.append({
+                    "page_id": page_id,
+                    "database_id": database_id,
+                    "subreddit": page["properties"]["SubReddit"]["title"][0]["text"]["content"],
+                    "created_time": page["created_time"],
+                    "last_edited_time": page["last_edited_time"],
+                })
+
+        return extracted_pages
+
     def queryDatabaseIndex_Inbox(self, database_id, source):
         query_data = {
             "database_id": database_id,
@@ -1462,6 +1505,65 @@ class NotionAgent:
             properties,
             blocks)
 
+    def createDatabaseItem_ToRead_Reddit(
+        self,
+        database_id,
+        page,
+        topics: list,
+        categories: list,
+        rate_number
+    ):
+        properties, blocks = self._createDatabaseItem_ArticleBase(
+            page, append_notion_url=False)
+
+        # Embed Raw reddit url
+        blocks.append({
+            "type": "embed",
+            "embed": {
+                "url": utils.urlUnshorten(page['url'])
+            }
+        })
+
+        # Append Reddit post text
+        blocks.append({
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": self._createBlock_RichText(page["text"])
+            }
+        })
+
+        # Common fields for article, youtube, etc
+        new_page = self._postprocess_ToRead(
+            properties,
+            blocks,
+            database_id,
+            page,
+            topics,
+            categories,
+            rate_number,
+            list_names=[page["list_name"]]
+        )
+
+        # Add post metadata as a comment
+        post_metadata = f"""
+        Subreddit: {page['subreddit']}
+        Author: {page['author']}
+        Publishing date: {page['datetime_pdt']}
+        """
+
+        try:
+            page_id = new_page["hash_id"]
+
+            print("Add reddit post metadata as comment")
+            self.createPageComment(page_id, post_metadata)
+
+        except Exception as e:
+            print(f"[ERROR] Failed to add comment: {e}")
+            traceback.print_exc()
+
+        return new_page
+
     def createPageComment(
         self,
         page_id,
@@ -1587,7 +1689,7 @@ class NotionAgent:
 
     def createDatabase_RSS_List(self, name, parent_page_id):
         """
-        Create a database for Inbox
+        Create a database for RSS inbox list
         """
         title = [
             {
@@ -1628,7 +1730,7 @@ class NotionAgent:
 
     def createDatabase_Tweets_List(self, name, parent_page_id):
         """
-        Create a database for Inbox
+        Create a database for Tweet
         """
         title = [
             {
@@ -1646,6 +1748,47 @@ class NotionAgent:
             },
             "Name": {
                 "rich_text": {}
+            },
+            "List Name": {
+                "multi_select": {}
+            },
+            "Created time": {
+                "created_time": {}
+            },
+            "Last edited time": {
+                "last_edited_time": {}
+            },
+            "Enabled": {
+                "checkbox": {}
+            },
+        }
+
+        # Create the new database under the specified page
+        new_database = self.api.databases.create(
+            parent={"type": "page_id", "page_id": parent_page_id},
+            title=title,
+            properties=new_database_properties
+        )
+
+        return new_database
+
+    def createDatabase_Reddit_List(self, name, parent_page_id):
+        """
+        Create a database for Reddit
+        """
+        title = [
+            {
+                "type": "text",
+                "text": {
+                    "content": name,
+                }
+            }
+        ]
+
+        # Set the properties of the new database
+        new_database_properties = {
+            "SubReddit": {
+                "title": {}
             },
             "List Name": {
                 "multi_select": {}

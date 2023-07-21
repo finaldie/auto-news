@@ -8,6 +8,7 @@ from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
 from ops_rss import OperatorRSS
+from ops_reddit import OperatorReddit
 import utils
 
 
@@ -118,6 +119,28 @@ def save_rss(args, op, data):
     op.save2json(args.data_folder, args.run_id, "rss.json", data)
 
 
+def pull_reddit(args, op):
+    """
+    Pull from Reddit
+    """
+    print("######################################################")
+    print("# Pull from Reddit")
+    print("######################################################")
+    print(f"environment: {os.environ}")
+
+    def run():
+        return op.pull()
+
+    return utils.prun(run) or {}
+
+
+def save_reddit(args, op, data):
+    print("######################################################")
+    print("# Save Reddit articles to json file")
+    print("######################################################")
+    op.save2json(args.data_folder, args.run_id, "reddit.json", data)
+
+
 def run(args):
     sources = args.sources.split(",")
     print(f"Sources: {sources}")
@@ -144,6 +167,11 @@ def run(args):
             op = OperatorRSS()
             data = pull_rss(args, op)
             save_rss(args, op, data)
+
+        elif source == "Reddit":
+            op = OperatorReddit()
+            data = pull_reddit(args, op)
+            save_reddit(args, op, data)
 
 
 if __name__ == "__main__":
