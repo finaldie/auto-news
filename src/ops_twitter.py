@@ -341,11 +341,17 @@ class OperatorTwitter(OperatorBase):
 
         min_scores_dict: dict = {}
         for data in min_scores:
-            list_name = data.split(":")[0]
-            min_score = float(data.split(":")[1])
+            print(f"parsing min_score: [{data}]")
 
-            min_scores_dict[list_name] = min_score
-            print(f"Parsed min_score: list_name: {list_name}, min_score: {min_score}")
+            if not data or len(data.split(":")) < 2:
+                print(f"Invalid min_score: {data}, skip it")
+
+            else:
+                list_name = data.split(":")[0]
+                min_score = float(data.split(":")[1])
+                min_scores_dict[list_name] = min_score
+
+                print(f"Parsed min_score: list_name: {list_name}, min_score: {min_score}")
 
         for list_name, tweets in pages.items():
             filtered_pages = filtered.setdefault(list_name, [])
