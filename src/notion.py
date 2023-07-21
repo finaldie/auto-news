@@ -1790,6 +1790,9 @@ class NotionAgent:
             "SubReddit": {
                 "title": {}
             },
+            "Notes": {
+                "rich_text": {}
+            },
             "List Name": {
                 "multi_select": {}
             },
