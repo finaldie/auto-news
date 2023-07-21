@@ -345,6 +345,7 @@ class OperatorReddit(OperatorBase):
 
         min_score_param: str = os.getenv("REDDIT_FILTER_MIN_SCORES")
         min_scores: list = min_score_param.split(",")
+        print(f"min_scores: {min_scores}")
 
         min_scores_dict: dict = {}
         for data in min_scores:
