@@ -129,7 +129,7 @@ def pull_reddit(args, op):
     print(f"environment: {os.environ}")
 
     def run():
-        return op.pull()
+        return op.pull(30, 0)
 
     return utils.prun(run) or {}
 
