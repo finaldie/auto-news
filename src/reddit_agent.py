@@ -62,7 +62,7 @@ class RedditAgent:
                                 params=params)
 
         response.raise_for_status()
-        self._save_ratelimit_info(response)
+        self._save_ratelimit_info(response=response)
         return self._extractSubredditPosts(response)
 
     def _extractSubredditPosts(self, response):
@@ -105,7 +105,7 @@ class RedditAgent:
 
         return ret
 
-    def _save_ratelimit_info(self, response):
+    def _save_ratelimit_info(self, response=None):
         prev_ratelimit_remaining = self.ratelimit_remaining
         prev_ratelimit_used = self.ratelimit_used
         prev_ratelimit_reset = self.ratelimit_reset
