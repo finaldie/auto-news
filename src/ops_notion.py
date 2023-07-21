@@ -124,7 +124,7 @@ class OperatorNotion:
             print(f"[ERROR] Errors in creating notion pages: {e}")
             raise
 
-    def init_reddit_pages(self, notion_agent):
+    def init_reddit_pages(self, notion_agent=None):
         print("Creating Reddit db and pages...")
         agent = notion_agent
         if not agent:
