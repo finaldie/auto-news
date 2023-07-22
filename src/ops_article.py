@@ -99,24 +99,6 @@ class OperatorArticle(OperatorBase):
 
         return deduped_pages
 
-    def _load_web(self, url):
-        landing_page = url
-        ok, resp = utils.urlHead(url)
-        if ok:
-            landing_page = resp.url
-
-        print(f"[load_web] origin url: {url}, landing page: {landing_page}")
-
-        loader = LLMWebLoader()
-        docs = loader.load(landing_page)
-
-        content = ""
-        for doc in docs:
-            content += doc.page_content
-            content += "\n"
-
-        return content
-
     def summarize(self, pages):
         print("#####################################################")
         print("# Summarize Articles")
@@ -150,7 +132,7 @@ class OperatorArticle(OperatorBase):
                 # the source url
                 if not content:
                     print("page content is empty, fallback to load web page via WebBaseLoader")
-                    content = self._load_web(source_url)
+                    content = utils.load_web(source_url)
                     print(f"Page content ({len(content)} chars): {content}")
 
                     if not content:

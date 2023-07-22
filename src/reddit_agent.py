@@ -78,6 +78,16 @@ class RedditAgent:
             post_long_id = f"{subreddit}_{title}_{author}_{ts}"
             post_hash_id = utils.hashcode_md5(post_long_id.encode("utf-8"))
 
+            page_url = post["data"]["url"]
+            is_video = self._is_video(post)
+            is_image = self._is_image(post)
+            is_external_link = self._is_external_link(post)
+
+            text = post["data"]["selftext"]
+            if not text and not is_video and not is_image and is_external_link:
+                text = utils.load_web(page_url)
+                print(f"Post from external link (non-video/image), load from source {page_url}, text: {text:200}...")
+
             extracted_post = {
                 "long_id": post_long_id,
                 "hash_id": post_hash_id,
@@ -88,8 +98,8 @@ class RedditAgent:
                 "source": "Reddit",
 
                 "title": title,
-                "text": post["data"]["selftext"],
-                "url": post["data"]["url"],
+                "text": text,
+                "url": page_url,
                 "subreddit": subreddit,
                 "author": author,
                 "ups": post["data"]["ups"],
@@ -97,12 +107,53 @@ class RedditAgent:
                 "num_comments": post["data"]["num_comments"],
                 "visited": post["data"]["visited"],
 
+                "is_video": is_video,
+                "is_image": is_image,
+                "is_external_link": is_external_link,
+
                 "raw": post,
             }
 
             ret.append(extracted_post)
 
         return ret
+
+    def _is_video(self, post):
+        page_url = post["data"]["url"]
+
+        has_media = post["data"]["media"]
+        is_video = post["data"]["is_video"] or "https://v.redd.it" in page_url
+
+        return has_media or is_video
+
+    def _is_image(self, post):
+        page_url = post["data"]["url"]
+
+        suffixs = ("jpg", "png", "gif")
+        others = ("www.reddit.com/gallery", "https://i.redd.it")
+
+        for suffix in suffixs:
+            if page_url.endswith(suffix):
+                return True
+
+        for part in others:
+            if part in page_url:
+                return True
+
+        return False
+
+    def _is_external_link(self, post):
+        """
+        post is the original reddit returned post dict object
+        """
+        page_url = post["data"]["url"]
+        cands = ("https://www.reddit.com", ".redd.it")
+
+        for cand in cands:
+            if cand in page_url:
+                return False
+
+        return True
 
     def _save_ratelimit_info(self, response=None):
         if not response:
