@@ -1569,7 +1569,7 @@ class NotionAgent:
                 "object": "block",
                 "type": "quote",
                 "quote": {
-                    "rich_text": self._createBlock_RichText()
+                    "rich_text": self._createBlock_RichText(page["text"])
                 }
             })
 
