@@ -71,7 +71,7 @@ class RedditAgent:
 
         for post in posts:
             ts = post["data"]["created_utc"]
-            dt_utc = datetime.fromtimestamp(ts)
+            dt_utc = datetime.fromtimestamp(ts).isoformat()
             dt_pdt = utils.convertUTC2PDT_str(dt_utc)
             author = post["data"]["author"]
             subreddit = post["data"]["subreddit"]
