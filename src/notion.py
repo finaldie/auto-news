@@ -853,6 +853,26 @@ class NotionAgent:
 
         return properties, blocks
 
+    def _createSummaryInPage(self, summary):
+        blocks = []
+
+        summary_en, summary_trans = utils.splitSummaryTranslation(summary)
+        block_content = f"Summary:\n{summary_en}"
+
+        blocks.append({
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": self._createBlock_RichText(block_content)
+            }
+        })
+
+        if summary_trans:
+            blocks.append(self._createBlock_Toggle(
+                "Translation", summary_trans))
+
+        return blocks
+
     def _createDatabaseItem_ArticleBase(self, ranked_page, **kwargs):
         """
         Create page properties and blocks, will put the summary
@@ -921,20 +941,8 @@ class NotionAgent:
 
         # Add summary content
         if summary_enabled:
-            summary_en, summary_trans = utils.splitSummaryTranslation(summary)
-            block_content = f"Summary:\n{summary_en}"
-
-            blocks.append({
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": self._createBlock_RichText(block_content)
-                }
-            })
-
-            if summary_trans:
-                blocks.append(self._createBlock_Toggle(
-                    "Translation", summary_trans))
+            summary_blocks = self._createSummaryInPage(summary)
+            blocks.extend(summary_blocks)
 
         # append orginal notion url
         if append_notion_url:
@@ -1519,21 +1527,28 @@ class NotionAgent:
             page, summary=False, append_notion_url=False)
 
         # Embed Raw reddit url
-        blocks.append({
-            "type": "embed",
-            "embed": {
-                "url": utils.urlUnshorten(page['url'])
-            }
-        })
+        # TODO: It doesn't work in API (works in UI creation)
+        #       Need to test it again
+        # blocks.append({
+        #     "type": "embed",
+        #     "embed": {
+        #         "url": utils.urlUnshorten(page['url'])
+        #     }
+        # })
 
         # Append Reddit post text
         blocks.append({
             "object": "block",
-            "type": "paragraph",
-            "paragraph": {
+            "type": "quote",
+            "quote": {
                 "rich_text": self._createBlock_RichText(page["text"])
             }
         })
+
+        summary = page.get("__summary") or ""
+        if summary:
+            summary_blocks = self._createSummaryInPage(summary)
+            blocks.extend(summary_blocks)
 
         # In the bottom, append the original link
         blocks.append({
