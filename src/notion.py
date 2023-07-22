@@ -1,6 +1,5 @@
 import os
 import time
-import copy
 import traceback
 
 from notion_client import Client
@@ -918,20 +917,20 @@ class NotionAgent:
                 },
             })
 
+        blocks = []
+
         # Add summary content
         if summary_enabled:
             summary_en, summary_trans = utils.splitSummaryTranslation(summary)
             block_content = f"Summary:\n{summary_en}"
 
-            blocks = [
-                {
-                    "object": "block",
-                    "type": "paragraph",
-                    "paragraph": {
-                        "rich_text": self._createBlock_RichText(block_content)
-                    }
+            blocks.append({
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": self._createBlock_RichText(block_content)
                 }
-            ]
+            })
 
             if summary_trans:
                 blocks.append(self._createBlock_Toggle(
