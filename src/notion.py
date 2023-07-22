@@ -1508,6 +1508,7 @@ class NotionAgent:
     def createDatabaseItem_ToRead_Reddit(
         self,
         database_id,
+        list_names: list,
         page,
         topics: list,
         categories: list,
@@ -1542,7 +1543,7 @@ class NotionAgent:
             topics,
             categories,
             rate_number,
-            list_names=[page["list_name"]]
+            list_names=list_names
         )
 
         # Add post metadata as a comment

@@ -335,7 +335,7 @@ class OperatorReddit(OperatorBase):
         print("#####################################################")
         print("# Filter Reddit Posts (After Scoring)")
         print("#####################################################")
-        default_min_score = kwargs.setdefault("min_score", 3.5)
+        default_min_score = kwargs.setdefault("min_score", 4)
         print(f"Default min_score: {default_min_score}")
 
         # 1. filter all score >= min_score
