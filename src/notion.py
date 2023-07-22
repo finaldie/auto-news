@@ -1585,7 +1585,9 @@ class NotionAgent:
         post_metadata = f"""
         Subreddit: {page['subreddit']}
         Author: {page['author']}
-        Publishing date: {page['datetime_pdt']}
+        Ups: {page['ups']}
+        Downs: {page['downs']}
+        NumOfComments: {page['num_comments']}
         """
 
         try:
