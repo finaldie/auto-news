@@ -544,11 +544,14 @@ class OperatorReddit(OperatorBase):
             "total_pushed": data_ranked,
         }
 
+        print(f"data_dict: {data_dict}")
+
         for list_name, items in data_input.items():
             stats[list_name] = OpsStats("Reddit", list_name)
 
         for counter_name, data in data_dict.items():
             for list_name, items in data.items():
+                print(f"update stats, list_name: {list_name}, counter_name: {counter_name}")
                 stats[list_name].getCounter(counter_name).set(len(items))
 
         for list_name, stat in pushed_stats.items():
