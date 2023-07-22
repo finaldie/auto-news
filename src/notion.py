@@ -863,6 +863,7 @@ class NotionAgent:
         - content    The original content (Could be very huge), notes that each block has 2000 chars limitation
         - __summary  The summary content
         """
+        summary_enabled = kwargs.setdefault("summary", True)
         summary = ranked_page.get("__summary") or ""
         # preview_content = summary[:100] + "..."
 
@@ -917,23 +918,24 @@ class NotionAgent:
                 },
             })
 
-        # put summary content
-        summary_en, summary_trans = utils.splitSummaryTranslation(summary)
-        block_content = f"Summary:\n{summary_en}"
+        # Add summary content
+        if summary_enabled:
+            summary_en, summary_trans = utils.splitSummaryTranslation(summary)
+            block_content = f"Summary:\n{summary_en}"
 
-        blocks = [
-            {
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": self._createBlock_RichText(block_content)
+            blocks = [
+                {
+                    "object": "block",
+                    "type": "paragraph",
+                    "paragraph": {
+                        "rich_text": self._createBlock_RichText(block_content)
+                    }
                 }
-            }
-        ]
+            ]
 
-        if summary_trans:
-            blocks.append(self._createBlock_Toggle(
-                "Translation", summary_trans))
+            if summary_trans:
+                blocks.append(self._createBlock_Toggle(
+                    "Translation", summary_trans))
 
         # append orginal notion url
         if append_notion_url:
@@ -1515,7 +1517,7 @@ class NotionAgent:
         rate_number
     ):
         properties, blocks = self._createDatabaseItem_ArticleBase(
-            page, append_notion_url=False)
+            page, summary=False, append_notion_url=False)
 
         # Embed Raw reddit url
         blocks.append({
@@ -1531,6 +1533,25 @@ class NotionAgent:
             "type": "paragraph",
             "paragraph": {
                 "rich_text": self._createBlock_RichText(page["text"])
+            }
+        })
+
+        # In the bottom, append the original link
+        blocks.append({
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": "Link",
+                            "link": {
+                                "url": page['url'],
+                            },
+                        },
+                        "href": page["url"],
+                    },
+                ],
             }
         })
 
