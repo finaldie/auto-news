@@ -8,7 +8,8 @@ from collections import Counter
 from reddit_agent import RedditAgent
 from notion import NotionAgent
 from llm_agent import (
-    LLMAgentCategoryAndRanking
+    LLMAgentCategoryAndRanking,
+    LLMAgentSummary,
 )
 import utils
 from ops_base import OperatorBase
@@ -34,7 +35,7 @@ class OperatorReddit(OperatorBase):
         self.notion_agent = NotionAgent(notion_api_key)
         self.reddit_agent = RedditAgent()
         self.op_notion = OperatorNotion()
-    
+
     def pull(self, pulling_count, pulling_interval):
         print("#####################################################")
         print("# Pulling Reddit")
@@ -79,7 +80,7 @@ class OperatorReddit(OperatorBase):
                     subreddit, limit=pulling_count)
 
                 list_posts.extend(posts)
-            
+
                 if pulling_interval > 0:
                     print(f"sleep {pulling_interval}s ...")
                     time.sleep(pulling_interval)
@@ -377,6 +378,69 @@ class OperatorReddit(OperatorBase):
 
         print(f"Filter output size: {cnt} / {tot}")
         return filtered
+
+    def summarize(self, pages):
+        print("#####################################################")
+        print("# Summarize Reddit Post")
+        print("#####################################################")
+        print(f"Number of pages: {len(pages)}")
+        llm_agent = LLMAgentSummary()
+        llm_agent.init_prompt()
+        llm_agent.init_llm()
+
+        client = DBClient()
+        redis_key_expire_time = os.getenv(
+            "BOT_REDIS_KEY_EXPIRE_TIME", 604800)
+
+        summarized_pages = {}
+
+        for list_name, posts in pages.items():
+            list_pages = summarized_pages.setdefault(list_name, [])
+
+            for page in posts:
+                title = page["title"]
+                page_id = page["hash_id"]
+                content = page["text"]
+                source_url = page["url"]
+
+                if len(content) <= 200:
+                    print(f"Post title: {title}, content length <= 200, skip summarization")
+                    list_pages.append(page)
+                    continue
+
+                print(f"Summarying page, title: {title}, source_url: {source_url}")
+                print(f"Page content ({len(content)} chars): {content:200}...")
+
+                st = time.time()
+
+                llm_summary_resp = client.get_notion_summary_item_id(
+                    "reddit", list_name, page_id)
+
+                if not llm_summary_resp:
+                    if not content:
+                        print(f"[ERROR] Empty Reddit posts, title: {title}, source_url: {source_url}, skip it")
+                        continue
+
+                    summary = llm_agent.run(content)
+
+                    print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")
+
+                    client.set_notion_summary_item_id(
+                        "reddit", list_name, page_id, summary,
+                        expired_time=int(redis_key_expire_time))
+
+                else:
+                    print("Found llm summary from cache, decoding (utf-8) ...")
+                    summary = utils.bytes2str(llm_summary_resp)
+
+                # assemble summary into page
+                summarized_page = copy.deepcopy(page)
+                summarized_page["__summary"] = summary
+
+                print(f"Used {time.time() - st:.3f}s, Summarized page_id: {page_id}, summary: {summary}")
+                list_pages.append(summarized_page)
+
+        return summarized_pages
 
     def _get_top_items(self, items: list, k):
         """

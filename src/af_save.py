@@ -203,8 +203,9 @@ def process_reddit(args):
 
     data_filtered = op.filter(data_scored, min_score=4)
 
+    data_summarized = op.summarize(data_filtered)
     data_ranked = op.rank(
-        data_filtered, min_score=args.min_score_to_rank)
+        data_summarized, min_score=args.min_score_to_rank)
 
     targets = args.targets.split(",")
     pushed_stats = op.push(
