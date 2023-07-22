@@ -27,8 +27,8 @@ class OpsStats:
             "total_input": OpsCounter("total_input"),
             "post_deduping": OpsCounter("post_deduping"),
             "post_scoring": OpsCounter("post_scoring"),
-            "post_summary": OpsCounter("post_summary"),
             "post_filtering": OpsCounter("post_filtering"),
+            "post_summary": OpsCounter("post_summary"),
             "post_ranking": OpsCounter("post_ranking"),
             "total_pushed": OpsCounter("total_pushed"),
         }

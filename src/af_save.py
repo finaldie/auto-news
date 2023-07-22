@@ -215,8 +215,8 @@ def process_reddit(args):
     op.printStats("Reddit", data, data_deduped, data_ranked)
 
     return op.createStats(
-        data, data_deduped, data_scored, data_filtered, data_ranked,
-        pushed_stats)
+        data, data_deduped, data_scored, data_filtered,
+        data_summarized, data_ranked, pushed_stats)
 
 
 def run(args):

@@ -528,6 +528,7 @@ class OperatorReddit(OperatorBase):
         data_deduped=None,
         data_scored=None,
         data_filtered=None,
+        data_summary=None,
         data_ranked=None,
         pushed_stats=None
     ):
@@ -538,6 +539,8 @@ class OperatorReddit(OperatorBase):
             "post_deduping": data_deduped,
             "post_scoring": data_scored,
             "post_filtering": data_filtered,
+            "post_summary": data_summary,
+            "post_ranked": data_ranked,
             "total_pushed": data_ranked,
         }
 
