@@ -1528,26 +1528,50 @@ class NotionAgent:
 
         # Embed Raw reddit url (if media is not None)
         # For example it's a YouTube video
+        page_url = page["url"]
         has_media = page["raw"]["data"]["media"]
-        is_video = page["raw"]["data"]["is_video"]
-        print(f"Create database item, has_media: {has_media}, is_video: {is_video}")
+        is_video = page["raw"]["data"]["is_video"] or "https://v.redd.it" in page_url
+        is_img = page_url.endswith("jpg") or page_url.endswith("png") or page_url.endswith("gif") or "www.reddit.com/gallery" in page_url or "https://i.redd.it" in page_url
+        is_external_link = "https://www.reddit.com" not in page_url and ".redd.it" not in page_url
+
+        print(f"Create database item, has_media: {has_media}, is_video: {is_video}, is_img: {is_img}")
 
         if has_media or is_video:
             blocks.append({
                 "type": "video",
                 "video": {
-                    "url": utils.urlUnshorten(page['url'])
+                    "url": utils.urlUnshorten(page_url)
+                }
+            })
+
+        elif is_img:
+            blocks.append({
+                "type": "image",
+                "image": {
+                    "type": "external",
+                    "external": {
+                        "url": utils.urlUnshorten(page_url)
+                    }
+                }
+            })
+
+        elif is_external_link:
+            blocks.append({
+                "type": "embed",
+                "embed": {
+                    "url": utils.urlUnshorten(page_url)
                 }
             })
 
         # Append Reddit post text
-        blocks.append({
-            "object": "block",
-            "type": "quote",
-            "quote": {
-                "rich_text": self._createBlock_RichText(page["text"])
-            }
-        })
+        if page["text"]:
+            blocks.append({
+                "object": "block",
+                "type": "quote",
+                "quote": {
+                    "rich_text": self._createBlock_RichText()
+                }
+            })
 
         summary = page.get("__summary") or ""
         if summary:
