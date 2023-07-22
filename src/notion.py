@@ -1526,15 +1526,19 @@ class NotionAgent:
         properties, blocks = self._createDatabaseItem_ArticleBase(
             page, summary=False, append_notion_url=False)
 
-        # Embed Raw reddit url
-        # TODO: It doesn't work in API (works in UI creation)
-        #       Need to test it again
-        # blocks.append({
-        #     "type": "embed",
-        #     "embed": {
-        #         "url": utils.urlUnshorten(page['url'])
-        #     }
-        # })
+        # Embed Raw reddit url (if media is not None)
+        # For example it's a YouTube video
+        has_media = page["raw"]["data"]["media"]
+        is_video = page["raw"]["data"]["is_video"]
+        print(f"Create database item, has_media: {has_media}, is_video: {is_video}")
+
+        if has_media or is_video:
+            blocks.append({
+                "type": "video",
+                "video": {
+                    "url": utils.urlUnshorten(page['url'])
+                }
+            })
 
         # Append Reddit post text
         blocks.append({
