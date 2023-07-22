@@ -1,6 +1,5 @@
 import os
 import time
-import uuid
 import requests
 from datetime import datetime
 
@@ -14,7 +13,7 @@ class RedditAgent:
     def __init__(self, client_id=None, client_secret=None):
         self.client_id = client_id or os.getenv("REDDIT_CLIENT_ID")
         self.client_secret = client_secret or os.getenv("REDDIT_CLIENT_SECRET")
-        self.app_id = os.getenv("REDDIT_APP_ID") or f"app_{str(uuid.uuid4())}"
+        self.app_id = os.getenv("REDDIT_APP_ID", "app_reddit_api")
         self.app_version = os.getenv("REDDIT_APP_VERSION") or "1.0.0"
         self.user_agent = f"auto_news:{self.app_id}:{self.app_version}"
         self.access_token = self.auth()
