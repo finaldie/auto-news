@@ -1554,7 +1554,7 @@ class NotionAgent:
         """
 
         try:
-            page_id = new_page["hash_id"]
+            page_id = new_page["id"]
 
             print("Add reddit post metadata as comment")
             self.createPageComment(page_id, post_metadata)
