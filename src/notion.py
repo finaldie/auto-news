@@ -815,13 +815,7 @@ class NotionAgent:
 
         block_content += f": {tweet['text']}"
 
-        blocks.append({
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": self._createBlock_RichText(block_content)
-            }
-        })
+        blocks.extend(self._createBlock_RichText("paragraph", block_content))
 
         # append embeded content (if have)
         if tweet['embed']:
@@ -859,13 +853,7 @@ class NotionAgent:
         summary_en, summary_trans = utils.splitSummaryTranslation(summary)
         block_content = f"Summary:\n{summary_en}"
 
-        blocks.append({
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": self._createBlock_RichText(block_content)
-            }
-        })
+        blocks.extend(self._createBlock_RichText("paragraph", block_content))
 
         if summary_trans:
             blocks.append(self._createBlock_Toggle(
@@ -1019,17 +1007,7 @@ class NotionAgent:
 
         summary_en, summary_trans = utils.splitSummaryTranslation(summary)
         block_content = f"Summary:\n{summary_en}"
-
-        blocks = [
-            # put summary content
-            {
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": self._createBlock_RichText(block_content)
-                }
-            },
-        ]
+        blocks = self._createBlock_RichText("paragraph", block_content)
 
         if summary_trans:
             blocks.append(self._createBlock_Toggle(
@@ -1116,14 +1094,16 @@ class NotionAgent:
 
         return new_page
 
-    def _createBlock_RichText(self, text, chunk_size=1800):
+    def _createBlock_RichText(self, type, text, chunk_size=1800):
         """
         Each rich text content must be <= 2000, use 1800 to be safer
+        Split the text into multiple blocks if needed
         """
+
         arr = text.split(".")
         cur_size = 0
         cur_text = []
-        rich_texts = []
+        blocks = []
 
         for i in range(len(arr)):
             new_size = cur_size + len(arr[i])
@@ -1132,10 +1112,18 @@ class NotionAgent:
                 cur_size += len(arr[i])
                 cur_text.append(arr[i])
             else:
-                rich_texts.append({
-                    "text": {
-                        "content": ". ".join(cur_text)
-                    },
+                blocks.append({
+                    "object": "block",
+                    "type": type,
+                    type: {
+                        "rich_text": [
+                            {
+                                "text": {
+                                    "content": ". ".join(cur_text)
+                                },
+                            }
+                        ]
+                    }
                 })
 
                 # reset to arr[i]
@@ -1143,16 +1131,24 @@ class NotionAgent:
                 cur_size = len(arr[i])
 
         # append last
-        rich_texts.append({
-            "text": {
-                "content": ". ".join(cur_text)
-            },
+        blocks.append({
+            "object": "block",
+            "type": type,
+            type: {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": ". ".join(cur_text)
+                        },
+                    }
+                ]
+            }
         })
 
-        if len(rich_texts) > 1:
-            print(f"[notion._createBlock_RichText]: chunked rich text content into {len(rich_texts)} chunks")
+        if len(blocks) > 1:
+            print(f"[notion._createBlock_RichText]: chunked rich text content into {len(blocks)} chunks")
 
-        return rich_texts
+        return blocks
 
     def _createBlock_Toggle(self, title, content):
         return {
@@ -1168,12 +1164,8 @@ class NotionAgent:
                 }],
 
                 "color": "default",
-                "children": [{
-                    "type": "paragraph",
-                    "paragraph": {
-                        "rich_text": self._createBlock_RichText(content)
-                    }
-                }]
+                "children": self._createBlock_RichText(
+                    "paragraph", content),
             }
         }
 
@@ -1492,13 +1484,7 @@ class NotionAgent:
             take_aways = self.extractRichText(
                 page["properties"]["properties"]["Take Aways"]["rich_text"])
 
-            blocks.append({
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": self._createBlock_RichText(take_aways),
-                }
-            })
+            blocks.extend(self._createBlock_RichText("paragraph", take_aways))
 
             # Uncomment below if need append the link
             # blocks.append({
@@ -1567,13 +1553,7 @@ class NotionAgent:
 
         # Append Reddit post text
         if page["text"]:
-            blocks.append({
-                "object": "block",
-                "type": "quote",
-                "quote": {
-                    "rich_text": self._createBlock_RichText(page["text"])
-                }
-            })
+            blocks.extend(self._createBlock_RichText("quote", page["text"]))
 
         summary = page.get("__summary") or ""
         if summary:
