@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import hashlib
 import traceback
 import subprocess
@@ -245,6 +246,29 @@ def prun(func):
     except Exception as e:
         print(f"[ERROR] Exception from prun: {e}")
         traceback.print_exc()
+
+
+def retry(func, retries=3):
+    retries = retries if retries > 0 else 3
+
+    while retries > 0:
+        retries -= 1
+
+        try:
+            st = time.time()
+            ret = func()
+            print(f"Function executed successfully, time used: {time.time() - st:.2f}s")
+            return ret
+
+        except Exception as e:
+            print(f"[ERROR] Failed to executed function: {e}")
+            traceback.print_exc()
+
+            if retries == 0:
+                raise
+            else:
+                print("Wait for 5s to retry ...")
+                time.sleep(5)
 
 
 def load_web(url):
