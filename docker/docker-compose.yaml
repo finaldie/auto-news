@@ -321,14 +321,10 @@ services:
       - |
         echo "User: `id`"
         echo "PWD: `pwd`"
-        echo "Apply Database patches..."
         echo "----"
-        python3 ~/airflow/run/auto-news/src/db_patches.py
-        echo "Apply Database patches finished"
-        echo "----"
-        echo "Creating notion entry pages"
-        python3 ~/airflow/run/auto-news/src/notion_init.py
-        echo "Creating notion entry pages finished"
+        echo "Apply patches ..."
+        python3 ~/airflow/run/auto-news/src/patches.py
+        echo "Apply patches finished"
         echo "----"
         sleep 5
         echo "Enable DAGs..."

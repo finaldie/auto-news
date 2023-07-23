@@ -177,17 +177,6 @@ class OperatorRSS(OperatorBase):
 
         return deduped_pages
 
-    def _load_web(self, url):
-        loader = LLMWebLoader()
-        docs = loader.load(url)
-
-        content = ""
-        for doc in docs:
-            content += doc.page_content
-            content += "\n"
-
-        return content
-
     def filter(self, pages, **kwargs):
         print("#####################################################")
         print("# Filter RSS (After Scoring)")
@@ -291,7 +280,7 @@ class OperatorRSS(OperatorBase):
                 # from this entrypoint
                 if not content:
                     print("page content is empty, fallback to load web page via WebBaseLoader")
-                    content = self._load_web(source_url)
+                    content = utils.load_web(source_url)
                     print(f"Page content ({len(content)} chars)")
 
                     if not content:

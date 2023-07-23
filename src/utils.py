@@ -9,6 +9,10 @@ from operator import itemgetter
 import pytz
 import requests
 
+from llm_agent import (
+    LLMWebLoader
+)
+
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -241,3 +245,18 @@ def prun(func):
     except Exception as e:
         print(f"[ERROR] Exception from prun: {e}")
         traceback.print_exc()
+
+
+def load_web(url):
+    landing_page = urlUnshorten(url)
+    print(f"[load_web] origin url: {url}, landing page: {landing_page}")
+
+    loader = LLMWebLoader()
+    docs = loader.load(landing_page)
+
+    content = ""
+    for doc in docs:
+        content += doc.page_content
+        content += "\n"
+
+    return content

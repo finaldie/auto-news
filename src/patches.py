@@ -1,26 +1,27 @@
 from dotenv import load_dotenv
 from mysql_cli import MySQLClient
 
-
-def patch_0(db_cli):
-    """
-    Create Notion metadata table
-    """
-    db_cli.create_table_index_pages()
-    return True, "OK"
+import patch_0
+import patch_1
 
 
-# DB patches: table creation, alter column/index, insert data, etc
-DATABASE_PATCHES = [
+# patches: table creation, alter column/index, insert data, etc
+PATCHES_TABLE = [
     {
         "name": "init_notion",
         "order_id": 0,
-        "function": patch_0,
+        "function": patch_0.apply,
+    },
+
+    {
+        "name": "init_notion_reddit",
+        "order_id": 1,
+        "function": patch_1.apply,
     },
 ]
 
 
-def apply_database_patches():
+def apply_patches():
     # 1. Init patch table (1st time)
     print("1 Database initializing...")
     db_cli = MySQLClient()
@@ -31,7 +32,7 @@ def apply_database_patches():
     applied_orders = db_cli.patch_table_load()
     print(f"2 Applied_orders: {applied_orders}")
 
-    for patch in DATABASE_PATCHES:
+    for patch in PATCHES_TABLE:
         name = patch["name"]
         order_id = patch["order_id"]
         func = patch["function"]
@@ -41,7 +42,7 @@ def apply_database_patches():
             print(f"2 order_id {order_id} has been applied, skip")
             continue
 
-        ok, msg = func(db_cli)
+        ok, msg = func()
 
         if ok:
             db_cli.patch_table_insert(name, order_id)
@@ -52,4 +53,4 @@ def apply_database_patches():
 
 if __name__ == "__main__":
     load_dotenv()
-    apply_database_patches()
+    apply_patches()

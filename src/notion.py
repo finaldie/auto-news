@@ -1,6 +1,5 @@
 import os
 import time
-import copy
 import traceback
 
 from notion_client import Client
@@ -366,6 +365,49 @@ class NotionAgent:
                     "database_id": database_id,
                     "twitter_id": page["properties"]["id"]["title"][0]["text"]["content"],
                     "name": self.extractRichText(page["properties"]["Name"]["rich_text"]),
+                    "created_time": page["created_time"],
+                    "last_edited_time": page["last_edited_time"],
+                })
+
+        return extracted_pages
+
+    def queryDatabase_RedditList(self, database_id):
+        query_data = {
+            "database_id": database_id,
+            "sorts": [
+                {
+                    "property": "Created time",
+                    "direction": "descending",
+                },
+            ],
+
+            "filter": {
+                "and": [
+                    {
+                        "property": "Enabled",
+                        "checkbox": {
+                            "equals": True,
+                        },
+                    },
+                ]
+            }
+        }
+
+        pages = self.api.databases.query(**query_data).get("results")
+        extracted_pages = {}
+
+        for page in pages:
+            print(f"result: page id: {page['id']}")
+            page_id = page["id"]
+            list_names = self.extractMultiSelect(page["properties"]["List Name"])
+
+            for list_name in list_names:
+                page_list = extracted_pages.setdefault(list_name, [])
+
+                page_list.append({
+                    "page_id": page_id,
+                    "database_id": database_id,
+                    "subreddit": page["properties"]["SubReddit"]["title"][0]["text"]["content"],
                     "created_time": page["created_time"],
                     "last_edited_time": page["last_edited_time"],
                 })
@@ -773,13 +815,7 @@ class NotionAgent:
 
         block_content += f": {tweet['text']}"
 
-        blocks.append({
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": self._createBlock_RichText(block_content)
-            }
-        })
+        blocks.extend(self._createBlock_RichText("paragraph", block_content))
 
         # append embeded content (if have)
         if tweet['embed']:
@@ -811,6 +847,20 @@ class NotionAgent:
 
         return properties, blocks
 
+    def _createSummaryInPage(self, summary):
+        blocks = []
+
+        summary_en, summary_trans = utils.splitSummaryTranslation(summary)
+        block_content = f"Summary:\n{summary_en}"
+
+        blocks.extend(self._createBlock_RichText("paragraph", block_content))
+
+        if summary_trans:
+            blocks.append(self._createBlock_Toggle(
+                "Translation", summary_trans))
+
+        return blocks
+
     def _createDatabaseItem_ArticleBase(self, ranked_page, **kwargs):
         """
         Create page properties and blocks, will put the summary
@@ -820,6 +870,7 @@ class NotionAgent:
         - content    The original content (Could be very huge), notes that each block has 2000 chars limitation
         - __summary  The summary content
         """
+        summary_enabled = kwargs.setdefault("summary", True)
         summary = ranked_page.get("__summary") or ""
         # preview_content = summary[:100] + "..."
 
@@ -874,23 +925,12 @@ class NotionAgent:
                 },
             })
 
-        # put summary content
-        summary_en, summary_trans = utils.splitSummaryTranslation(summary)
-        block_content = f"Summary:\n{summary_en}"
+        blocks = []
 
-        blocks = [
-            {
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": self._createBlock_RichText(block_content)
-                }
-            }
-        ]
-
-        if summary_trans:
-            blocks.append(self._createBlock_Toggle(
-                "Translation", summary_trans))
+        # Add summary content
+        if summary_enabled:
+            summary_blocks = self._createSummaryInPage(summary)
+            blocks.extend(summary_blocks)
 
         # append orginal notion url
         if append_notion_url:
@@ -967,17 +1007,7 @@ class NotionAgent:
 
         summary_en, summary_trans = utils.splitSummaryTranslation(summary)
         block_content = f"Summary:\n{summary_en}"
-
-        blocks = [
-            # put summary content
-            {
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": self._createBlock_RichText(block_content)
-                }
-            },
-        ]
+        blocks = self._createBlock_RichText("paragraph", block_content)
 
         if summary_trans:
             blocks.append(self._createBlock_Toggle(
@@ -1064,14 +1094,16 @@ class NotionAgent:
 
         return new_page
 
-    def _createBlock_RichText(self, text, chunk_size=1900):
+    def _createBlock_RichText(self, type, text, chunk_size=1800):
         """
-        Each rich text content must be <= 2000, use 1900 to be safer
+        Each rich text content must be <= 2000, use 1800 to be safer
+        Split the text into multiple blocks if needed
         """
-        arr = text.split("\n")
+
+        arr = text.split(".")
         cur_size = 0
         cur_text = []
-        rich_texts = []
+        blocks = []
 
         for i in range(len(arr)):
             new_size = cur_size + len(arr[i])
@@ -1080,10 +1112,18 @@ class NotionAgent:
                 cur_size += len(arr[i])
                 cur_text.append(arr[i])
             else:
-                rich_texts.append({
-                    "text": {
-                        "content": "\n".join(cur_text)
-                    },
+                blocks.append({
+                    "object": "block",
+                    "type": type,
+                    type: {
+                        "rich_text": [
+                            {
+                                "text": {
+                                    "content": ". ".join(cur_text)
+                                },
+                            }
+                        ]
+                    }
                 })
 
                 # reset to arr[i]
@@ -1091,16 +1131,24 @@ class NotionAgent:
                 cur_size = len(arr[i])
 
         # append last
-        rich_texts.append({
-            "text": {
-                "content": "\n".join(cur_text)
-            },
+        blocks.append({
+            "object": "block",
+            "type": type,
+            type: {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": ". ".join(cur_text)
+                        },
+                    }
+                ]
+            }
         })
 
-        if len(rich_texts) > 1:
-            print(f"[notion._createBlock_RichText]: chunked rich text content into {len(rich_texts)} chunks")
+        if len(blocks) > 1:
+            print(f"[notion._createBlock_RichText]: chunked rich text content into {len(blocks)} chunks")
 
-        return rich_texts
+        return blocks
 
     def _createBlock_Toggle(self, title, content):
         return {
@@ -1116,12 +1164,8 @@ class NotionAgent:
                 }],
 
                 "color": "default",
-                "children": [{
-                    "type": "paragraph",
-                    "paragraph": {
-                        "rich_text": self._createBlock_RichText(content)
-                    }
-                }]
+                "children": self._createBlock_RichText(
+                    "paragraph", content),
             }
         }
 
@@ -1440,13 +1484,7 @@ class NotionAgent:
             take_aways = self.extractRichText(
                 page["properties"]["properties"]["Take Aways"]["rich_text"])
 
-            blocks.append({
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": self._createBlock_RichText(take_aways),
-                }
-            })
+            blocks.extend(self._createBlock_RichText("paragraph", take_aways))
 
             # Uncomment below if need append the link
             # blocks.append({
@@ -1461,6 +1499,119 @@ class NotionAgent:
             {"database_id": database_id},
             properties,
             blocks)
+
+    def createDatabaseItem_ToRead_Reddit(
+        self,
+        database_id,
+        list_names: list,
+        page,
+        topics: list,
+        categories: list,
+        rate_number
+    ):
+        properties, blocks = self._createDatabaseItem_ArticleBase(
+            page, summary=False, append_notion_url=False)
+
+        # Embed Raw reddit url (if media is not None)
+        # For example it's a YouTube video
+        page_url = page["url"]
+        is_video = page["is_video"]
+        is_image = page["is_image"]
+        is_external_link = page["is_external_link"]
+        video_url = page['video_url']
+
+        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_external_link: {is_external_link}, video_url: {video_url}")
+
+        if is_video:
+            blocks.append({
+                "type": "video",
+                "video": {
+                    "type": "external",
+                    "external": {
+                        "url": utils.urlUnshorten(video_url)
+                    }
+                }
+            })
+
+        elif is_image:
+            blocks.append({
+                "type": "image",
+                "image": {
+                    "type": "external",
+                    "external": {
+                        "url": utils.urlUnshorten(page_url)
+                    }
+                }
+            })
+
+        elif is_external_link:
+            blocks.append({
+                "type": "embed",
+                "embed": {
+                    "url": utils.urlUnshorten(page_url)
+                }
+            })
+
+        # Append Reddit post text
+        if page["text"]:
+            blocks.extend(self._createBlock_RichText("quote", page["text"]))
+
+        summary = page.get("__summary") or ""
+        if summary:
+            summary_blocks = self._createSummaryInPage(summary)
+            blocks.extend(summary_blocks)
+
+        # In the bottom, append the original link
+        blocks.append({
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": "Link",
+                            "link": {
+                                "url": page['url'],
+                            },
+                        },
+                        "href": page["url"],
+                    },
+                ],
+            }
+        })
+
+        # Common fields for article, youtube, etc
+        new_page = self._postprocess_ToRead(
+            properties,
+            blocks,
+            database_id,
+            page,
+            topics,
+            categories,
+            rate_number,
+            list_names=list_names
+        )
+
+        # Add post metadata as a comment
+        post_metadata = f"""
+        Subreddit: {page['subreddit']}
+        Author: {page['author']}
+        Ups: {page['ups']}
+        Downs: {page['downs']}
+        NumOfComments: {page['num_comments']}
+        """
+
+        try:
+            page_id = new_page["id"]
+
+            print("Add reddit post metadata as comment")
+            self.createPageComment(page_id, post_metadata)
+
+        except Exception as e:
+            print(f"[ERROR] Failed to add comment: {e}")
+            traceback.print_exc()
+
+        return new_page
 
     def createPageComment(
         self,
@@ -1587,7 +1738,7 @@ class NotionAgent:
 
     def createDatabase_RSS_List(self, name, parent_page_id):
         """
-        Create a database for Inbox
+        Create a database for RSS inbox list
         """
         title = [
             {
@@ -1628,7 +1779,7 @@ class NotionAgent:
 
     def createDatabase_Tweets_List(self, name, parent_page_id):
         """
-        Create a database for Inbox
+        Create a database for Tweet
         """
         title = [
             {
@@ -1645,6 +1796,50 @@ class NotionAgent:
                 "title": {}
             },
             "Name": {
+                "rich_text": {}
+            },
+            "List Name": {
+                "multi_select": {}
+            },
+            "Created time": {
+                "created_time": {}
+            },
+            "Last edited time": {
+                "last_edited_time": {}
+            },
+            "Enabled": {
+                "checkbox": {}
+            },
+        }
+
+        # Create the new database under the specified page
+        new_database = self.api.databases.create(
+            parent={"type": "page_id", "page_id": parent_page_id},
+            title=title,
+            properties=new_database_properties
+        )
+
+        return new_database
+
+    def createDatabase_Reddit_List(self, name, parent_page_id):
+        """
+        Create a database for Reddit
+        """
+        title = [
+            {
+                "type": "text",
+                "text": {
+                    "content": name,
+                }
+            }
+        ]
+
+        # Set the properties of the new database
+        new_database_properties = {
+            "SubReddit": {
+                "title": {}
+            },
+            "Notes": {
                 "rich_text": {}
             },
             "List Name": {

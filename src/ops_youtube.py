@@ -217,7 +217,7 @@ class OperatorYoutube(OperatorBase):
             content = page["__transcript"]
             source_url = page["source_url"]
             print(f"Summarying page, title: {title}, source_url: {source_url}")
-            print(f"Page content ({len(content)} chars): {content}")
+            print(f"Page content ({len(content)} chars): {content:200}...")
 
             st = time.time()
 
@@ -225,8 +225,6 @@ class OperatorYoutube(OperatorBase):
                 "youtube", "default", page_id)
 
             if not llm_summary_resp:
-                # Double check the content, if empty, load it from
-                # the source url
                 if not content:
                     print(f"[ERROR] Empty Youtube transcript loaded, title: {title}, source_url: {source_url}, skip it")
                     continue

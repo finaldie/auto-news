@@ -1,5 +1,5 @@
 # Auto-News: An Automatic News Aggregator with LLM
-A personal news aggregator to pull information from multi-sources + LLM (ChatGPT) to help us read efficiently with less noise, the sources including Tweets, RSS, YouTube, and Articles.
+A personal news aggregator to pull information from multi-sources + LLM (ChatGPT) to help us read efficiently with less noise, the sources including Tweets, RSS, YouTube, Web Articles and Reddit.
 
 ## Why need it?
 In the world of this information explosion, we live with noise every day, it becomes even worse after the generative AI was born. Time is a precious resource for each of us, How to use our time more efficiently? It becomes more challenging than ever. Think about how much time we spent on pulling/searching/filtering content from different sources, how many times we put the article/paper or long video as a side tab, but never got a chance to look at, and how much effort to organize the information we have read. We need a better way to get rid of the noises, focus on reading the information efficiently based on our interests, and stay on track with the goals we defined.
@@ -36,8 +36,9 @@ The Auto-News was born for the following goals:
 * [Required] [Notion token](https://www.notion.so/my-integrations)
 * [Required] [OpenAI token](https://openai.com/blog/openai-api)
 * [Required] [Docker](https://www.docker.com/)
-* [Optional] [Notion Web Clipper](https://chrome.google.com/webstore/detail/notion-web-clipper/knheggckgoiihginacbkhaalnibhilkk)
-* [Optional] [Twitter Developer Tokens](https://developer.twitter.com/en)
+* [Optional] Highly Recommended! [Notion Web Clipper](https://chrome.google.com/webstore/detail/notion-web-clipper/knheggckgoiihginacbkhaalnibhilkk)
+* [Optional] [Reddit Tokens](https://www.reddit.com/prefs/apps)
+* [Optional] [Twitter Developer Tokens](https://developer.twitter.com/en), **Paid Account Only**
 
 ## [UI] Create Notion Entry Page
 
@@ -48,6 +49,7 @@ Checkout the repo and copy `.env.template` to `build/.env`, then fill up the env
 * `NOTION_TOKEN`
 * `NOTION_ENTRY_PAGE_ID`
 * `OPENAI_API_KEY`
+* [Optional] `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET`
 * [Optional] Vars with `TWITTER_` prefix
 
 ## [Backend] Build Services
@@ -80,8 +82,8 @@ Readings
 ```
 
 - Go to `RSS_List` page, and fill in the RSS name and URL
+- Go to `Reddit_List` page, and fill the subreddit names
 - Go to `Tweet_List` page, and fill in the Tweet screen names
-
 
 ## [UI] Set up Notion database views
 Go to Notion `ToRead` database page, all the data will flow into this database later on, create the database views for different sources to help us organize flows easier. E.g. Tweets, Articles, YouTube, RSS, etc
