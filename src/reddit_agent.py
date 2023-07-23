@@ -90,9 +90,15 @@ class RedditAgent:
             text = post["data"]["selftext"]
             if not text and not is_video and not is_image and is_external_link:
                 def load_web():
+                    print(f"[RedditAgent] Loading web page from {page_url} ...")
                     return utils.load_web(page_url)
 
-                text = utils.retry(load_web, retries=3)
+                try:
+                    text = utils.retry(load_web, retries=3)
+
+                except Exception as e:
+                    print(f"[ERROR] Load web content failed from {page_url}, use empty string instead: {e}")
+
                 print(f"Post from external link (non-video/image), load from source {page_url}, text: {text:200}...")
 
             extracted_post = {
