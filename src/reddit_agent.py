@@ -132,7 +132,9 @@ class RedditAgent:
 
     def _extract_video_url(self, post):
         media = post["data"].get("media")
-        if not media or len(media) == 0:
+        print(f"[RedditAgent] Extract media section: {media}, type: {type(media)}")
+
+        if not media or len(media) == 0 or not isinstance(media, dict):
             return ""
 
         for key, metadata in media.items():
