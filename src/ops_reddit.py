@@ -481,7 +481,7 @@ class OperatorReddit(OperatorBase):
             database_id, [list_name], ranked_post,
             topics_topk, categories_topk, rate)
 
-        print("Inserted one tweet into ToRead database")
+        print("Inserted one Reddit post into ToRead database")
         self.markVisited(
             ranked_post["hash_id"],
             source="reddit",

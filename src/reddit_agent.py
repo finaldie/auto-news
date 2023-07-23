@@ -110,6 +110,7 @@ class RedditAgent:
                 "is_video": is_video,
                 "is_image": is_image,
                 "is_external_link": is_external_link,
+                "video_url": self._extract_video_url(post),
 
                 "raw": post,
             }
@@ -128,6 +129,16 @@ class RedditAgent:
             return True
         else:
             return False
+
+    def _extract_video_url(self, post):
+        media = post["data"].get("media")
+        if not media or len(media) == 0:
+            return ""
+
+        for key, metadata in media.items():
+            print(f"[RedditAgent] Extract video URL from {key}, metadata: {metadata}")
+
+            return metadata.get("fallback_url") or ""
 
     def _is_image(self, post):
         page_url = post["data"]["url"]

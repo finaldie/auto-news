@@ -1518,8 +1518,9 @@ class NotionAgent:
         is_video = page["is_video"]
         is_image = page["is_image"]
         is_external_link = page["is_external_link"]
+        video_url = page['video_url']
 
-        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_external_link: {is_external_link}")
+        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_external_link: {is_external_link}, video_url: {video_url}")
 
         if is_video:
             blocks.append({
@@ -1527,7 +1528,7 @@ class NotionAgent:
                 "video": {
                     "type": "external",
                     "external": {
-                        "url": utils.urlUnshorten(page_url)
+                        "url": utils.urlUnshorten(video_url)
                     }
                 }
             })
