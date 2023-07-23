@@ -137,10 +137,12 @@ class RedditAgent:
         if not media or len(media) == 0 or not isinstance(media, dict):
             return ""
 
-        for key, metadata in media.items():
-            print(f"[RedditAgent] Extract video URL from {key}, metadata: {metadata}")
-
-            return metadata.get("fallback_url") or ""
+        if media.get("reddit_video"):
+            return media["reddit_video"].get("fallback_url") or ""
+        elif media.get("type"):
+            # For example, a youtube video:
+            # {'type': 'youtube.com', 'oembed': {'provider_url': 'https://www.youtube.com/', 'version' ...
+            return post["data"]["url"]
 
     def _is_image(self, post):
         page_url = post["data"]["url"]
