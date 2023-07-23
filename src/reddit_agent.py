@@ -37,7 +37,7 @@ class RedditAgent:
         response.raise_for_status()
         return response.json()['access_token']
 
-    def get_subreddit_posts(self, subreddit, limit=25, wait_on_ratelimit=True):
+    def get_subreddit_posts(self, subreddit, limit=25, wait_on_ratelimit=True, retries=3):
         if self.ratelimit_remaining == 0 and wait_on_ratelimit:
             print(f"Reaching ratelimit cap, wait {self.ratelimit_reset} seconds until cap reset...")
 
@@ -56,13 +56,17 @@ class RedditAgent:
         URL = self.SUBREDDIT_NEW_URL.format(subreddit)
         print(f"[INFO] get_subreddit_posts for url: {URL}")
 
-        response = requests.get(URL,
-                                headers=headers,
-                                params=params)
+        def query():
+            response = requests.get(
+                URL,
+                headers=headers,
+                params=params)
 
-        response.raise_for_status()
-        self._save_ratelimit_info(response=response)
-        return self._extractSubredditPosts(response)
+            response.raise_for_status()
+            self._save_ratelimit_info(response=response)
+            return self._extractSubredditPosts(response)
+
+        return utils.retry(query, retries=retries)
 
     def _extractSubredditPosts(self, response):
         posts = response.json()["data"]["children"]
@@ -85,7 +89,10 @@ class RedditAgent:
 
             text = post["data"]["selftext"]
             if not text and not is_video and not is_image and is_external_link:
-                text = utils.load_web(page_url)
+                def load_web():
+                    return utils.load_web(page_url)
+
+                text = utils.retry(load_web, retries=3)
                 print(f"Post from external link (non-video/image), load from source {page_url}, text: {text:200}...")
 
             extracted_post = {
