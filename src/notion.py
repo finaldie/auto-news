@@ -1116,11 +1116,11 @@ class NotionAgent:
 
         return new_page
 
-    def _createBlock_RichText(self, text, chunk_size=1900):
+    def _createBlock_RichText(self, text, chunk_size=1800):
         """
-        Each rich text content must be <= 2000, use 1900 to be safer
+        Each rich text content must be <= 2000, use 1800 to be safer
         """
-        arr = text.split("\n")
+        arr = text.split(".")
         cur_size = 0
         cur_text = []
         rich_texts = []
@@ -1134,7 +1134,7 @@ class NotionAgent:
             else:
                 rich_texts.append({
                     "text": {
-                        "content": "\n".join(cur_text)
+                        "content": ". ".join(cur_text)
                     },
                 })
 
@@ -1145,7 +1145,7 @@ class NotionAgent:
         # append last
         rich_texts.append({
             "text": {
-                "content": "\n".join(cur_text)
+                "content": ". ".join(cur_text)
             },
         })
 
@@ -1539,7 +1539,10 @@ class NotionAgent:
             blocks.append({
                 "type": "video",
                 "video": {
-                    "url": utils.urlUnshorten(page_url)
+                    "type": "external",
+                    "external": {
+                        "url": utils.urlUnshorten(page_url)
+                    }
                 }
             })
 
