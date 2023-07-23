@@ -1519,7 +1519,7 @@ class NotionAgent:
         is_image = page["is_image"]
         is_external_link = page["is_external_link"]
 
-        print(f"Create database item, is_video: {is_video}, is_image: {is_image}, is_external_link: {is_external_link}")
+        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_external_link: {is_external_link}")
 
         if is_video:
             blocks.append({

@@ -124,7 +124,10 @@ class RedditAgent:
         has_media = post["data"]["media"]
         is_video = post["data"]["is_video"] or "https://v.redd.it" in page_url
 
-        return has_media or is_video
+        if has_media or is_video:
+            return True
+        else:
+            return False
 
     def _is_image(self, post):
         page_url = post["data"]["url"]
