@@ -310,7 +310,7 @@ class OperatorReddit(OperatorBase):
                 try:
                     title = post["title"]
                     text = post["text"]
-                    content = f"{title}: {text}"
+                    content = f"{list_name} {title}: {text}"
 
                     # Notes: k = 10 looks too noisy, tune k = 2
                     relevant_metas = op_milvus.get_relevant(
