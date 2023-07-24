@@ -95,7 +95,7 @@ push_dags:
 
 copy_files:
 	if [ -f "requirements-local.txt" ]; then \
-		cp requirements-local.txt $(AIRFLOW_PROJ_DIR)/run/
+		cp requirements-local.txt $(AIRFLOW_PROJ_DIR)/run/; \
 	fi
 
 .PHONY: help deploy init start stop
