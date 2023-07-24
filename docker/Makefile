@@ -55,7 +55,7 @@ deploy: deploy-airflow deploy-postgres deploy-redis deploy-mysql deploy-milvus
 deploy: post-deploy
 
 
-init: push_dags
+init: push_dags copy_files
 
 start-services:
 	docker-compose up -d
@@ -93,6 +93,11 @@ push_dags:
 	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags
 	cd $(topdir)/dags && cp *.py $(AIRFLOW_PROJ_DIR)/dags
 
+copy_files:
+	if [ -f "requirements-local.txt" ]; then \
+		cp requirements-local.txt $(AIRFLOW_PROJ_DIR)/run/
+	fi
+
 .PHONY: help deploy init start stop
 .PHONY: init-airflow post-deploy deploy-code logs info ps push_dags
-.PHONY: enable_dags deploy-postgres
+.PHONY: enable_dags deploy-postgres copy_files
