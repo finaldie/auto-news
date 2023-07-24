@@ -94,7 +94,7 @@ push_dags:
 	cd $(topdir)/dags && cp *.py $(AIRFLOW_PROJ_DIR)/dags
 
 copy_files:
-	if [ -f "requirements-local.txt" ]; then \
+	if [ -f requirements-local.txt ]; then \
 		cp requirements-local.txt $(AIRFLOW_PROJ_DIR)/run/; \
 	fi
 
