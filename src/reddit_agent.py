@@ -85,6 +85,7 @@ class RedditAgent:
             page_url = post["data"]["url"]
             is_video = self._is_video(post)
             is_image = self._is_image(post)
+            is_gallery = self._is_gallery(post)
             is_external_link = self._is_external_link(post)
 
             text = post["data"]["selftext"]
@@ -112,7 +113,12 @@ class RedditAgent:
 
                 "title": title,
                 "text": text,
+
+                # resource link
                 "url": page_url,
+                # original post link
+                "permalink": f'https://www.reddit.com{post["data"]["permalink"]}',
+
                 "subreddit": subreddit,
                 "author": author,
                 "ups": post["data"]["ups"],
@@ -122,6 +128,7 @@ class RedditAgent:
 
                 "is_video": is_video,
                 "is_image": is_image,
+                "is_gallery": is_gallery,
                 "is_external_link": is_external_link,
                 "video_url": self._extract_video_url(post),
 
@@ -166,6 +173,19 @@ class RedditAgent:
         for suffix in suffixs:
             if page_url.endswith(suffix):
                 return True
+
+        for part in others:
+            if part in page_url:
+                return True
+
+        return False
+
+    def _is_gallery(self, post):
+        """
+        Multiple images combined, and user can scroll it
+        """
+        page_url = post["data"]["url"]
+        others = ["www.reddit.com/gallery"]
 
         for part in others:
             if part in page_url:
