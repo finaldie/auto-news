@@ -1515,12 +1515,14 @@ class NotionAgent:
         # Embed Raw reddit url (if media is not None)
         # For example it's a YouTube video
         page_url = page["url"]
+        permalink = page["permalink"]
         is_video = page["is_video"]
         is_image = page["is_image"]
+        is_gallery = page["is_gallery"]
         is_external_link = page["is_external_link"]
         video_url = page['video_url']
 
-        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_external_link: {is_external_link}, video_url: {video_url}")
+        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_gallery: {is_gallery}, is_external_link: {is_external_link}, video_url: {video_url}, permalink: {permalink}")
 
         if is_video:
             blocks.append({
@@ -1541,6 +1543,14 @@ class NotionAgent:
                     "external": {
                         "url": utils.urlUnshorten(page_url)
                     }
+                }
+            })
+
+        elif is_gallery:
+            blocks.append({
+                "type": "embed",
+                "embed": {
+                    "url": utils.urlUnshorten(permalink)
                 }
             })
 
@@ -1571,10 +1581,10 @@ class NotionAgent:
                         "text": {
                             "content": "Link",
                             "link": {
-                                "url": page['url'],
+                                "url": permalink,
                             },
                         },
-                        "href": page["url"],
+                        "href": permalink,
                     },
                 ],
             }
