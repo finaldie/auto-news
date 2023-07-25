@@ -215,6 +215,7 @@ class RedditAgent:
         if not media_metadata:
             return []
 
+        print(f"[_extract_gallery] media_metadata: {media_metadata}")
         res = []
 
         for media_id, metadata in media_metadata.items():
