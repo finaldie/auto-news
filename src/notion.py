@@ -1521,8 +1521,9 @@ class NotionAgent:
         is_gallery = page["is_gallery"]
         is_external_link = page["is_external_link"]
         video_url = page['video_url']
+        gallery_medias = page["gallery_medias"]
 
-        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_gallery: {is_gallery}, is_external_link: {is_external_link}, video_url: {video_url}, permalink: {permalink}")
+        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_gallery: {is_gallery}, is_external_link: {is_external_link}, video_url: {video_url}, permalink: {permalink}, gallery_medias: {gallery_medias}")
 
         if is_video:
             blocks.append({
@@ -1547,12 +1548,19 @@ class NotionAgent:
             })
 
         elif is_gallery:
-            blocks.append({
-                "type": "embed",
-                "embed": {
-                    "url": utils.urlUnshorten(permalink)
-                }
-            })
+            # Assume they are all images
+            for media in gallery_medias:
+                print(f"[notion] Append Reddit gallery media: {media}")
+
+                blocks.append({
+                    "type": "image",
+                    "image": {
+                        "type": "external",
+                        "external": {
+                            "url": utils.urlUnshorten(media["url"])
+                        }
+                    }
+                })
 
         elif is_external_link:
             blocks.append({

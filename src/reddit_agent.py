@@ -131,6 +131,7 @@ class RedditAgent:
                 "is_gallery": is_gallery,
                 "is_external_link": is_external_link,
                 "video_url": self._extract_video_url(post),
+                "gallery_medias": self._extract_gallery(post),
 
                 "raw": post,
             }
@@ -184,6 +185,9 @@ class RedditAgent:
         """
         Multiple images combined, and user can scroll it
         """
+        if post["data"].get("is_gallery"):
+            return post["data"]["is_gallery"]
+
         page_url = post["data"]["url"]
         others = ["www.reddit.com/gallery"]
 
@@ -205,6 +209,29 @@ class RedditAgent:
                 return False
 
         return True
+
+    def _extract_gallery(self, post):
+        media_metadata = post["data"].get("media_metadata")
+        if not media_metadata:
+            return []
+
+        res = []
+
+        for media_id, metadata in media_metadata.items():
+            if metadata["status"] != "valid":
+                print(f"[WARN] media {media_id} is invalid, skip")
+                continue
+
+            media_type = metadata["e"]
+            media_url = metadata["s"]["u"]
+
+            res.append({
+                "id": media_id,
+                "type": media_type,
+                "url": media_url,
+            })
+
+        return res
 
     def _save_ratelimit_info(self, response=None):
         if not response:
