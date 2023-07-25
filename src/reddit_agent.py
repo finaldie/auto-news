@@ -168,7 +168,7 @@ class RedditAgent:
         page_url = post["data"]["url"]
 
         suffixs = ("jpg", "png", "gif")
-        others = ("www.reddit.com/gallery", "https://i.redd.it")
+        others = ["https://i.redd.it"]
 
         for suffix in suffixs:
             if page_url.endswith(suffix):
