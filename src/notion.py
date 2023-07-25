@@ -1,5 +1,6 @@
 import os
 import time
+import html
 import traceback
 
 from notion_client import Client
@@ -1551,13 +1552,15 @@ class NotionAgent:
             # Assume they are all images
             for media in gallery_medias:
                 print(f"[notion] Append Reddit gallery media: {media}")
+                unescaped_url = html.unescape(media["url"])
+                print(f"[notion] - unescaped url: {unescaped_url}")
 
                 blocks.append({
                     "type": "image",
                     "image": {
                         "type": "external",
                         "external": {
-                            "url": utils.urlUnshorten(media["url"])
+                            "url": utils.urlUnshorten(unescaped_url)
                         }
                     }
                 })
