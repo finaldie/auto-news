@@ -224,7 +224,7 @@ class RedditAgent:
                 continue
 
             media_type = metadata["e"]
-            media_url = metadata["s"]["u"]
+            media_url = metadata["s"].get("u") or metadata["s"].get("gif")
 
             res.append({
                 "id": media_id,
