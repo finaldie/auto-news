@@ -1527,15 +1527,36 @@ class NotionAgent:
         print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_gallery: {is_gallery}, is_external_link: {is_external_link}, video_url: {video_url}, permalink: {permalink}, gallery_medias: {gallery_medias}")
 
         if is_video:
-            blocks.append({
-                "type": "video",
-                "video": {
-                    "type": "external",
-                    "external": {
+            # The audio will also falling into this section
+            # Currently youtube and v.redd.it hosted videos
+            # are working fine, others we can wrap with embed
+            # but not guarantee to work
+            valid_video_provider = ["youtube", "v.redd.it"]
+
+            use_video_block = False
+            for video_provider in valid_video_provider:
+                if video_provider in video_url:
+                    use_video_block = True
+                    break
+
+            if use_video_block:
+                blocks.append({
+                    "type": "video",
+                    "video": {
+                        "type": "external",
+                        "external": {
+                            "url": utils.urlUnshorten(video_url)
+                        }
+                    }
+                })
+
+            else:
+                blocks.append({
+                    "type": "embed",
+                    "embed": {
                         "url": utils.urlUnshorten(video_url)
                     }
-                }
-            })
+                })
 
         elif is_image:
             blocks.append({

@@ -163,6 +163,9 @@ class RedditAgent:
         elif media.get("type"):
             # For example, a youtube video:
             # {'type': 'youtube.com', 'oembed': {'provider_url': 'https://www.youtube.com/', 'version' ...
+            #
+            # Notes: youtube and v.redd.it can be displayed correctly
+            #        others maybe not...
             return post["data"]["url"]
 
     def _is_image(self, post):
