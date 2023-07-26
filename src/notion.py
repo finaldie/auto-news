@@ -1531,7 +1531,7 @@ class NotionAgent:
             # Currently youtube and v.redd.it hosted videos
             # are working fine, others we can wrap with embed
             # but not guarantee to work
-            valid_video_provider = ["youtube", "v.redd.it"]
+            valid_video_provider = ["youtube.com", "youtu.be", "v.redd.it"]
 
             use_video_block = False
             for video_provider in valid_video_provider:
