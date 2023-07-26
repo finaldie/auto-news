@@ -1,5 +1,6 @@
 import os
 import time
+import html
 import traceback
 
 from notion_client import Client
@@ -1521,19 +1522,41 @@ class NotionAgent:
         is_gallery = page["is_gallery"]
         is_external_link = page["is_external_link"]
         video_url = page['video_url']
+        gallery_medias = page["gallery_medias"]
 
-        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_gallery: {is_gallery}, is_external_link: {is_external_link}, video_url: {video_url}, permalink: {permalink}")
+        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_gallery: {is_gallery}, is_external_link: {is_external_link}, video_url: {video_url}, permalink: {permalink}, gallery_medias: {gallery_medias}")
 
         if is_video:
-            blocks.append({
-                "type": "video",
-                "video": {
-                    "type": "external",
-                    "external": {
+            # The audio will also falling into this section
+            # Currently youtube and v.redd.it hosted videos
+            # are working fine, others we can wrap with embed
+            # but not guarantee to work
+            valid_video_provider = ["youtube.com", "youtu.be", "v.redd.it"]
+
+            use_video_block = False
+            for video_provider in valid_video_provider:
+                if video_provider in video_url:
+                    use_video_block = True
+                    break
+
+            if use_video_block:
+                blocks.append({
+                    "type": "video",
+                    "video": {
+                        "type": "external",
+                        "external": {
+                            "url": utils.urlUnshorten(video_url)
+                        }
+                    }
+                })
+
+            else:
+                blocks.append({
+                    "type": "embed",
+                    "embed": {
                         "url": utils.urlUnshorten(video_url)
                     }
-                }
-            })
+                })
 
         elif is_image:
             blocks.append({
@@ -1547,12 +1570,21 @@ class NotionAgent:
             })
 
         elif is_gallery:
-            blocks.append({
-                "type": "embed",
-                "embed": {
-                    "url": utils.urlUnshorten(permalink)
-                }
-            })
+            # Assume they are all images
+            for media in gallery_medias:
+                print(f"[notion] Append Reddit gallery media: {media}")
+                unescaped_url = html.unescape(media["url"])
+                print(f"[notion] - unescaped url: {unescaped_url}")
+
+                blocks.append({
+                    "type": "image",
+                    "image": {
+                        "type": "external",
+                        "external": {
+                            "url": utils.urlUnshorten(unescaped_url)
+                        }
+                    }
+                })
 
         elif is_external_link:
             blocks.append({

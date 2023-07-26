@@ -131,6 +131,7 @@ class RedditAgent:
                 "is_gallery": is_gallery,
                 "is_external_link": is_external_link,
                 "video_url": self._extract_video_url(post),
+                "gallery_medias": self._extract_gallery(post),
 
                 "raw": post,
             }
@@ -162,13 +163,16 @@ class RedditAgent:
         elif media.get("type"):
             # For example, a youtube video:
             # {'type': 'youtube.com', 'oembed': {'provider_url': 'https://www.youtube.com/', 'version' ...
+            #
+            # Notes: youtube and v.redd.it can be displayed correctly
+            #        others maybe not...
             return post["data"]["url"]
 
     def _is_image(self, post):
         page_url = post["data"]["url"]
 
         suffixs = ("jpg", "png", "gif")
-        others = ("www.reddit.com/gallery", "https://i.redd.it")
+        others = ["https://i.redd.it"]
 
         for suffix in suffixs:
             if page_url.endswith(suffix):
@@ -184,6 +188,9 @@ class RedditAgent:
         """
         Multiple images combined, and user can scroll it
         """
+        if post["data"].get("is_gallery"):
+            return post["data"]["is_gallery"]
+
         page_url = post["data"]["url"]
         others = ["www.reddit.com/gallery"]
 
@@ -205,6 +212,30 @@ class RedditAgent:
                 return False
 
         return True
+
+    def _extract_gallery(self, post):
+        media_metadata = post["data"].get("media_metadata")
+        if not media_metadata:
+            return []
+
+        print(f"[_extract_gallery] media_metadata: {media_metadata}")
+        res = []
+
+        for media_id, metadata in media_metadata.items():
+            if metadata["status"] != "valid":
+                print(f"[WARN] media {media_id} is invalid, skip")
+                continue
+
+            media_type = metadata["e"]
+            media_url = metadata["s"].get("u") or metadata["s"].get("gif")
+
+            res.append({
+                "id": media_id,
+                "type": media_type,
+                "url": media_url,
+            })
+
+        return res
 
     def _save_ratelimit_info(self, response=None):
         if not response:
