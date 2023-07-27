@@ -163,7 +163,7 @@ def run(args):
             data = pull_rss(args, op, source)
             save_rss(args, op, source, data)
 
-        elif source == "RSS":
+        elif source == "Reddit":
             op = OperatorReddit()
             data = pull_reddit(args, op, source)
             save_reddit(args, op, source, data)
