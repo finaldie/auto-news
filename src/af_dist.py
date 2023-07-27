@@ -9,6 +9,7 @@ from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
 from ops_obsidian import OperatorObsidian
 from ops_milvus import OperatorMilvus
+from ops_reddit import OperatorReddit
 import utils
 
 
@@ -90,6 +91,19 @@ def process_rss(args, folders):
     return data_deduped
 
 
+def process_reddit(args, folders):
+    print("#####################################################")
+    print(f"# Process Reddit, dedup: {args.dedup}")
+    print("#####################################################")
+    op = OperatorReddit()
+
+    data = op.load_folders(folders, "reddit.json")
+    data_deduped = op.unique(data)
+    print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
+
+    return data_deduped
+
+
 def dist(args, data, source, target):
     """
     data: The past few days unique data
@@ -164,6 +178,9 @@ def run(args):
 
         elif source == "RSS":
             data_deduped = process_rss(args, folders)
+
+        elif source == "Reddit":
+            data_deduped = process_reddit(args, folders)
 
         for target in targets:
             dist(args, data_deduped, source, target)
