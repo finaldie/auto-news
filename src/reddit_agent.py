@@ -227,6 +227,12 @@ class RedditAgent:
                 continue
 
             media_type = metadata["e"]
+            print(f"[INFO] media_id: {media_id}, type: {media_type}")
+
+            if not metadata.get("s"):
+                print(f"[WARN] Skip media_id: {media_id}, type: {media_type}, it has no valid section to extract: {metadata}")
+                continue
+
             media_url = metadata["s"].get("u") or metadata["s"].get("gif")
 
             res.append({
