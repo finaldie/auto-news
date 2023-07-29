@@ -83,10 +83,16 @@ class RedditAgent:
             post_hash_id = utils.hashcode_md5(post_long_id.encode("utf-8"))
 
             page_url = post["data"]["url"]
-            is_video = self._is_video(post)
-            is_image = self._is_image(post)
-            is_gallery = self._is_gallery(post)
-            is_external_link = self._is_external_link(post)
+            if page_url.startswith("/r/"):
+                print("[RedditAgent]: Fixing page_url: original: {page_url}")
+                page_url = f"https://www.reddit.com{page_url}"
+                print("[RedditAgent]: Fixing page_url: Fixed: {page_url}")
+
+            page_permalink = f'https://www.reddit.com{post["data"]["permalink"]}'
+            is_video = self._is_video(post, page_url)
+            is_image = self._is_image(post, page_url)
+            is_gallery = self._is_gallery(post, page_url)
+            is_external_link = self._is_external_link(post, page_url)
 
             text = post["data"]["selftext"]
             if not text and not is_video and not is_image and is_external_link:
@@ -117,7 +123,7 @@ class RedditAgent:
                 # resource link
                 "url": page_url,
                 # original post link
-                "permalink": f'https://www.reddit.com{post["data"]["permalink"]}',
+                "permalink": page_permalink,
 
                 "subreddit": subreddit,
                 "author": author,
@@ -140,9 +146,7 @@ class RedditAgent:
 
         return ret
 
-    def _is_video(self, post):
-        page_url = post["data"]["url"]
-
+    def _is_video(self, post, page_url):
         has_media = post["data"]["media"]
         is_video = post["data"]["is_video"] or "https://v.redd.it" in page_url
 
@@ -168,8 +172,7 @@ class RedditAgent:
             #        others maybe not...
             return post["data"]["url"]
 
-    def _is_image(self, post):
-        page_url = post["data"]["url"]
+    def _is_image(self, post, page_url):
 
         suffixs = ("jpg", "png", "gif")
         others = ["https://i.redd.it"]
@@ -184,14 +187,13 @@ class RedditAgent:
 
         return False
 
-    def _is_gallery(self, post):
+    def _is_gallery(self, post, page_url):
         """
         Multiple images combined, and user can scroll it
         """
         if post["data"].get("is_gallery"):
             return post["data"]["is_gallery"]
 
-        page_url = post["data"]["url"]
         others = ["www.reddit.com/gallery"]
 
         for part in others:
@@ -200,11 +202,10 @@ class RedditAgent:
 
         return False
 
-    def _is_external_link(self, post):
+    def _is_external_link(self, post, page_url):
         """
         post is the original reddit returned post dict object
         """
-        page_url = post["data"]["url"]
         cands = ("https://www.reddit.com", ".redd.it")
 
         for cand in cands:
