@@ -301,13 +301,11 @@ def load_video_transcript(
     loader = LLMYoutubeLoader()
     transcript_langs = os.getenv("YOUTUBE_TRANSCRIPT_LANGS", "en")
     langs = transcript_langs.split(",")
-    print(f"Loading Youtube transcript, supported language list: {langs}")
+    print(f"Loading Youtube transcript, supported language list: {langs}, url: {url}, page_id: {page_id}")
 
     client = DBClient()
     redis_key_expire_time = os.getenv(
         "BOT_REDIS_KEY_EXPIRE_TIME", 604800)
-
-    transcript = ""
 
     if enable_cache:
         transcript = client.get_notion_summary_item_id(
@@ -322,6 +320,7 @@ def load_video_transcript(
             print(f"[utils.load_video_transcript] cannot find cached transcript, will load it from original video, url: {url}, page_id: {page_id}")
 
     docs = []
+    transcript = ""
     metadata = {}
 
     for lang in langs:
