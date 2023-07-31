@@ -129,6 +129,7 @@ class RedditAgent:
                 text = transcript
 
             extracted_post = {
+                "id": post_hash_id,
                 "long_id": post_long_id,
                 "hash_id": post_hash_id,
                 "timestamp": ts,
