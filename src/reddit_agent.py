@@ -130,7 +130,7 @@ class RedditAgent:
                     data_folder,
                     run_id)
 
-                print(f"[RedditAgent] Loaded video {video_url}, transcript: {transcript}...")
+                print(f"[RedditAgent] Loaded video {video_url}, audio {audio_url}, transcript: {transcript:200}...")
                 text = transcript
 
             extracted_post = {
