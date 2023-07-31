@@ -10,9 +10,13 @@ from operator import itemgetter
 import pytz
 import requests
 
+from db_cli import DBClient
 from llm_agent import (
-    LLMWebLoader
+    LLMWebLoader,
+    LLMYoutubeLoader
 )
+
+from ops_audio2text import OperatorAudioToText
 
 
 def str2bool(v):
@@ -284,3 +288,76 @@ def load_web(url):
         content += "\n"
 
     return content
+
+
+def load_video_transcript(
+    url,
+    page_id="",
+    data_folder="",
+    run_id="",
+    audio2text=True,
+    enable_cache=True
+):
+    loader = LLMYoutubeLoader()
+    transcript_langs = os.getenv("YOUTUBE_TRANSCRIPT_LANGS", "en")
+    langs = transcript_langs.split(",")
+    print(f"Loading Youtube transcript, supported language list: {langs}")
+
+    client = DBClient()
+    redis_key_expire_time = os.getenv(
+        "BOT_REDIS_KEY_EXPIRE_TIME", 604800)
+
+    transcript = ""
+
+    if enable_cache:
+        transcript = client.get_notion_summary_item_id(
+            "reddit_transcript", "default", page_id)
+
+        if transcript:
+            transcript = bytes2str(transcript)
+
+        return transcript, {}
+
+    docs = []
+    metadata = {}
+
+    for lang in langs:
+        print(f"Loading Youtube transcript with language {lang} ...")
+        docs = loader.load(url, language=lang)
+
+        if len(docs) > 0:
+            print(f"Found transcript for language {lang}, number of docs returned: {len(docs)}")
+            break
+
+    if not docs:
+        print(f"[WARN] Transcipt not found for language list: {langs}")
+
+        if audio2text:
+            st = time.time()
+            print(f"Audio2Text enabled, transcribe it, page_id: {page_id}, url: {url} ...")
+            op_a2t = OperatorAudioToText(model_name="base")
+
+            audio_file = op_a2t.extract_audio(
+                page_id, url, data_folder, run_id)
+            print(f"Extracted audio file: {audio_file}")
+
+            audio_text = op_a2t.transcribe(audio_file)
+            print(f"Transcribed audio text (total {time.time() - st:.2f}s): {audio_text}")
+
+            transcript = audio_text.get("text") or ""
+
+    else:
+        for doc in docs:
+            transcript += doc.page_content
+            transcript += "\n"
+
+            # Notes: metadata is the same for all the docs
+            metadata = doc.metadata
+
+    # cache it
+    if enable_cache:
+        client.set_notion_summary_item_id(
+            "reddit_transcript", "default", page_id, transcript,
+            expired_time=int(redis_key_expire_time))
+
+    return transcript, metadata

@@ -37,7 +37,15 @@ class RedditAgent:
         response.raise_for_status()
         return response.json()['access_token']
 
-    def get_subreddit_posts(self, subreddit, limit=25, wait_on_ratelimit=True, retries=3):
+    def get_subreddit_posts(
+        self,
+        subreddit,
+        limit=25,
+        wait_on_ratelimit=True,
+        retries=3,
+        data_folder="/tmp",
+        run_id="",
+    ):
         if self.ratelimit_remaining == 0 and wait_on_ratelimit:
             print(f"Reaching ratelimit cap, wait {self.ratelimit_reset} seconds until cap reset...")
 
@@ -64,11 +72,12 @@ class RedditAgent:
 
             response.raise_for_status()
             self._save_ratelimit_info(response=response)
-            return self._extractSubredditPosts(response)
+            return self._extractSubredditPosts(
+                response, data_folder, run_id)
 
         return utils.retry(query, retries=retries)
 
-    def _extractSubredditPosts(self, response):
+    def _extractSubredditPosts(self, response, data_folder, run_id):
         posts = response.json()["data"]["children"]
         ret = []
 
@@ -93,6 +102,7 @@ class RedditAgent:
             is_image = self._is_image(post, page_url)
             is_gallery = self._is_gallery(post, page_url)
             is_external_link = self._is_external_link(post, page_url)
+            video_url = self._extract_video_url(post)
 
             text = post["data"]["selftext"]
             if not text and not is_video and not is_image and is_external_link:
@@ -107,6 +117,16 @@ class RedditAgent:
                     print(f"[ERROR] Load web content failed from {page_url}, use empty string instead: {e}")
 
                 print(f"Post from external link (non-video/image), load from source {page_url}, text: {text:200}...")
+
+            elif is_video:
+                transcript, metadata = utils.load_video_transcript(
+                    video_url,
+                    post_hash_id,
+                    data_folder,
+                    run_id)
+
+                print(f"[RedditAgent] Loaded video {video_url}, transcript: {transcript:200}...")
+                text = transcript
 
             extracted_post = {
                 "long_id": post_long_id,
@@ -136,7 +156,7 @@ class RedditAgent:
                 "is_image": is_image,
                 "is_gallery": is_gallery,
                 "is_external_link": is_external_link,
-                "video_url": self._extract_video_url(post),
+                "video_url": ,
                 "gallery_medias": self._extract_gallery(post),
 
                 "raw": post,

@@ -36,12 +36,16 @@ class OperatorReddit(OperatorBase):
         self.reddit_agent = RedditAgent()
         self.op_notion = OperatorNotion()
 
-    def pull(self, pulling_count, pulling_interval):
+    def pull(self, pulling_count, pulling_interval, **kwargs):
         print("#####################################################")
         print("# Pulling Reddit")
         print("#####################################################")
+        data_folder = kwargs.setdefault("data_folder", "")
+        run_id = kwargs.setdefault("run_id", "")
+
         print(f"pulling_count: {pulling_count}")
         print(f"pulling_interval: {pulling_interval}")
+        print(f"data_folder: {data_folder}, run_id: {run_id}")
 
         # Get reddit lists
         db_index_id = self.op_notion.get_index_inbox_dbid()
@@ -77,7 +81,8 @@ class OperatorReddit(OperatorBase):
                 print(f"Pulling subreddit {subreddit}...")
 
                 posts = self.reddit_agent.get_subreddit_posts(
-                    subreddit, limit=pulling_count)
+                    subreddit, limit=pulling_count,
+                    data_folder=data_folder, run_id=run_id)
 
                 list_posts.extend(posts)
 
