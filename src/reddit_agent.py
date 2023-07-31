@@ -119,13 +119,14 @@ class RedditAgent:
                 print(f"Post from external link (non-video/image), load from source {page_url}, text: {text:200}...")
 
             elif is_video:
+                print(f"[RedditAgent] is_video: {is_video}, loading video url: {video_url} ...")
                 transcript, metadata = utils.load_video_transcript(
                     video_url,
                     post_hash_id,
                     data_folder,
                     run_id)
 
-                print(f"[RedditAgent] Loaded video {video_url}, transcript: {transcript:200}...")
+                print(f"[RedditAgent] Loaded video {video_url}, transcript: {transcript}...")
                 text = transcript
 
             extracted_post = {

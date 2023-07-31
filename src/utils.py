@@ -316,7 +316,10 @@ def load_video_transcript(
         if transcript:
             transcript = bytes2str(transcript)
 
-        return transcript, {}
+            return transcript, {}
+
+        else:
+            print(f"[utils.load_video_transcript] cannot find cached transcript, will load it from original video, url: {url}, page_id: {page_id}")
 
     docs = []
     metadata = {}
