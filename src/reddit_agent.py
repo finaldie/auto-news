@@ -102,7 +102,7 @@ class RedditAgent:
             is_image = self._is_image(post, page_url)
             is_gallery = self._is_gallery(post, page_url)
             is_external_link = self._is_external_link(post, page_url)
-            video_url = self._extract_video_url(post)
+            video_blob = self._extract_video_url(post)
 
             text = post["data"]["selftext"]
             if not text and not is_video and not is_image and is_external_link:
@@ -119,9 +119,13 @@ class RedditAgent:
                 print(f"Post from external link (non-video/image), load from source {page_url}, text: {text:200}...")
 
             elif is_video:
-                print(f"[RedditAgent] is_video: {is_video}, loading video url: {video_url} ...")
+                print(f"[RedditAgent] is_video: {is_video}, loading video: {video_blob} ...")
+                video_url = video_blob["video_url"]
+                audio_url = video_blob["audio_url"]
+
                 transcript, metadata = utils.load_video_transcript(
                     video_url,
+                    audio_url,
                     post_hash_id,
                     data_folder,
                     run_id)
@@ -158,7 +162,7 @@ class RedditAgent:
                 "is_image": is_image,
                 "is_gallery": is_gallery,
                 "is_external_link": is_external_link,
-                "video_url": video_url,
+                "video": video_blob,
                 "gallery_medias": self._extract_gallery(post),
 
                 "raw": post,
@@ -182,17 +186,38 @@ class RedditAgent:
         print(f"[RedditAgent] Extract media section: {media}, type: {type(media)}")
 
         if not media or len(media) == 0 or not isinstance(media, dict):
-            return ""
+            return {
+                "video_provider": "unknown",
+                "video_url": "",
+                "audio_url": "",
+            }
 
         if media.get("reddit_video"):
-            return media["reddit_video"].get("fallback_url") or ""
+            # This one can be embedded in notion but no audio
+            video_url = media["reddit_video"].get("fallback_url") or ""
+
+            # This one can be downloaded via yt-dlp but cannot be embedded in notion
+            dash_url = media["reddit_video"].get("dash_url") or ""
+
+            return {
+                "video_provider": "reddit",
+                "video_url": video_url,
+                "audio_url": dash_url,
+            }
+
         elif media.get("type"):
             # For example, a youtube video:
             # {'type': 'youtube.com', 'oembed': {'provider_url': 'https://www.youtube.com/', 'version' ...
             #
             # Notes: youtube and v.redd.it can be displayed correctly
             #        others maybe not...
-            return post["data"]["url"]
+            provider_name = media["oembed"]["provider_name"]
+
+            return {
+                "video_provider": provider_name,
+                "video_url": post["data"]["url"],
+                "audio_url": post["data"]["url"],
+            }
 
     def _is_image(self, post, page_url):
 

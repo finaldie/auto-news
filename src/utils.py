@@ -292,6 +292,7 @@ def load_web(url):
 
 def load_video_transcript(
     url,
+    audio_url,
     page_id="",
     data_folder="",
     run_id="",
@@ -301,7 +302,7 @@ def load_video_transcript(
     loader = LLMYoutubeLoader()
     transcript_langs = os.getenv("YOUTUBE_TRANSCRIPT_LANGS", "en")
     langs = transcript_langs.split(",")
-    print(f"Loading Youtube transcript, supported language list: {langs}, url: {url}, page_id: {page_id}")
+    print(f"Loading Youtube transcript, supported language list: {langs}, video_url: {url}, audio_url: {audio_url}, page_id: {page_id}")
 
     client = DBClient()
     redis_key_expire_time = os.getenv(
@@ -336,11 +337,11 @@ def load_video_transcript(
 
         if audio2text:
             st = time.time()
-            print(f"Audio2Text enabled, transcribe it, page_id: {page_id}, url: {url} ...")
+            print(f"Audio2Text enabled, transcribe it, page_id: {page_id}, url: {url}, audio_url: {audio_url} ...")
             op_a2t = OperatorAudioToText(model_name="base")
 
             audio_file = op_a2t.extract_audio(
-                page_id, url, data_folder, run_id)
+                page_id, audio_url, data_folder, run_id)
             print(f"Extracted audio file: {audio_file}")
 
             audio_text = op_a2t.transcribe(audio_file)
