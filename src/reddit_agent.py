@@ -156,7 +156,7 @@ class RedditAgent:
                 "is_image": is_image,
                 "is_gallery": is_gallery,
                 "is_external_link": is_external_link,
-                "video_url": ,
+                "video_url": video_url,
                 "gallery_medias": self._extract_gallery(post),
 
                 "raw": post,
