@@ -1521,7 +1521,7 @@ class NotionAgent:
         is_image = page["is_image"]
         is_gallery = page["is_gallery"]
         is_external_link = page["is_external_link"]
-        video_blob = page['video_blob']
+        video_blob = page['video']
         video_url = video_blob["video_url"]
         gallery_medias = page["gallery_medias"]
 
