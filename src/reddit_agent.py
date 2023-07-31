@@ -116,7 +116,7 @@ class RedditAgent:
                 except Exception as e:
                     print(f"[ERROR] Load web content failed from {page_url}, use empty string instead: {e}")
 
-                print(f"Post from external link (non-video/image), load from source {page_url}, text: {text:200}...")
+                print(f"Post from external link (non-video/image), load from source {page_url}, text: {text[:200]}...")
 
             elif is_video:
                 print(f"[RedditAgent] is_video: {is_video}, loading video: {video_blob} ...")
@@ -130,7 +130,7 @@ class RedditAgent:
                     data_folder,
                     run_id)
 
-                print(f"[RedditAgent] Loaded video {video_url}, audio {audio_url}, transcript: {transcript:200}...")
+                print(f"[RedditAgent] Loaded video {video_url}, audio {audio_url}, transcript: {transcript[:200]}...")
                 text = transcript
 
             extracted_post = {
