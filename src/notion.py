@@ -1597,7 +1597,12 @@ class NotionAgent:
 
         # Append Reddit post text
         if page["text"]:
-            blocks.extend(self._createBlock_RichText("quote", page["text"]))
+            text_blocks = self._createBlock_RichText("quote", page["text"])
+            if len(text_blocks) > 10:
+                print(f"[WARN] [notion] text_blocks contains {len(text_blocks)} chunks, that's too many chunks, cut to at most 10 blocks")
+                text_blocks = text_blocks[:10]
+
+            blocks.extend(text_blocks)
 
         summary = page.get("__summary") or ""
         if summary:
