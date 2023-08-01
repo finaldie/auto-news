@@ -68,7 +68,10 @@ class EmbeddingOpenAI(Embedding):
             source, page_id)
 
         if not embedding:
-            embedding = self.create(text)
+            # OpenAI embedding model accept 8k tokens, exceed it will
+            # throw exceptions. Here we simply limited it <= 5000 chars
+            # for the input
+            embedding = self.create(text[:5000])
 
             # store embedding into redis (ttl = 1 month)
             client.set_milvus_embedding_item_id(
