@@ -1521,10 +1521,11 @@ class NotionAgent:
         is_image = page["is_image"]
         is_gallery = page["is_gallery"]
         is_external_link = page["is_external_link"]
-        video_url = page['video_url']
+        video_blob = page['video']
+        video_url = video_blob["video_url"]
         gallery_medias = page["gallery_medias"]
 
-        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_gallery: {is_gallery}, is_external_link: {is_external_link}, video_url: {video_url}, permalink: {permalink}, gallery_medias: {gallery_medias}")
+        print(f"[Notion.Reddit] Create database item, page_url: {page_url}, is_video: {is_video}, is_image: {is_image}, is_gallery: {is_gallery}, is_external_link: {is_external_link}, video_blob: {video_blob}, permalink: {permalink}, gallery_medias: {gallery_medias}")
 
         if is_video:
             # The audio will also falling into this section
@@ -1596,7 +1597,12 @@ class NotionAgent:
 
         # Append Reddit post text
         if page["text"]:
-            blocks.extend(self._createBlock_RichText("quote", page["text"]))
+            text_blocks = self._createBlock_RichText("quote", page["text"])
+            if len(text_blocks) > 10:
+                print(f"[WARN] [notion] text_blocks contains {len(text_blocks)} chunks, that's too many chunks, cut to at most 10 blocks")
+                text_blocks = text_blocks[:10]
+
+            blocks.extend(text_blocks)
 
         summary = page.get("__summary") or ""
         if summary:

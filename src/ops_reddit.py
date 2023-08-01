@@ -36,12 +36,16 @@ class OperatorReddit(OperatorBase):
         self.reddit_agent = RedditAgent()
         self.op_notion = OperatorNotion()
 
-    def pull(self, pulling_count, pulling_interval):
+    def pull(self, pulling_count, pulling_interval, **kwargs):
         print("#####################################################")
         print("# Pulling Reddit")
         print("#####################################################")
+        data_folder = kwargs.setdefault("data_folder", "")
+        run_id = kwargs.setdefault("run_id", "")
+
         print(f"pulling_count: {pulling_count}")
         print(f"pulling_interval: {pulling_interval}")
+        print(f"data_folder: {data_folder}, run_id: {run_id}")
 
         # Get reddit lists
         db_index_id = self.op_notion.get_index_inbox_dbid()
@@ -77,7 +81,8 @@ class OperatorReddit(OperatorBase):
                 print(f"Pulling subreddit {subreddit}...")
 
                 posts = self.reddit_agent.get_subreddit_posts(
-                    subreddit, limit=pulling_count)
+                    subreddit, limit=pulling_count,
+                    data_folder=data_folder, run_id=run_id)
 
                 list_posts.extend(posts)
 
@@ -163,13 +168,13 @@ class OperatorReddit(OperatorBase):
                 # Assemble ranking content
                 content = f"{title}: {text}"
 
-                print(f"Ranking post: {content}")
+                print(f"Ranking post: length: {len(content)}, content: {content[:200]}...")
                 print(f"Relevant score: {relevant_score}")
 
                 ranked_post = copy.deepcopy(post)
 
-                if relevant_score and relevant_score >= 0 and relevant_score < min_score:
-                    print(f"Skip the low score {relevant_score} to rank")
+                if ((relevant_score and relevant_score >= 0 and relevant_score < min_score) or len(content) > 2000):
+                    print(f"Skip the low score {relevant_score} or long content ({len(content)}) to rank")
                     skipped += 1
 
                     ranked_post["__topics"] = []
@@ -409,7 +414,7 @@ class OperatorReddit(OperatorBase):
                     continue
 
                 print(f"Summarying page, title: {title}, source_url: {source_url}")
-                print(f"Page content ({len(content)} chars): {content:200}...")
+                print(f"Page content ({len(content)} chars): {content[:200]}...")
 
                 st = time.time()
 

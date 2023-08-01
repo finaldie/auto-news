@@ -217,7 +217,7 @@ class OperatorYoutube(OperatorBase):
             content = page["__transcript"]
             source_url = page["source_url"]
             print(f"Summarying page, title: {title}, source_url: {source_url}")
-            print(f"Page content ({len(content)} chars): {content:200}...")
+            print(f"Page content ({len(content)} chars): {content[:200]}...")
 
             st = time.time()
 

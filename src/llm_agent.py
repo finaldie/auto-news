@@ -63,6 +63,10 @@ class LLMArxivLoader:
             return False, {}
 
         arxiv_id = url.split("/")[-1]
+
+        # Fix potential wrong id
+        arxiv_id = arxiv_id.replace(".pdf", "")
+
         print(f"[_load_arxiv]: arxiv_id: {arxiv_id}")
 
         docs = self.load_doc_from_id(
@@ -278,7 +282,7 @@ class LLMAgentSummary(LLMAgentBase):
         chunk_size = chunk_size or int(os.getenv("TEXT_CHUNK_SIZE", 2048))
         chunk_overlap = chunk_overlap or int(os.getenv("TEXT_CHUNK_OVERLAP", 256))
 
-        print(f"[LLM] input text ({len(text)} chars), chunk_size: {chunk_size}, chunk_overlap: {chunk_overlap}, text: {text:200}")
+        print(f"[LLM] input text ({len(text)} chars), chunk_size: {chunk_size}, chunk_overlap: {chunk_overlap}, text: {text[:200]}")
 
         if not text:
             print("[LLM] Empty input text, return empty summary")
