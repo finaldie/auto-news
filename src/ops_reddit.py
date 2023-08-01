@@ -168,13 +168,13 @@ class OperatorReddit(OperatorBase):
                 # Assemble ranking content
                 content = f"{title}: {text}"
 
-                print(f"Ranking post: {content}")
+                print(f"Ranking post: length: {len(content)}, content: {content[:200]}...")
                 print(f"Relevant score: {relevant_score}")
 
                 ranked_post = copy.deepcopy(post)
 
-                if relevant_score and relevant_score >= 0 and relevant_score < min_score:
-                    print(f"Skip the low score {relevant_score} to rank")
+                if relevant_score and relevant_score >= 0 and relevant_score < min_score and len(content) > 2000:
+                    print(f"Skip the low score {relevant_score} or long content ({len(content)}) to rank")
                     skipped += 1
 
                     ranked_post["__topics"] = []
