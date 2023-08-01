@@ -65,7 +65,7 @@ class LLMArxivLoader:
         arxiv_id = url.split("/")[-1]
 
         # Fix potential wrong id
-        arxiv_id.replace(".pdf", "")
+        arxiv_id = arxiv_id.replace(".pdf", "")
 
         print(f"[_load_arxiv]: arxiv_id: {arxiv_id}")
 
