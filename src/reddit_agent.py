@@ -3,6 +3,11 @@ import time
 import requests
 from datetime import datetime
 
+
+from llm_agent import (
+    LLMArxivLoader
+)
+
 import utils
 
 
@@ -106,15 +111,23 @@ class RedditAgent:
 
             text = post["data"]["selftext"]
             if not text and not is_video and not is_image and is_external_link:
-                def load_web():
-                    print(f"[RedditAgent] Loading web page from {page_url} ...")
-                    return utils.load_web(page_url)
+                arxiv_loader = LLMArxivLoader()
+                loaded, arxiv_res = arxiv_loader.load_from_url(page_url)
 
-                try:
-                    text = utils.retry(load_web, retries=3)
+                if loaded:  # if it's arxiv paper
+                    text = arxiv_res["metadata_text"]
+                    print(f"[RedditAgent] Loaded from arxiv, text summary: {text[:200]}..., arxiv_res: {arxiv_res}")
 
-                except Exception as e:
-                    print(f"[ERROR] Load web content failed from {page_url}, use empty string instead: {e}")
+                else:
+                    def load_web():
+                        print(f"[RedditAgent] Loading web page from {page_url} ...")
+                        return utils.load_web(page_url)
+
+                    try:
+                        text = utils.retry(load_web, retries=3)
+
+                    except Exception as e:
+                        print(f"[ERROR] Load web content failed from {page_url}, use empty string instead: {e}")
 
                 print(f"Post from external link (non-video/image), load from source {page_url}, text: {text[:200]}...")
 
