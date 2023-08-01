@@ -173,7 +173,7 @@ class OperatorReddit(OperatorBase):
 
                 ranked_post = copy.deepcopy(post)
 
-                if relevant_score and relevant_score >= 0 and relevant_score < min_score and len(content) > 2000:
+                if ((relevant_score and relevant_score >= 0 and relevant_score < min_score) or len(content) > 2000):
                     print(f"Skip the low score {relevant_score} or long content ({len(content)}) to rank")
                     skipped += 1
 
