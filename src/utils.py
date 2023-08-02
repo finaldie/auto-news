@@ -316,6 +316,7 @@ def load_video_transcript(
 
         if transcript:
             transcript = bytes2str(transcript)
+            print(f"[[utils.load_video_transcript]] Found cached video transcript: {transcript[:200]}...")
 
             return transcript, {}
 
