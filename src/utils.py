@@ -287,6 +287,8 @@ def load_web(url):
         content += doc.page_content
         content += "\n"
 
+    content = refine_content(content)
+    print(f"[load_web] finished, content (post refinement): {content[:200]}...")
     return content
 
 
@@ -364,3 +366,16 @@ def load_video_transcript(
             expired_time=int(redis_key_expire_time))
 
     return transcript, metadata
+
+
+def refine_content(text: str):
+    """
+    A simple 'refine' method to merge all sequence \n to one
+    """
+    if not text:
+        return ""
+
+    while "\n\n" in text:
+        text = text.replace("\n\n", "\n")
+
+    return text.strip()
