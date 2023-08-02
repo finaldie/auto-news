@@ -110,6 +110,8 @@ class RedditAgent:
             video_blob = self._extract_video_url(post)
             text = post["data"]["selftext"]
 
+            print(f"[RedditAgent] Loading reddit post: {page_permalink}, page_url: {page_url}")
+
             if not text and not is_video and not is_image and is_external_link:
                 arxiv_loader = LLMArxivLoader()
                 loaded, arxiv_res = arxiv_loader.load_from_url(page_url)
