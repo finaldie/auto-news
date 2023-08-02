@@ -48,7 +48,7 @@ class LLMYoutubeLoader:
             docs = loader.load()
 
         except Exception as e:
-            print(f"[ERROR] LLMYoutubeLoader load transcript failed: {e}")
+            print(f"[WARN] LLMYoutubeLoader load transcript failed: {e}")
             # traceback.print_exc()
 
         return docs
