@@ -388,7 +388,10 @@ class OperatorReddit(OperatorBase):
         print("#####################################################")
         print("# Summarize Reddit Post")
         print("#####################################################")
+        SUMMARY_MAX_LENGTH = os.getenv("SUMMARY_MAX_LENGTH", 20000)
         print(f"Number of pages: {len(pages)}")
+        print(f"Summary max length: {SUMMARY_MAX_LENGTH}")
+
         llm_agent = LLMAgentSummary()
         llm_agent.init_prompt()
         llm_agent.init_llm()
@@ -426,6 +429,7 @@ class OperatorReddit(OperatorBase):
                         print(f"[ERROR] Empty Reddit posts, title: {title}, source_url: {source_url}, skip it")
                         continue
 
+                    content = content[:SUMMARY_MAX_LENGTH]
                     summary = llm_agent.run(content)
 
                     print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")
