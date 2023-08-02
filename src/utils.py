@@ -304,7 +304,7 @@ def load_video_transcript(
     loader = LLMYoutubeLoader()
     transcript_langs = os.getenv("YOUTUBE_TRANSCRIPT_LANGS", "en")
     langs = transcript_langs.split(",")
-    print(f"Loading Youtube transcript, supported language list: {langs}, video_url: {url}, audio_url: {audio_url}, page_id: {page_id}")
+    print(f"Loading Youtube transcript, supported language list: {langs}, video_url: {url}, audio_url: {audio_url}, page_id: {page_id}, audio2text: {audio2text}, enable_cache: {enable_cache}")
 
     client = DBClient()
     redis_key_expire_time = os.getenv(
