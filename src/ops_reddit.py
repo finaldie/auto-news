@@ -388,7 +388,7 @@ class OperatorReddit(OperatorBase):
         print("#####################################################")
         print("# Summarize Reddit Post")
         print("#####################################################")
-        SUMMARY_MAX_LENGTH = os.getenv("SUMMARY_MAX_LENGTH", 20000)
+        SUMMARY_MAX_LENGTH = int(os.getenv("SUMMARY_MAX_LENGTH", 20000))
         print(f"Number of pages: {len(pages)}")
         print(f"Summary max length: {SUMMARY_MAX_LENGTH}")
 

@@ -72,7 +72,7 @@ class EmbeddingOpenAI(Embedding):
             # throw exceptions. Here we simply limited it <= 5000 chars
             # for the input
 
-            EMBEDDING_MAX_LENGTH = os.getenv("EMBEDDING_MAX_LENGTH", 5000)
+            EMBEDDING_MAX_LENGTH = int(os.getenv("EMBEDDING_MAX_LENGTH", 5000))
             embedding = self.create(text[:EMBEDDING_MAX_LENGTH])
 
             # store embedding into redis (ttl = 1 month)
