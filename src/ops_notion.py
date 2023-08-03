@@ -182,6 +182,7 @@ class OperatorNotion:
         print(f"loaded notion indexes: {notion_indexes}")
 
         index_page_id = notion_indexes["index_page_id"]["index_id"]
+        inbox_page_id = notion_indexes["inbox_page_id"]["index_id"]
         index_inbox_db_id = notion_indexes["index_inbox_db_id"]["index_id"]
         journal_db_id = notion_indexes.get("index_journal_db_id")
 
@@ -195,7 +196,7 @@ class OperatorNotion:
 
         print("[notion] Creating Journal inbox database ...")
         index_journal_db = agent.createDatabase_Journal(
-            "Journal", index_page_id)
+            "Inbox - Journal", inbox_page_id)
 
         print("[notion] Update Inbox mapping ...")
         agent.createDatabaseItem_Index(
