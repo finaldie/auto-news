@@ -166,6 +166,49 @@ class OperatorNotion:
         db_cli.index_pages_table_insert(
             "notion", "index_reddit_list_db_id", index_reddit_list_db["id"])
 
+    def init_journal_pages(self, notion_agent=None):
+        print("Creating Reddit db and pages...")
+        agent = notion_agent
+
+        if not agent:
+            notion_api_key = os.getenv("NOTION_TOKEN")
+            agent = NotionAgent(notion_api_key)
+
+        db_cli = MySQLClient()
+        indexes = db_cli.index_pages_table_load()
+        print(f"loaded indexes: {indexes}")
+
+        notion_indexes = indexes.get("notion")
+        print(f"loaded notion indexes: {notion_indexes}")
+
+        index_page_id = notion_indexes["index_page_id"]["index_id"]
+        index_inbox_db_id = notion_indexes["index_inbox_db_id"]["index_id"]
+        journal_db_id = notion_indexes.get("index_journal_db_id")
+
+        print(f"index_page_id: {index_page_id}")
+        print(f"index_inbox_db_id: {index_inbox_db_id}")
+        print(f"journal_db_id: {journal_db_id}")
+
+        if journal_db_id:
+            print(f"[INFO] Journal database is already created {journal_db_id}, skip")
+            return
+
+        print("[notion] Creating Journal inbox database ...")
+        index_journal_db = agent.createDatabase_Journal(
+            "Journal", index_page_id)
+
+        print("[notion] Update Inbox mapping ...")
+        agent.createDatabaseItem_Index(
+            index_inbox_db_id,
+            index_journal_db["id"],
+            source="Journal",
+            description="Journal Database"
+        )
+
+        print("[MySQL] Update Journal inbox database ...")
+        db_cli.index_pages_table_insert(
+            "notion", "index_journal_db_id", index_journal_db["id"])
+
     def get_index_inbox_dbid(self):
         """
         Get database id of index - inbox

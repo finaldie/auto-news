@@ -35,46 +35,17 @@ default_args = {
 }
 
 
-def should_run(**kwargs):
-    """
-    The pipeline should only runs on Saturday
-
-    :param dict kwargs: Context
-    :return: Id of the task to run
-    :rtype: str
-    """
-    next_exec_date = kwargs['next_execution_date']
-    force_to_run = kwargs["dag_run"].conf.setdefault("force_to_run", False)
-
-    print('---- weekday: {}, force_to_run: {}, context {}'.format(next_exec_date.weekday(), force_to_run, kwargs))
-
-    if force_to_run:
-        return "start"
-
-    # check weekday is Saturday, aka weekday() == 5
-    if next_exec_date.weekday() == 5:
-        return "start"
-    else:
-        return "finish"
-
-
 with DAG(
-    'collection_weekly',
+    'journal_daily',
     default_args=default_args,
     max_active_runs=1,
-    description='Collect weekly best content. config: {"sources": "Twitter,Article,Youtube,RSS", "targets": "notion", "dedup": true, "min-rating": 4, "force_to_run": true}',
+    description='config: {"sources": "Journal", "targets": "notion", "dedup": true}',
     # schedule_interval=timedelta(minutes=60),
-    schedule_interval="30 2 */1 * *",  # At 02:30 everyday
+    schedule_interval="30 3 */1 * *",  # At 03:30 UTC everyday
     # schedule_interval=None,
     start_date=days_ago(1),
     tags=['NewsBot'],
 ) as dag:
-
-    br = BranchPythonOperator(
-        task_id='condition',
-        python_callable=should_run,
-        dag=dag,
-    )
 
     t1 = BashOperator(
         task_id='start',
@@ -83,34 +54,30 @@ with DAG(
 
     t2 = BashOperator(
         task_id='prepare',
-        bash_command='mkdir -p ~/airflow/data/collect/{{ run_id }}',
+        bash_command='mkdir -p ~/airflow/data/journal/{{ run_id }}',
     )
 
     t3 = BashOperator(
         task_id='pull',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_collect.py '
+        bash_command='cd ~/airflow/run/auto-news/src && python3 af_journal_pull.py '
         '--start {{ ds }} '
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder=data/collect '
-        '--collection-type=weekly '
-        '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
+        '--data-folder=data/journal '
+        '--sources={{ dag_run.conf.setdefault("sources", "Journal") }} '
     )
 
     t4 = BashOperator(
         task_id='save',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_publish.py '
+        bash_command='cd ~/airflow/run/auto-news/src && python3 af_journal_save.py '
         '--start {{ ds }} '
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder=data/collect '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
+        '--data-folder=data/journal '
+        '--sources={{ dag_run.conf.setdefault("sources", "Journal") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
-        '--collection-type=weekly '
-        '--min-rating={{ dag_run.conf.setdefault("publishing-min-rating", 4.5) }} '
     )
 
     t5 = BashOperator(
@@ -121,5 +88,4 @@ with DAG(
         '--prefix=./run ',
     )
 
-    br >> t1 >> t2 >> t3 >> t4 >> t5
-    br >> t5
+    t1 >> t2 >> t3 >> t4 >> t5
