@@ -70,7 +70,7 @@ class OperatorCollection(OperatorBase):
             print(f"Pulling from database_id: {database_id}...")
 
             for source in sources:
-                print("Querying source: {source} ...")
+                print(f"Querying source: {source} ...")
                 # The api will return the pages and sort by "created time" asc
                 # format dict(<page_id, page>)
                 pages = notion_agent.queryDatabaseToRead(

@@ -45,7 +45,7 @@ class OperatorJournal(OperatorBase):
         print(f"Get last_created_time from redis: {last_created_time}")
 
         if not last_created_time:
-            last_created_time = (datetime.now() - timedelta(days=1)).isoformat()
+            last_created_time = (datetime.now() - timedelta(days=365)).isoformat()
 
         print(f"last_created_time: {last_created_time}")
 
@@ -72,7 +72,7 @@ class OperatorJournal(OperatorBase):
             print(f"Pulling from database_id: {database_id}...")
 
             for source in sources:
-                print("Querying source: {source} ...")
+                print(f"Querying source: {source} ...")
                 # The api will return the pages and sort by "created time" asc
                 # format dict(<page_id, page>)
                 pages = notion_agent.queryDatabaseInbox_Journal(
@@ -93,6 +93,9 @@ class OperatorJournal(OperatorBase):
         """
         Aggregate journal pages (ideally last day) and do content refinement
         """
+        print("#####################################################")
+        print("# Refine Journal Pages")
+        print("#####################################################")
         today = kwargs.setdefault("today", date.today().isoformat())
 
         llm_agent = LLMAgentJournal()
@@ -100,8 +103,10 @@ class OperatorJournal(OperatorBase):
         llm_agent.init_llm()
 
         content = ""
-        for page in pages:
+        last_created_time = ""
+        for page_id, page in pages.items():
             content += f"{page['title']} {page['content']}" + "\n"
+            last_created_time = page["created_time"]
 
         llm_response = llm_agent.run(content)
 
@@ -110,10 +115,12 @@ class OperatorJournal(OperatorBase):
             "name": f"{today}",
             "source": "Journal",
             "text": llm_response,
+            "last_created_time": last_created_time,
         }
 
         journal_pages.append(journal_page)
 
+        print(f"journal pages: {journal_pages}")
         return journal_pages
 
     def push(self, pages, targets, **kwargs):
@@ -157,6 +164,11 @@ class OperatorJournal(OperatorBase):
                         notion_agent.createDatabaseItem_ToRead_Journal(
                             database_id,
                             page)
+
+                        self.updateCreatedTime(
+                            page["last_created_time"],
+                            source="journal",
+                            list_name="default")
 
                     except Exception as e:
                         err += 1

@@ -28,7 +28,7 @@ def pull(args, op, sources):
     print("######################################################")
     print(f"environment: {os.environ}")
     data = op.pull(sources=sources)
-    return filtered_data
+    return data
 
 
 def save(args, op, data):
