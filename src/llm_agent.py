@@ -323,14 +323,6 @@ class LLMAgentJournal(LLMAgentBase):
     def init_prompt(self, prompt=None):
         if not prompt:
             prompt = llm_prompts.LLM_PROMPT_JOURNAL_PREFIX.strip()
-
-            translation_lang = os.getenv("TRANSLATION_LANG")
-            print(f"[LLMAgentJournal] translation language: {translation_lang}")
-
-            if translation_lang:
-                prompt_middle = llm_prompts.LLM_PROMPT_JOURNAL_MIDDLE.strip().format(translation_lang)
-                prompt += prompt_middle
-
             prompt += llm_prompts.LLM_PROMPT_JOURNAL_SUFFIX.strip()
 
         self._init_prompt(prompt)
