@@ -9,12 +9,10 @@ from notion import NotionAgent
 from llm_agent import (
     LLMAgentCategoryAndRanking,
     LLMAgentSummary,
-    LLMYoutubeLoader
 )
 import utils
 from ops_base import OperatorBase
 from db_cli import DBClient
-from ops_audio2text import OperatorAudioToText
 from ops_notion import OperatorNotion
 
 
@@ -29,58 +27,6 @@ class OperatorYoutube(OperatorBase):
     - ranking
     - publish
     """
-    def _load_youtube_transcript(
-        self,
-        url,
-        page_id="",
-        data_folder="",
-        run_id="",
-        audio2text=True
-    ):
-        loader = LLMYoutubeLoader()
-        transcript_langs = os.getenv("YOUTUBE_TRANSCRIPT_LANGS", "en")
-        langs = transcript_langs.split(",")
-        print(f"Loading Youtube transcript, supported language list: {langs}")
-
-        docs = []
-
-        for lang in langs:
-            print(f"Loading Youtube transcript with language {lang} ...")
-            docs = loader.load(url, language=lang)
-
-            if len(docs) > 0:
-                print(f"Found transcript for language {lang}, number of docs returned: {len(docs)}")
-                break
-
-        if not docs:
-            print(f"[WARN] Transcipt not found for language list: {langs}")
-
-            if audio2text:
-                st = time.time()
-                print(f"Audio2Text enabled, transcribe it, page_id: {page_id}, url: {url} ...")
-                op_a2t = OperatorAudioToText(model_name="base")
-
-                audio_file = op_a2t.extract_audio(
-                    page_id, url, data_folder, run_id)
-                print(f"Extracted audio file: {audio_file}")
-
-                audio_text = op_a2t.transcribe(audio_file)
-                print(f"Transcribed audio text (total {time.time() - st:.2f}s): {audio_text}")
-
-                return audio_text.get("text") or "", {}
-
-        content = ""
-        metadata = {}
-
-        for doc in docs:
-            content += doc.page_content
-            content += "\n"
-
-            # Notes: metadata is the same for all the docs
-            metadata = doc.metadata
-
-        return content, metadata
-
     def pull(self, **kwargs):
         print("#####################################################")
         print("# Pulling Youtube video transcripts")
@@ -140,8 +86,9 @@ class OperatorYoutube(OperatorBase):
                 source_url = page["source_url"] or title
                 print(f"Pulling youtube transcript, title: {title}, page_id: {page_id}, source_url: {source_url}")
 
-                transcript, metadata = self._load_youtube_transcript(
-                    source_url,
+                transcript, metadata = utils.load_video_transcript(
+                    source_url,  # video
+                    source_url,  # audio
                     page_id=page_id,
                     data_folder=data_folder,
                     run_id=run_id)
@@ -200,7 +147,10 @@ class OperatorYoutube(OperatorBase):
         print("#####################################################")
         print("# Summarize Youtube transcripts")
         print("#####################################################")
+        SUMMARY_MAX_LENGTH = int(os.getenv("SUMMARY_MAX_LENGTH", 20000))
         print(f"Number of pages: {len(pages)}")
+        print(f"Summary max length: {SUMMARY_MAX_LENGTH}")
+
         llm_agent = LLMAgentSummary()
         llm_agent.init_prompt()
         llm_agent.init_llm()
@@ -229,6 +179,7 @@ class OperatorYoutube(OperatorBase):
                     print(f"[ERROR] Empty Youtube transcript loaded, title: {title}, source_url: {source_url}, skip it")
                     continue
 
+                content = content[:SUMMARY_MAX_LENGTH]
                 summary = llm_agent.run(content)
 
                 print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")

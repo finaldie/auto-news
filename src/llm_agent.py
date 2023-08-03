@@ -48,7 +48,7 @@ class LLMYoutubeLoader:
             docs = loader.load()
 
         except Exception as e:
-            print(f"[ERROR] LLMYoutubeLoader load transcript failed: {e}")
+            print(f"[WARN] LLMYoutubeLoader load transcript failed: {e}")
             # traceback.print_exc()
 
         return docs
@@ -66,8 +66,21 @@ class LLMArxivLoader:
 
         # Fix potential wrong id
         arxiv_id = arxiv_id.replace(".pdf", "")
-
         print(f"[_load_arxiv]: arxiv_id: {arxiv_id}")
+
+        # According to the arxiv identifier https://info.arxiv.org/help/arxiv_identifier.html
+        # the format could be 1501.0001[vx] or 1501.00001[vx]
+        # Here the library cannot fetch the id with version > v1
+        # example: 1706.03762v6, will return empty docs
+        if "v" in arxiv_id:
+            idx = 0
+            for idx in range(len(arxiv_id)):
+                if arxiv_id[idx] == "v":
+                    break
+
+            arxiv_id = arxiv_id[:idx]
+
+        print(f"[_load_arxiv]: final arxiv_id: {arxiv_id}")
 
         docs = self.load_doc_from_id(
             arxiv_id,

@@ -287,6 +287,8 @@ def load_web(url):
         content += doc.page_content
         content += "\n"
 
+    content = refine_content(content)
+    print(f"[load_web] finished, content (post refinement): {content[:200]}...")
     return content
 
 
@@ -302,7 +304,7 @@ def load_video_transcript(
     loader = LLMYoutubeLoader()
     transcript_langs = os.getenv("YOUTUBE_TRANSCRIPT_LANGS", "en")
     langs = transcript_langs.split(",")
-    print(f"Loading Youtube transcript, supported language list: {langs}, video_url: {url}, audio_url: {audio_url}, page_id: {page_id}")
+    print(f"Loading Youtube transcript, supported language list: {langs}, video_url: {url}, audio_url: {audio_url}, page_id: {page_id}, audio2text: {audio2text}, enable_cache: {enable_cache}")
 
     client = DBClient()
     redis_key_expire_time = os.getenv(
@@ -314,6 +316,7 @@ def load_video_transcript(
 
         if transcript:
             transcript = bytes2str(transcript)
+            print(f"[[utils.load_video_transcript]] Found cached video transcript: {transcript[:200]}...")
 
             return transcript, {}
 
@@ -364,3 +367,16 @@ def load_video_transcript(
             expired_time=int(redis_key_expire_time))
 
     return transcript, metadata
+
+
+def refine_content(text: str):
+    """
+    A simple 'refine' method to merge all sequence \n to one
+    """
+    if not text:
+        return ""
+
+    while "\n\n" in text:
+        text = text.replace("\n\n", "\n")
+
+    return text.strip()

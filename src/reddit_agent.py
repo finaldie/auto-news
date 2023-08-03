@@ -108,8 +108,10 @@ class RedditAgent:
             is_gallery = self._is_gallery(post, page_url)
             is_external_link = self._is_external_link(post, page_url)
             video_blob = self._extract_video_url(post)
-
             text = post["data"]["selftext"]
+
+            print(f"[RedditAgent] Loading reddit post: {page_permalink}, page_url: {page_url}")
+
             if not text and not is_video and not is_image and is_external_link:
                 arxiv_loader = LLMArxivLoader()
                 loaded, arxiv_res = arxiv_loader.load_from_url(page_url)
@@ -136,15 +138,19 @@ class RedditAgent:
                 video_url = video_blob["video_url"]
                 audio_url = video_blob["audio_url"]
 
-                transcript, metadata = utils.load_video_transcript(
-                    video_url,
-                    audio_url,
-                    post_hash_id,
-                    data_folder,
-                    run_id)
+                try:
+                    transcript, metadata = utils.load_video_transcript(
+                        video_url,
+                        audio_url,
+                        post_hash_id,
+                        data_folder,
+                        run_id)
 
-                print(f"[RedditAgent] Loaded video {video_url}, audio {audio_url}, transcript: {transcript[:200]}...")
-                text = transcript
+                    print(f"[RedditAgent] Loaded video {video_url}, audio {audio_url}, transcript: {transcript[:200]}...")
+                    text = transcript
+
+                except Exception as e:
+                    print(f"[ERROR] Load video {video_url}, audio {audio_url} failed: {e}")
 
             extracted_post = {
                 "id": post_hash_id,
