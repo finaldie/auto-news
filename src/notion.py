@@ -1587,6 +1587,10 @@ class NotionAgent:
         text_blocks = self._createBlock_RichText("paragraph", page["text"])
         blocks.extend(text_blocks)
 
+        if page.get("translation"):
+            blocks.append(self._createBlock_Toggle(
+                "Translation", page.get("translation")))
+
         return self.createPage(
             {"database_id": database_id},
             properties,

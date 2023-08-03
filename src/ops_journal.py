@@ -1,7 +1,5 @@
 import os
-import copy
 import time
-import traceback
 from datetime import date, datetime, timedelta
 
 import utils
@@ -9,7 +7,10 @@ from notion import NotionAgent
 from ops_base import OperatorBase
 from db_cli import DBClient
 from ops_notion import OperatorNotion
-from llm_agent import LLMAgentJournal
+from llm_agent import (
+    LLMAgentJournal,
+    LLMAgentTranslation,
+)
 
 
 class OperatorJournal(OperatorBase):
@@ -110,12 +111,19 @@ class OperatorJournal(OperatorBase):
 
         llm_response = llm_agent.run(content)
 
+        llm_trans_agent = LLMAgentTranslation()
+        llm_trans_agent.init_prompt()
+        llm_trans_agent.init_llm()
+
+        llm_translation_response = llm_trans_agent.run(llm_response)
+
         journal_pages = []
         journal_page = {
             "name": f"{today}",
             "source": "Journal",
             "last_created_time": last_created_time,
             "text": llm_response,
+            "translation": llm_translation_response,
         }
 
         journal_pages.append(journal_page)

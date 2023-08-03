@@ -341,3 +341,25 @@ class LLMAgentJournal(LLMAgentBase):
 
         response = self.llmchain.run(text)
         return response
+
+
+class LLMAgentTranslation(LLMAgentBase):
+    def __init__(self, api_key="", model_name="gpt-3.5-turbo"):
+        super().__init__(api_key, model_name)
+
+    def init_prompt(self, prompt=None, trans_lang=None):
+        if not prompt:
+            translation_lang = trans_lang or os.getenv("TRANSLATION_LANG")
+            print(f"[LLMAgentTranslation] translation language: {translation_lang}")
+
+            prompt = llm_prompts.LLM_PROMPT_TRANSLATION.format(translation_lang) + "{content}"
+            prompt = prompt.strip()
+
+        self._init_prompt(prompt)
+
+    def run(self, text: str):
+        tokens = self.get_num_tokens(text)
+        print(f"[LLMAgentTranslation] number of tokens: {tokens}")
+
+        response = self.llmchain.run(text)
+        return response

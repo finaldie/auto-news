@@ -88,3 +88,7 @@ Before responding to the output, review it carefully and make sure it meets all 
 Take the provided notes below and craft a well-structured journal entry:
 {content}
 """
+
+LLM_PROMPT_TRANSLATION = """
+Translate the below content into {}:
+"""
