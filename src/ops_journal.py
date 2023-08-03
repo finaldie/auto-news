@@ -114,8 +114,8 @@ class OperatorJournal(OperatorBase):
         journal_page = {
             "name": f"{today}",
             "source": "Journal",
-            "text": llm_response,
             "last_created_time": last_created_time,
+            "text": llm_response,
         }
 
         journal_pages.append(journal_page)
