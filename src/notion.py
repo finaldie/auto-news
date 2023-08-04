@@ -700,6 +700,78 @@ class NotionAgent:
 
         return extracted_pages
 
+    def queryDatabaseInbox_Journal(
+        self,
+        database_id,
+        filter_last_edited_time=None,
+        filter_created_time=None
+    ):
+        query_data = {
+            "database_id": database_id,
+
+            "sorts": [
+                {
+                    "property": "Created time",
+                    "direction": "ascending",
+                },
+            ],
+
+            "filter": {
+                "and": [],
+            },
+        }
+
+        if filter_last_edited_time:
+            query_data["filter"]["and"].append({
+                "property": "Last edited time",
+                "date": {
+                    "after": filter_last_edited_time,
+                }
+            })
+
+        if filter_created_time:
+            query_data["filter"]["and"].append({
+                "property": "Created time",
+                "date": {
+                    "after": filter_created_time,
+                }
+            })
+
+        print(f"Query Journal inbox, query: {query_data}")
+
+        pages = self.api.databases.query(**query_data).get("results")
+        print(f"Queried pages: {pages}")
+
+        extracted_pages = {}
+        for page in pages:
+            print(f"result: page id: {page['id']}")
+
+            page_id = page["id"]
+            props, blocks = self.extractPage(page_id)
+            page_content = self.concatBlocksText(blocks)
+
+            print(f"Extracting one page: {page}, props: {props}")
+
+            extracted_pages[page_id] = {
+                "id": page_id,
+
+                # article title
+                "title": props["properties"]["Name"]["title"][0]["plain_text"],
+                # utc timezone (notion auto-created)
+                "created_time": props["created_time"],
+
+                # utc timezone (notion auto-created)
+                "last_edited_time": props["last_edited_time"],
+                "source": "Journal",
+
+                "props": props,
+                "blocks": blocks,
+
+                "content": page_content,
+            }
+
+        return extracted_pages
+
     def _createDatabaseItem_TwitterBase(self, list_names, tweet):
         """
         Create page properties and blocks
@@ -1501,6 +1573,29 @@ class NotionAgent:
             properties,
             blocks)
 
+    def createDatabaseItem_ToRead_Journal(
+        self,
+        database_id: str,
+        page: dict,
+        **kwargs
+    ):
+        print(f"[Notion.createDatabaseItem_ToRead_Journal] title: {page['name']}, page: {page}")
+
+        properties, blocks = self._createDatabaseItem_CollectionBase(
+            page["name"], page["source"], [], [], **kwargs)
+
+        text_blocks = self._createBlock_RichText("paragraph", page["text"])
+        blocks.extend(text_blocks)
+
+        if page.get("translation"):
+            blocks.append(self._createBlock_Toggle(
+                "Translation", page.get("translation")))
+
+        return self.createPage(
+            {"database_id": database_id},
+            properties,
+            blocks)
+
     def createDatabaseItem_ToRead_Reddit(
         self,
         database_id,
@@ -1901,6 +1996,41 @@ class NotionAgent:
             },
             "Enabled": {
                 "checkbox": {}
+            },
+        }
+
+        # Create the new database under the specified page
+        new_database = self.api.databases.create(
+            parent={"type": "page_id", "page_id": parent_page_id},
+            title=title,
+            properties=new_database_properties
+        )
+
+        return new_database
+
+    def createDatabase_Journal(self, name, parent_page_id):
+        """
+        Create a database for Journal
+        """
+        title = [
+            {
+                "type": "text",
+                "text": {
+                    "content": name,
+                }
+            }
+        ]
+
+        # Set the properties of the new database
+        new_database_properties = {
+            "Name": {
+                "title": {}
+            },
+            "Created time": {
+                "created_time": {}
+            },
+            "Last edited time": {
+                "last_edited_time": {}
             },
         }
 

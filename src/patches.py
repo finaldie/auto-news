@@ -3,6 +3,7 @@ from mysql_cli import MySQLClient
 
 import patch_0
 import patch_1
+import patch_2
 
 
 # patches: table creation, alter column/index, insert data, etc
@@ -17,6 +18,12 @@ PATCHES_TABLE = [
         "name": "init_notion_reddit",
         "order_id": 1,
         "function": patch_1.apply,
+    },
+
+    {
+        "name": "init_notion_journal",
+        "order_id": 2,
+        "function": patch_2.apply,
     },
 ]
 

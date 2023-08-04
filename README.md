@@ -66,7 +66,7 @@ make start
 
 Now, the services are up and running, it will pull sources every hour.
 
-## [UI] Set up Notion Tweet and RSS list
+## [UI] Set up Notion Tweet/RSS/Reddit list
 
 Go to the Notion entry page we created before, and we will see the following folder structure has been created automatically:
 ```bash
@@ -74,18 +74,20 @@ Readings
 ├── Inbox
 │   ├── Inbox - Article
 │   └── Inbox - YouTube
+│   └── Inbox - Journal
 ├── Index
 │   ├── Index - Inbox
 │   ├── Index - ToRead
 │   ├── RSS_List
 │   └── Tweet_List
+│   └── Reddit_List
 └── ToRead
     └── ToRead
 ```
 
 - Go to `RSS_List` page, and fill in the RSS name and URL
 - Go to `Reddit_List` page, and fill the subreddit names
-- Go to `Tweet_List` page, and fill in the Tweet screen names
+- Go to `Tweet_List` page, and fill in the Tweet screen names (Tips: **Paid Account Only**)
 
 ## [UI] Set up Notion database views
 Go to Notion `ToRead` database page, all the data will flow into this database later on, create the database views for different sources to help us organize flows easier. E.g. Tweets, Articles, YouTube, RSS, etc
