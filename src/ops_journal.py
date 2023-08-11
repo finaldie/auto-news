@@ -7,9 +7,11 @@ from notion import NotionAgent
 from ops_base import OperatorBase
 from db_cli import DBClient
 from ops_notion import OperatorNotion
+import llm_prompts
 from llm_agent import (
     LLMAgentJournal,
     LLMAgentTranslation,
+    LLMAgentGeneric,
 )
 
 
@@ -117,6 +119,17 @@ class OperatorJournal(OperatorBase):
 
         llm_translation_response = llm_trans_agent.run(llm_response)
 
+        # Generate title and action items
+        llm_agent_title = LLMAgentGeneric()
+        llm_agent_title.init_prompt(llm_prompts.LLM_PROMPT_TITLE)
+        title = llm_agent_title.run(llm_response)
+        print(f"Journal Title: {title}")
+
+        llm_agent_todo = LLMAgentGeneric()
+        llm_agent_todo.init_prompt(llm_prompts.LLM_PROMPT_ACTION_ITEM)
+        todo_list = llm_agent_todo.run(llm_response)
+        print(f"Journal TODO list: {todo_list}")
+
         journal_pages = []
         journal_page = {
             "name": f"{today}",
@@ -124,6 +137,8 @@ class OperatorJournal(OperatorBase):
             "last_created_time": last_created_time,
             "text": llm_response,
             "translation": llm_translation_response,
+            "title": f"{today} {title}",
+            "todo": todo_list or "n/a",
         }
 
         journal_pages.append(journal_page)
@@ -166,7 +181,9 @@ class OperatorJournal(OperatorBase):
                 for page in pages:
                     tot += 1
                     title = page["name"]
-                    print(f"Pushing title: {title}")
+                    full_title = page["title"]
+                    print(f"Pushing title: {title}, full title: {full_title}")
+                    print(f"Todo list: {page['todo']}")
 
                     try:
                         notion_agent.createDatabaseItem_ToRead_Journal(

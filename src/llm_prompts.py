@@ -75,6 +75,7 @@ Your goal is to:
 - Have a section for critical insights.
 - Have a section for takeaways.
 - Have a section for action items.
+- Have a section for summary.
 """
 
 # In case need a translation
@@ -91,4 +92,14 @@ Take the provided notes below and craft a well-structured journal entry:
 
 LLM_PROMPT_TRANSLATION = """
 Translate the below content into {}:
+"""
+
+LLM_PROMPT_TITLE = """
+Generate a concise SEO optimized 'title' for the below content:
+{content}
+"""
+
+LLM_PROMPT_ACTION_ITEM = """
+Analyze the below content carefully and generate concise 'Action Items':
+{content}
 """
