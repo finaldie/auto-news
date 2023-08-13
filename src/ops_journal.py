@@ -112,30 +112,66 @@ class OperatorJournal(OperatorBase):
             last_created_time = page["created_time"]
 
         llm_response = llm_agent.run(content)
+        print(f"Refine content llm response: {llm_response}")
 
-        llm_trans_agent = LLMAgentTranslation()
-        llm_trans_agent.init_prompt()
-        llm_trans_agent.init_llm()
-
-        llm_translation_response = llm_trans_agent.run(llm_response)
-
-        # Generate title and action items
+        # Generate title
         llm_agent_title = LLMAgentGeneric()
         llm_agent_title.init_prompt(llm_prompts.LLM_PROMPT_TITLE)
+        llm_agent_title.init_llm()
+
         title = llm_agent_title.run(llm_response)
         print(f"Journal Title: {title}")
 
+        # Generate insights
+        llm_agent_insights = LLMAgentGeneric()
+        llm_agent_insights.init_prompt(llm_prompts.LLM_PROMPT_KEY_INSIGHTS)
+        llm_agent_insights.init_llm()
+
+        insights = llm_agent_insights.run(llm_response)
+        print(f"Journal insights: {insights}")
+
+        # Generate takeaways
+        llm_agent_takeaways = LLMAgentGeneric()
+        llm_agent_takeaways.init_prompt(llm_prompts.LLM_PROMPT_TAKEAWAYS)
+        llm_agent_takeaways.init_llm()
+
+        takeaways = llm_agent_takeaways.run(llm_response)
+        print(f"Journal takeaways: {takeaways}")
+
+        # Generate action items
         llm_agent_todo = LLMAgentGeneric()
         llm_agent_todo.init_prompt(llm_prompts.LLM_PROMPT_ACTION_ITEM)
+        llm_agent_todo.init_llm()
+
         todo_list = llm_agent_todo.run(llm_response)
         print(f"Journal TODO list: {todo_list}")
+
+        # Generate action items
+        llm_agent_summary = LLMAgentGeneric()
+        llm_agent_summary.init_prompt(llm_prompts.LLM_PROMPT_SUMMARY_SIMPLE)
+        llm_agent_summary.init_llm()
+
+        summary = llm_agent_summary.run(llm_response)
+        print(f"Journal summary: {summary}")
+
+        # Combine all sections together
+        full_content = f"{today} {title}\n\n{llm_response}\n\n{insights}\n\n{takeaways}\n\n{todo_list}\n\n{summary}"
+        print(f"full_content: {full_content}")
+
+        # Generate translation
+        llm_agent_trans = LLMAgentTranslation()
+        llm_agent_trans.init_prompt()
+        llm_agent_trans.init_llm()
+
+        llm_translation_response = llm_agent_trans.run(full_content)
+        print(f"Translation llm response: {llm_translation_response}")
 
         journal_pages = []
         journal_page = {
             "name": f"{today}",
             "source": "Journal",
             "last_created_time": last_created_time,
-            "text": llm_response,
+            "text": full_content,
             "translation": llm_translation_response,
             "title": f"{today} {title}",
             "todo": todo_list or "n/a",

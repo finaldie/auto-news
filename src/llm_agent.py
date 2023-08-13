@@ -362,7 +362,8 @@ class LLMAgentGeneric(LLMAgentBase):
         super().__init__(api_key, model_name)
 
     def init_prompt(self, prompt):
-        self._init_prompt(prompt,strip())
+        self._init_prompt(prompt.strip())
+        return self
 
     def run(self, text: str):
         tokens = self.get_num_tokens(text)

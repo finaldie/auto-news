@@ -1582,7 +1582,7 @@ class NotionAgent:
         print(f"[Notion.createDatabaseItem_ToRead_Journal] title: {page['name']}, page: {page}")
 
         properties, blocks = self._createDatabaseItem_CollectionBase(
-            page["name"], page["source"], [], [], **kwargs)
+            page["title"], page["source"], [], [], **kwargs)
 
         text_blocks = self._createBlock_RichText("paragraph", page["text"])
         blocks.extend(text_blocks)
