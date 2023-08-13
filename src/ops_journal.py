@@ -166,6 +166,9 @@ class OperatorJournal(OperatorBase):
         llm_translation_response = llm_agent_trans.run(full_content)
         print(f"Translation llm response: {llm_translation_response}")
 
+        llm_translation_response_todo = llm_agent_trans.run(todo_list)
+        print(f"Translation llm response (todo): {llm_translation_response_todo}")
+
         journal_pages = []
         journal_page = {
             "name": f"{today}",
@@ -175,6 +178,7 @@ class OperatorJournal(OperatorBase):
             "translation": llm_translation_response,
             "title": f"{today} {title}",
             "todo": todo_list or "n/a",
+            "translation_todo": llm_translation_response_todo or "n/a",
         }
 
         journal_pages.append(journal_page)
@@ -223,6 +227,10 @@ class OperatorJournal(OperatorBase):
 
                     try:
                         notion_agent.createDatabaseItem_ToRead_Journal(
+                            database_id,
+                            page)
+
+                        notion_agent.createDatabaseItem_ToRead_TODO(
                             database_id,
                             page)
 
