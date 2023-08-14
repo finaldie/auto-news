@@ -355,3 +355,19 @@ class LLMAgentTranslation(LLMAgentBase):
 
         response = self.llmchain.run(text)
         return response
+
+
+class LLMAgentGeneric(LLMAgentBase):
+    def __init__(self, api_key="", model_name="gpt-3.5-turbo"):
+        super().__init__(api_key, model_name)
+
+    def init_prompt(self, prompt):
+        self._init_prompt(prompt.strip())
+        return self
+
+    def run(self, text: str):
+        tokens = self.get_num_tokens(text)
+        print(f"[LLMAgentGeneric] number of tokens: {tokens}")
+
+        response = self.llmchain.run(text)
+        return response

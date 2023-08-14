@@ -1582,7 +1582,7 @@ class NotionAgent:
         print(f"[Notion.createDatabaseItem_ToRead_Journal] title: {page['name']}, page: {page}")
 
         properties, blocks = self._createDatabaseItem_CollectionBase(
-            page["name"], page["source"], [], [], **kwargs)
+            page["title"], page["source"], [], [], **kwargs)
 
         text_blocks = self._createBlock_RichText("paragraph", page["text"])
         blocks.extend(text_blocks)
@@ -1595,6 +1595,49 @@ class NotionAgent:
             {"database_id": database_id},
             properties,
             blocks)
+
+    def createDatabaseItem_ToRead_TODO(
+        self,
+        database_id: str,
+        page: dict,
+        **kwargs
+    ):
+        print(f"[Notion.createDatabaseItem_ToRead_TODO] page: {page}")
+
+        todos = page["todo"]
+        todo_list = todos.split("\n")
+
+        todos_translation = page["translation_todo"]
+        todo_list_trans = todos_translation.split("\n")
+
+        i = 0
+        for todo, todo_trans in zip(todo_list, todo_list_trans):
+            i += 1
+
+            # skip the header
+            if i == 1:
+                continue
+
+            todo_refined = todo[3:]
+            todo_trans_refined = todo_trans[3:]
+
+            print(f"todo: {todo}, refined: {todo_refined}")
+            print(f"todo_trans: {todo_trans}, refined: {todo_trans_refined}")
+
+            properties, blocks = self._createDatabaseItem_CollectionBase(
+                todo_refined, "TODO", [], [], **kwargs)
+
+            text_blocks = self._createBlock_RichText("paragraph", todo_refined)
+            blocks.extend(text_blocks)
+
+            if todo_trans_refined:
+                blocks.append(self._createBlock_Toggle(
+                    "Translation", todo_trans_refined))
+
+            self.createPage(
+                {"database_id": database_id},
+                properties,
+                blocks)
 
     def createDatabaseItem_ToRead_Reddit(
         self,

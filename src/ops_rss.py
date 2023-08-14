@@ -222,7 +222,7 @@ class OperatorRSS(OperatorBase):
                 title = page["title"]
 
                 # Get a summary text (at most 1024 chars)
-                score_text = f"{page['title']}. {page['summary']}"
+                score_text = f"{page['title']} - {page['list_name']} - {page['summary']}"
                 score_text = score_text[:1024]
                 print(f"Scoring page: {title}, score_text: {score_text}")
 
@@ -413,7 +413,6 @@ class OperatorRSS(OperatorBase):
                 op_notion = OperatorNotion()
 
                 # Get the latest toread database id from index db
-                # db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
                 db_index_id = op_notion.get_index_toread_dbid()
 
                 database_id = utils.get_notion_database_id_toread(

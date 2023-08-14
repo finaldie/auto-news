@@ -72,9 +72,6 @@ You have a series of random journal notes that need refinement and rewriting wit
 
 Your goal is to:
 - Make the journal entry more cohesive, polished, and organized while preserving the essence of the original content.
-- Have a section for critical insights.
-- Have a section for takeaways.
-- Have a section for action items.
 """
 
 # In case need a translation
@@ -91,4 +88,29 @@ Take the provided notes below and craft a well-structured journal entry:
 
 LLM_PROMPT_TRANSLATION = """
 Translate the below content into {}:
+"""
+
+LLM_PROMPT_TITLE = """
+Generate a concise SEO optimized 'title' for the below content:
+{content}
+"""
+
+LLM_PROMPT_ACTION_ITEM = """
+Analyze the below content carefully and generate concise 'Action Items':
+{content}
+"""
+
+LLM_PROMPT_KEY_INSIGHTS = """
+Analyze the below content carefully and generate concise 'Critical Insights':
+{content}
+"""
+
+LLM_PROMPT_TAKEAWAYS = """
+Analyze the below content carefully and generate concise 'Takeaways':
+{content}
+"""
+
+LLM_PROMPT_SUMMARY_SIMPLE = """
+Analyze the below content carefully and generate concise 'Summary':
+{content}
 """
