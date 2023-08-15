@@ -155,7 +155,7 @@ class OperatorJournal(OperatorBase):
         print(f"Journal summary: {summary}")
 
         # Combine all sections together
-        full_content = f"{today} {title}\n\n{llm_response}\n\n{insights}\n\n{takeaways}\n\n{todo_list}\n\n{summary}"
+        full_content = f"{today} {title}\n\n{llm_response}\n\nInsights:\n{insights}\n\nTakaeways:\n{takeaways}\n\nAction Items:\n{todo_list}\n\n{summary}"
         print(f"full_content: {full_content}")
 
         # Generate translation

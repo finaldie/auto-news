@@ -1610,12 +1610,8 @@ class NotionAgent:
         todos_translation = page["translation_todo"]
         todo_list_trans = todos_translation.split("\n")
 
-        i = 0
         for todo, todo_trans in zip(todo_list, todo_list_trans):
-            i += 1
-
-            # skip the header
-            if i == 1:
+            if not todo.strip():
                 continue
 
             todo_refined = todo[3:]

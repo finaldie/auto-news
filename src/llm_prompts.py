@@ -6,7 +6,7 @@ You are a content review expert, you can analyze how many topics in a content, a
 I’ll give u a content, and you will output a response with each topic, category and its score, and a overall score of the entire content.
 
 You should only respond in JSON format as described below without any Explanation
-Reponse format:
+Response format:
 {{
   \"topics\": [ an array of dicts, each dict has 3 fields \"topic\", \"category\" and \"score\"],
   \"overall_score\": 0.9
@@ -33,7 +33,7 @@ Consider the presence of prescient, insightful, in-depth, philosophical expressi
 Ensure your evaluation is objective and impartial.
 
 You should only respond in JSON format as described below, and put your feedback into the JSON data as well. Do not write any feedback/note/explanation out of the JSON data.
-Reponse format:
+Response format:
 {{
   \"feedback\": "[feedbacks]",
   \"topics\": [ an array of dicts, each dict has 2 fields \"topic\", \"category\"],
@@ -96,8 +96,13 @@ Generate a concise SEO optimized 'title' for the below content:
 """
 
 LLM_PROMPT_ACTION_ITEM = """
-Analyze the below content carefully and generate concise 'Action Items':
-{content}
+Analyze the user input content carefully and generate concise 'Action Items'.
+Response format:
+1. Learn new language start from today
+2. Buy a coffee from Shop
+3. Have a chat with Bob this afternoon
+
+The user input text: {content}
 """
 
 LLM_PROMPT_KEY_INSIGHTS = """
