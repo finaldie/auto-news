@@ -1614,8 +1614,11 @@ class NotionAgent:
         for todo, todo_trans in zip(todo_list, todo_list_trans):
             i += 1
 
-            # skip the header
-            if i == 1:
+            if not todo.strip():
+                continue
+
+            # Skip header if possible
+            if i == 1 and "Action Items" in todo:
                 continue
 
             todo_refined = todo[3:]

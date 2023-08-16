@@ -155,7 +155,11 @@ class OperatorJournal(OperatorBase):
         print(f"Journal summary: {summary}")
 
         # Combine all sections together
-        full_content = f"{today} {title}\n\n{llm_response}\n\n{insights}\n\n{takeaways}\n\n{todo_list}\n\n{summary}"
+        header_insights = "Critical Insights\n" if "Critical Insights" not in insights else ""
+        header_takeaways = "Takeaways\n" if "Takeaways" not in takeaways else ""
+        header_todo = "Action Items\n" if "Action Items" not in todo_list else ""
+
+        full_content = f"{today} {title}\n\n{llm_response}\n\n{header_insights}{insights}\n\n{header_takeaways}{takeaways}\n\n{header_todo}{todo_list}\n\nOverall:\n{summary}"
         print(f"full_content: {full_content}")
 
         # Generate translation
