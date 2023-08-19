@@ -91,7 +91,7 @@ Translate the below content into {}:
 """
 
 LLM_PROMPT_TITLE = """
-Generate a concise SEO optimized 'title' for the below content:
+Generate a concise SEO-optimized 'Title', which is at most eight words for the below content:
 {content}
 """
 
