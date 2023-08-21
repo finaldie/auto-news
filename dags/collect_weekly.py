@@ -96,7 +96,7 @@ with DAG(
         '--data-folder=data/collect '
         '--collection-type=weekly '
         '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS,Reddit") }} '
     )
 
     t4 = BashOperator(
@@ -107,7 +107,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder=data/collect '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS,Reddit") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
         '--collection-type=weekly '
         '--min-rating={{ dag_run.conf.setdefault("publishing-min-rating", 4.5) }} '
