@@ -1624,6 +1624,10 @@ class NotionAgent:
             todo_refined = todo[3:]
             todo_trans_refined = todo_trans[3:]
 
+            # LLM may returns empty todo list and leave one line with 'None.'
+            if todo_refined.strip() == "None.":
+                continue
+
             print(f"todo: {todo}, refined: {todo_refined}")
             print(f"todo_trans: {todo_trans}, refined: {todo_trans_refined}")
 
