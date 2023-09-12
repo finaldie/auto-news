@@ -111,7 +111,7 @@ class OperatorJournal(OperatorBase):
             content += f"{page['title']} {page['content']}" + "\n"
             last_created_time = page["created_time"]
 
-        print(f"Journal input content: {content}")
+        print(f"Journal input content: [{content}]")
 
         if not content:
             return [{
