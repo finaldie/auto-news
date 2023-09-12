@@ -218,6 +218,10 @@ class OperatorBase:
         db_client=None
     ):
         print(f"[updateCreatedTime] last_created_time: {last_created_time}")
+        if not last_created_time:
+            print("No last_created_time, skip updating")
+            return
+
         client = db_client or DBClient()
 
         curr_created_time = client.get_notion_inbox_created_time(source, list_name)
