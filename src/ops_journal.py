@@ -111,6 +111,20 @@ class OperatorJournal(OperatorBase):
             content += f"{page['title']} {page['content']}" + "\n"
             last_created_time = page["created_time"]
 
+        print(f"Journal input content: [{content}]")
+
+        if not content:
+            return [{
+                "name": f"{today}",
+                "source": "Journal",
+                "last_created_time": last_created_time,
+                "text": "",
+                "translation": "",
+                "title": f"{today} n/a",
+                "todo": "n/a",
+                "translation_todo": "n/a",
+            }]
+
         llm_response = llm_agent.run(content)
         print(f"Refine content llm response: {llm_response}")
 
