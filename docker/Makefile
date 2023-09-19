@@ -18,7 +18,7 @@ deploy-code:
 deploy-airflow: deploy-code
 	@echo "Assembling Airflow ..."
 	mkdir -p $(AIRFLOW_PROJ_DIR)
-	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs plugins run data
+	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs config plugins run data
 	cd $(AIRFLOW_PROJ_DIR) && chmod 777 run/ data/
 	@echo "Airflow deployment finished"
 
