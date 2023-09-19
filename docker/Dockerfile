@@ -1,4 +1,4 @@
-FROM apache/airflow:2.6.3-python3.11
+FROM apache/airflow:2.7.1-python3.11
 
 # keep them same as docker-compose volume path
 VOLUME /opt/airflow
