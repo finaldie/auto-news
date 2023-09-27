@@ -119,10 +119,10 @@ class OperatorYoutube(OperatorBase):
                     # unit: second
                     page["__length"] = metadata.setdefault("length", 0)
 
+                    pages.update(extracted_pages)
+
                 except Exception as e:
                     print(f"[ERROR] Exception occurred during pulling Youtube video: {title}, page_id: {page_id}, source_url: {source_url} : {e}")
-
-            pages.update(extracted_pages)
 
         return pages
 
