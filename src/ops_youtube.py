@@ -78,7 +78,8 @@ class OperatorYoutube(OperatorBase):
             # - title
             # - video url
             # Pull transcipt and merge it
-            for page_id, page in extracted_pages.items():
+            for page_id, extracted_page in extracted_pages.items():
+                page = copy.deepcopy(extracted_page)
                 title = page["title"]
 
                 # Notes: some app (e.g. From iOS) will only fill the title
@@ -119,7 +120,8 @@ class OperatorYoutube(OperatorBase):
                     # unit: second
                     page["__length"] = metadata.setdefault("length", 0)
 
-                    pages.update(extracted_pages)
+                    pages[page_id] = page
+                    print(f"Page pulled succeed, title {title}, source_url: {source_url}")
 
                 except Exception as e:
                     print(f"[ERROR] Exception occurred during pulling Youtube video: {title}, page_id: {page_id}, source_url: {source_url} : {e}")
