@@ -84,7 +84,7 @@ class OperatorYoutube(OperatorBase):
                 # Notes: some app (e.g. From iOS) will only fill the title
                 # with the url link, it wont fill other fields
                 source_url = page["source_url"] or title
-                print(f"[Pulling youtube transcript]: title: {title}, page_id: {page_id}, source_url: {source_url}")
+                print(f"====== [Pulling youtube transcript]: title: {title}, page_id: {page_id}, source_url: {source_url} ======")
 
                 try:
                     transcript, metadata = utils.load_video_transcript(
