@@ -168,9 +168,11 @@ class OperatorYoutube(OperatorBase):
         for page in pages:
             title = page["title"]
             page_id = page["id"]
+            print(f"====== Summarying page, title: {title} ======")
+
             content = page["__transcript"]
             source_url = page["source_url"]
-            print(f"Summarying page, title: {title}, source_url: {source_url}")
+            print(f"Summarying page, source_url: {source_url}")
             print(f"Page content ({len(content)} chars): {content[:200]}...")
 
             st = time.time()
