@@ -84,39 +84,43 @@ class OperatorYoutube(OperatorBase):
                 # Notes: some app (e.g. From iOS) will only fill the title
                 # with the url link, it wont fill other fields
                 source_url = page["source_url"] or title
-                print(f"Pulling youtube transcript, title: {title}, page_id: {page_id}, source_url: {source_url}")
+                print(f"[Pulling youtube transcript]: title: {title}, page_id: {page_id}, source_url: {source_url}")
 
-                transcript, metadata = utils.load_video_transcript(
-                    source_url,  # video
-                    source_url,  # audio
-                    page_id=page_id,
-                    data_folder=data_folder,
-                    run_id=run_id)
+                try:
+                    transcript, metadata = utils.load_video_transcript(
+                        source_url,  # video
+                        source_url,  # audio
+                        page_id=page_id,
+                        data_folder=data_folder,
+                        run_id=run_id)
 
-                print(f"Pulled youtube transcipt, metadata: {metadata}")
+                    print(f"Pulled youtube transcipt, metadata: {metadata}")
 
-                page["__transcript"] = transcript
+                    page["__transcript"] = transcript
 
-                page["__title"] = metadata.setdefault("title", "")
-                page["__description"] = metadata.setdefault("description", "")
-                page["__thumbnail_url"] = metadata.setdefault("thumbnail_url", "")
-                page["__publish_date"] = ""
-                if metadata.get("publish_date"):
-                    # Notes: pd is datetime object or str
-                    pd = metadata["publish_date"]
+                    page["__title"] = metadata.setdefault("title", "")
+                    page["__description"] = metadata.setdefault("description", "")
+                    page["__thumbnail_url"] = metadata.setdefault("thumbnail_url", "")
+                    page["__publish_date"] = ""
+                    if metadata.get("publish_date"):
+                        # Notes: pd is datetime object or str
+                        pd = metadata["publish_date"]
 
-                    if isinstance(pd, str):
-                        page["__publish_date"] = pd
+                        if isinstance(pd, str):
+                            page["__publish_date"] = pd
 
-                    else:
-                        pd_pdt = pd.astimezone(pytz.timezone('America/Los_Angeles'))
-                        page["__publish_date"] = pd_pdt.isoformat()
+                        else:
+                            pd_pdt = pd.astimezone(pytz.timezone('America/Los_Angeles'))
+                            page["__publish_date"] = pd_pdt.isoformat()
 
-                page["__author"] = metadata.setdefault("author", "")
-                page["__view_count"] = metadata.setdefault("view_count", 0)
+                    page["__author"] = metadata.setdefault("author", "")
+                    page["__view_count"] = metadata.setdefault("view_count", 0)
 
-                # unit: second
-                page["__length"] = metadata.setdefault("length", 0)
+                    # unit: second
+                    page["__length"] = metadata.setdefault("length", 0)
+
+                except Exception as e:
+                    print(f"[ERROR] Exception occurred during pulling Youtube video: {title}, page_id: {page_id}, source_url: {source_url}")
 
             pages.update(extracted_pages)
 
