@@ -136,8 +136,13 @@ class OperatorArticle(OperatorBase):
                 # the source url
                 if not content:
                     print("page content is empty, fallback to load web page via WebBaseLoader")
-                    content = utils.load_web(source_url)
-                    print(f"Page content ({len(content)} chars): {content}")
+
+                    try:
+                        content = utils.load_web(source_url)
+                        print(f"Page content ({len(content)} chars): {content}")
+
+                    except Exception as e:
+                        print(f"[ERROR] Exception occurred during utils.load_web(), source_url: {source_url}, {e}")
 
                     if not content:
                         print("[ERROR] Empty Web page loaded via WebBaseLoader, skip it")
@@ -147,6 +152,7 @@ class OperatorArticle(OperatorBase):
                 summary = llm_agent.run(content)
 
                 print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")
+
                 client.set_notion_summary_item_id(
                     "article", "default", page_id, summary,
                     expired_time=int(redis_key_expire_time))
