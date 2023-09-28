@@ -283,8 +283,13 @@ class OperatorRSS(OperatorBase):
                 # from this entrypoint
                 if not content:
                     print("page content is empty, fallback to load web page via WebBaseLoader")
-                    content = utils.load_web(source_url)
-                    print(f"Page content ({len(content)} chars)")
+
+                    try:
+                        content = utils.load_web(source_url)
+                        print(f"Page content ({len(content)} chars)")
+
+                    except Exception as e:
+                        print(f"[ERROR] Exception occurred during utils.load_web(), source_url: {source_url}, {e}")
 
                     if not content:
                         print("[ERROR] Empty Web page loaded via WebBaseLoader, skip it")

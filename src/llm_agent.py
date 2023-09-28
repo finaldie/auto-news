@@ -20,7 +20,7 @@ class LLMWebLoader:
         if not url:
             return []
 
-        loader = WebBaseLoader(url)
+        loader = WebBaseLoader([url])
         docs = loader.load()
         return docs
 
