@@ -48,8 +48,11 @@ MILVUS_EMBEDDING_ITEM_ID = "milvus_embedding_item_id_{}_{}"
 # ttl: 4 weeks
 MILVUS_PERF_DATA_ITEM_ID = "milvus_collection_item_id_{}_{}_{}"
 
-
 # key: page_id
 # val: json format: {"user_rating": xx}
 # ttl: 4 weeks
 PAGE_ITEM_ID = "page_item_id_{}"
+
+# key: page_id
+# val: json format: {"last_edited_time": xx, "todo": xx}
+TODO_ITEM_ID = "todo_item_id_{}"

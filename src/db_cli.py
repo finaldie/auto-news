@@ -143,9 +143,25 @@ class DBClient(DBClientBase):
     def set_page_item_id(
         self,
         item_id,
-        json_data,
+        json_data: str,
         **kwargs
     ):
         key_tpl = data_model.PAGE_ITEM_ID
+        key = key_tpl.format(item_id)
+        self.driver.set(key, json_data, **kwargs)
+
+    # TODO: Switch to MySQL driver
+    def get_todo_item_id(self, item_id):
+        key_tpl = data_model.TODO_ITEM_ID
+        key = key_tpl.format(item_id)
+        return self.driver.get(key)
+
+    def set_todo_item_id(
+        self,
+        item_id,
+        json_data: str,
+        **kwargs
+    ):
+        key_tpl = data_model.TODO_ITEM_ID
         key = key_tpl.format(item_id)
         self.driver.set(key, json_data, **kwargs)
