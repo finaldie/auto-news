@@ -70,6 +70,9 @@ def fix_json_str(data):
 
 
 def fix_and_parse_json(data):
+    if not data:
+        return None
+
     res = None
 
     try:
