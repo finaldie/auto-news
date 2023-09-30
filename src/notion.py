@@ -1614,7 +1614,7 @@ class NotionAgent:
         for todo, todo_trans in zip(todo_list, todo_list_trans):
             i += 1
 
-            if not todo.strip() or todo.strip() == "n/a":
+            if not todo.strip() or todo.strip() == "n/a" or todo.strip() == "None":
                 continue
 
             # Skip header if possible

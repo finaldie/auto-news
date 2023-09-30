@@ -33,8 +33,18 @@ class OperatorTODO(OperatorBase):
         """
         @return pages <id, page>
         """
+        takeaways_pages = self._pull_takeaways(**kwargs)
+
+        journal_pages = self._pull_journal(**kwargs)
+
+        return {
+            "takeaways": takeaways_pages,
+            "journal": journal_pages,
+        }
+
+    def _pull_takeaways(self, **kwargs):
         print("#####################################################")
-        print("# Pulling Pages: Journal, Takeaways ...")
+        print("# Pulling Pages: Takeaways ...")
         print("#####################################################")
         sources = kwargs.setdefault("sources", ["Youtube", "Article", "Twitter", "RSS", "Reddit"])
         now = datetime.now()
@@ -66,10 +76,11 @@ class OperatorTODO(OperatorBase):
             print(f"Pulling from database_id: {database_id}...")
 
             for source in sources:
-                print(f"Pulling source: {source} ...")
+                print(f"====== Pulling source: {source} ======")
                 client = DBClient()
+
                 last_edited_time = client.get_notion_last_edited_time(
-                    source, "default")
+                    source, "todo")
                 last_edited_time = utils.bytes2str(last_edited_time)
 
                 if not last_edited_time:
@@ -96,13 +107,118 @@ class OperatorTODO(OperatorBase):
         print(f"Pulled total {len(page_list)} items")
         return page_list
 
+    def _pull_journal(self, **kwargs):
+        print("#####################################################")
+        print("# Pulling Pages: Journal ...")
+        print("#####################################################")
+        client = DBClient()
+        last_edited_time = client.get_notion_last_edited_time(
+            "Journal", "todo")
+
+        last_edited_time = utils.bytes2str(last_edited_time)
+        print(f"Get last_edited_time from redis: {last_edited_time}")
+
+        if not last_edited_time:
+            last_edited_time = (datetime.now() - timedelta(days=1)).isoformat()
+
+        print(f"last_edited_time: {last_edited_time}")
+
+        # 1. prepare notion agent and db connection
+        notion_api_key = os.getenv("NOTION_TOKEN")
+        notion_agent = NotionAgent(notion_api_key)
+        op_notion = OperatorNotion()
+
+        # 2. get inbox database indexes
+        db_index_id = op_notion.get_index_inbox_dbid()
+
+        db_pages = utils.get_notion_database_pages_inbox(
+            notion_agent, db_index_id, "Journal")
+        print(f"The database pages founded: {db_pages}")
+
+        # 2. get latest two databases and collect recent items
+        db_pages = db_pages[:2]
+        print(f"The latest 2 databases: {db_pages}")
+
+        page_list = {}
+        sources = kwargs.setdefault("sources", ["Journal"])
+
+        for db_page in db_pages:
+            database_id = db_page["database_id"]
+            print(f"Pulling from database_id: {database_id}...")
+
+            for source in sources:
+                print(f"Querying source: {source} ...")
+                # The api will return the pages and sort by "created time" asc
+                # format dict(<page_id, page>)
+                pages = notion_agent.queryDatabaseInbox_Journal(
+                    database_id,
+                    filter_last_edited_time=last_edited_time)
+
+                page_list.update(pages)
+
+                # Wait a moment to mitigate rate limiting
+                wait_for_secs = 5
+                print(f"Wait for a moment: {wait_for_secs}s")
+                time.sleep(wait_for_secs)
+
+        print(f"Pulled total {len(page_list)} items")
+        return page_list
+
+    def dedup(self, pages):
+        print("#####################################################")
+        print("# TODO: dedup")
+        print("#####################################################")
+        takeaways_pages = pages["takeaways"]
+        journal_pages = pages["journal"]
+
+        dedup_takeaways_pages = self._dedup(takeaways_pages)
+        dedup_journal_pages = self._dedup(journal_pages)
+
+        print(f"Total takeaways {len(takeaways_pages)}, post dedup {len(dedup_takeaways_pages)}")
+        print(f"Total journal {len(journal_pages)}, post dedup {len(dedup_journal_pages)}")
+
+        return {
+            "takeaways": dedup_takeaways_pages,
+            "journal": dedup_journal_pages,
+        }
+
+    def _dedup(self, pages):
+        dedup_pages = {}
+        client = DBClient()
+
+        for page_id, page in pages.items():
+            last_edited_time = page["last_edited_time"]
+
+            page_todo_meta = client.get_todo_item_id(page_id)
+            if not page_todo_meta or page_todo_meta["last_edited_time"] != last_edited_time:
+                dedup_pages[page_id] = page
+                print(f"Valid page to generate TODO: {page}, metadata: {page_todo_meta}")
+            else:
+                print(f"[WARN] same last_edited_time {last_edited_time}, skip this page: {page}")
+
+        return dedup_pages
+
     def generate(self, pages):
         print("#####################################################")
         print("# Generating TODOs for pages")
         print("#####################################################")
-        print(f"Total pages: {len(pages())}")
-        extracted_pages = self.get_takeaways_from_pages(pages)
-        print(f"Pages contains takeaways: {len(extracted_pages)}")
+
+        takeaways_pages = pages["takeaways"]
+        journal_pages = pages["journal"]
+
+        print(f"Total takeaways pages: {len(takeaways_pages())}")
+        print(f"Total journal pages: {len(journal_pages())}")
+
+        extracted_takeaways_pages = self._get_takeaways_from_pages(pages)
+        print(f"Pages contains takeaways: {len(extracted_takeaways_pages)}")
+
+        extracted_journal_pages = self._get_journals_from_pages(journal_pages)
+
+        print(f"Pages contains journals: {len(extracted_journal_pages)}")
+
+        extracted_pages = []
+        extracted_pages.extend(extracted_takeaways_pages)
+        extracted_pages.extend(extracted_journal_pages)
 
         llm_agent_todo = LLMAgentGeneric()
         llm_agent_todo.init_prompt(llm_prompts.LLM_PROMPT_ACTION_ITEM)
@@ -115,13 +231,14 @@ class OperatorTODO(OperatorBase):
         todo_pages = []
 
         for page in extracted_pages:
-            print(f"[Generating] page id: {page['id']}, title: {page['title']}, take")
-            takeaways = page["__takeaways"]
+            print(f"======= [Generating] page id: {page['id']}, title: {page['title']}")
+            # This is the takeaways or journal content
+            content = page["__content"]
 
-            print(f"Takeaways: {takeaways}")
+            print(f"Content: {content}")
 
             try:
-                todo_list = llm_agent_todo.run(takeaways)
+                todo_list = llm_agent_todo.run(content)
                 print(f"LLM: TODO list: {todo_list}")
 
                 if todo_list == "None":
@@ -143,7 +260,7 @@ class OperatorTODO(OperatorBase):
         print("Returns todo pages: {len(todo_pages)}")
         return todo_pages
 
-    def get_takeaways_from_pages(self, pages, **kwargs):
+    def _get_takeaways_from_pages(self, pages, **kwargs):
         notion_api_key = os.getenv("NOTION_TOKEN")
         notion_agent = NotionAgent(notion_api_key)
         takeaway_pages = []
@@ -156,27 +273,25 @@ class OperatorTODO(OperatorBase):
                 continue
 
             page = copy.deepcopy(raw_page)
-            page["__takeaways"] = take_aways
+            page["__content"] = take_aways
             takeaway_pages.append(page)
 
         return takeaway_pages
 
-    def dedup(self, pages):
-        dedup_pages = {}
+    def _get_journals_from_pages(self, pages, **kwargs):
+        journal_pages = []
 
-        client = DBClient()
+        for page_id, raw_page in pages.items():
+            content = f"{raw_page['title']} {raw_page['content']}"
 
-        for page_id, page in pages.items():
-            last_edited_time = page["last_edited_time"]
+            if not content:
+                continue
 
-            page_todo_meta = client.get_todo_item_id(page_id)
-            if not page_todo_meta or page_todo_meta["last_edited_time"] != last_edited_time:
-                dedup_pages[page_id] = page
-                print(f"Valid page to generate TODO: {page}, metadata: {page_todo_meta}")
-            else:
-                print(f"[WARN] same last_edited_time {last_edited_time}, skip this page: {page}")
+            page = copy.deepcopy(raw_page)
+            page["__content"] = content
+            journal_pages.append(page)
 
-        return dedup_pages
+        return journal_pages
 
     def push(self, pages, targets, **kwargs):
         print("#####################################################")
@@ -212,9 +327,12 @@ class OperatorTODO(OperatorBase):
 
                 for page in pages:
                     try:
+                        print(f"====== Pushing page: {page} ======")
+
                         tot += 1
                         last_edited_time = page["last_edited_time"]
                         todo_list = page["todo"]
+                        source = page["source"]
 
                         notion_agent.createDatabaseItem_ToRead_TODO(
                             database_id,
@@ -229,9 +347,15 @@ class OperatorTODO(OperatorBase):
                             }),
                         )
 
+                        self.updateLastEditedTime(
+                            last_edited_time,
+                            source,
+                            "todo",
+                            client)
+
                     except Exception as e:
                         err += 1
-                        print(f"[ERROR]: Collecting notion pages failed, skip: {e}")
+                        print(f"[ERROR]: Pushing notion pages failed, skip: {e}")
                         traceback.print_exc()
 
                 print(f"Pushing to {target} finished, total: {tot}, errors: {err}")
