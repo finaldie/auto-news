@@ -209,7 +209,7 @@ class OperatorTODO(OperatorBase):
         print(f"Total takeaways pages: {len(takeaways_pages)}")
         print(f"Total journal pages: {len(journal_pages)}")
 
-        extracted_takeaways_pages = self._get_takeaways_from_pages(pages)
+        extracted_takeaways_pages = self._get_takeaways_from_pages(takeaways_pages)
         print(f"Pages contains takeaways: {len(extracted_takeaways_pages)}")
 
         extracted_journal_pages = self._get_journals_from_pages(journal_pages)
