@@ -1610,11 +1610,16 @@ class NotionAgent:
         todos_translation = page["translation_todo"]
         todo_list_trans = todos_translation.split("\n")
 
+        INVALID_LLM_RESPONSES = ["n/a", "None", "None."]
+
+        print(f"todos: {todos}")
+        print(f"todos_trans: {todos_translation}")
+
         i = 0
         for todo, todo_trans in zip(todo_list, todo_list_trans):
             i += 1
 
-            if not todo.strip() or todo.strip() == "n/a" or todo.strip() == "None":
+            if not todo.strip() or todo.strip() in INVALID_LLM_RESPONSES:
                 continue
 
             # Skip header if possible
@@ -1625,7 +1630,7 @@ class NotionAgent:
             todo_trans_refined = todo_trans[3:]
 
             # LLM may returns empty todo list and leave one line with 'None.'
-            if todo_refined.strip() == "None.":
+            if todo_refined.strip() in INVALID_LLM_RESPONSES:
                 continue
 
             print(f"todo: {todo}, refined: {todo_refined}")
@@ -1640,6 +1645,16 @@ class NotionAgent:
             if todo_trans_refined:
                 blocks.append(self._createBlock_Toggle(
                     "Translation", todo_trans_refined))
+
+            # append orginal notion link
+            if append_notion_url:
+                blocks.append({
+                    "type": "link_to_page",
+                    "link_to_page": {
+                        "type": "page_id",
+                        "page_id": page['id']
+                    }
+                })
 
             self.createPage(
                 {"database_id": database_id},
