@@ -190,6 +190,8 @@ class OperatorTODO(OperatorBase):
             last_edited_time = page["last_edited_time"]
 
             page_todo_meta = client.get_todo_item_id(page_id)
+            page_todo_meta = utils.fix_and_parse_json(page_todo_meta)
+
             if not page_todo_meta or page_todo_meta["last_edited_time"] != last_edited_time:
                 dedup_pages[page_id] = page
                 print(f"Valid page to generate TODO: {page}, metadata: {page_todo_meta}")
