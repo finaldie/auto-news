@@ -57,7 +57,7 @@ class OperatorJournal(OperatorBase):
         notion_agent = NotionAgent(notion_api_key)
         op_notion = OperatorNotion()
 
-        # 2. get toread database indexes
+        # 2. get inbox database indexes
         db_index_id = op_notion.get_index_inbox_dbid()
 
         db_pages = utils.get_notion_database_pages_inbox(
@@ -245,10 +245,6 @@ class OperatorJournal(OperatorBase):
 
                     try:
                         notion_agent.createDatabaseItem_ToRead_Journal(
-                            database_id,
-                            page)
-
-                        notion_agent.createDatabaseItem_ToRead_TODO(
                             database_id,
                             page)
 
