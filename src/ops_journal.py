@@ -248,10 +248,6 @@ class OperatorJournal(OperatorBase):
                             database_id,
                             page)
 
-                        notion_agent.createDatabaseItem_ToRead_TODO(
-                            database_id,
-                            page)
-
                         self.updateCreatedTime(
                             page["last_created_time"],
                             source="journal",

@@ -1646,14 +1646,15 @@ class NotionAgent:
                 blocks.append(self._createBlock_Toggle(
                     "Translation", todo_trans_refined))
 
-            # append orginal notion link
-            blocks.append({
-                "type": "link_to_page",
-                "link_to_page": {
-                    "type": "page_id",
-                    "page_id": page['id']
-                }
-            })
+            # Append orginal notion link
+            if page.get("id"):
+                blocks.append({
+                    "type": "link_to_page",
+                    "link_to_page": {
+                        "type": "page_id",
+                        "page_id": page['id']
+                    }
+                })
 
             self.createPage(
                 {"database_id": database_id},
