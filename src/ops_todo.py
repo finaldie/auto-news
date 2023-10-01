@@ -12,6 +12,7 @@ from db_cli import DBClient
 from ops_notion import OperatorNotion
 
 import llm_prompts
+import llm_const
 from llm_agent import (
     LLMAgentTranslation,
     LLMAgentGeneric,
@@ -245,8 +246,8 @@ class OperatorTODO(OperatorBase):
                 todo_list = llm_agent_todo.run(content)
                 print(f"LLM: TODO list: {todo_list}")
 
-                if todo_list == "None":
-                    print("[WARN] generated TODO list is None, skip it")
+                if todo_list in llm_const.LLM_INVALID_RESPONSES:
+                    print(f"[WARN] generated TODO list is invalid ({todo_list}), skip it")
                     continue
 
                 todo_page = copy.deepcopy(page)
