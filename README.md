@@ -27,11 +27,12 @@ The Auto-News was born for the following goals:
 
 
 ## Backend System Requirements
-| Component | Requirement  |
-| --------- | -----------  |
-| OS        | Linux, MacOS |
-| Memory    | 6GB          |
-| Disk      | 20GB+        |
+| Component | Minimum Requirements | Recommended |
+| --------- | -----------          | ----        |
+| OS        | Linux, MacOS         |             |
+| CPU       | 2 cores              | 4 cores     |
+| Memory    | 6GB                  | 12GB        |
+| Disk      | 20GB                 | 50GB        |
 
 # Installation
 ## Preparison
@@ -123,4 +124,9 @@ make stop && make init && make start
 ## Upgrade to the latest code
 ```bash
 make upgrade && make stop && make init && make start
+```
+
+## Rebuild Docker Images
+```bash
+make stop && make build && make init && make start
 ```
