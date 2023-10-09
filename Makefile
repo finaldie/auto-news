@@ -52,6 +52,9 @@ deps: prepare-env docker-network
 build:
 	cd docker && make build topdir=$(topdir)
 
+build-nocache:
+	cd docker && make build-nocache topdir=$(topdir)
+
 deploy-airflow:
 	cd docker && make deploy topdir=$(topdir) build_dir=$(build_dir)
 

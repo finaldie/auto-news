@@ -51,6 +51,9 @@ init-airflow:
 build:
 	docker compose build
 
+build-nocache:
+	docker compose build --no-cache
+
 deploy: deploy-airflow deploy-postgres deploy-redis deploy-mysql deploy-milvus
 deploy: post-deploy
 
