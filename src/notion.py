@@ -2153,7 +2153,30 @@ class NotionAgent:
                 "last_edited_time": {}
             },
             "User Rating": {
-                "select": {}
+                "select": {
+                    "options": [
+                        {
+                            "name": "1",
+                            "color": "red"
+                        },
+                        {
+                            "name": "2",
+                            "color": "blue"
+                        },
+                        {
+                            "name": "3",
+                            "color": "green"
+                        },
+                        {
+                            "name": "4",
+                            "color": "orange"
+                        },
+                        {
+                            "name": "5",
+                            "color": "yellow"
+                        }
+                    ]
+                }
             },
             "Relevant Score": {
                 "number": {}
