@@ -41,7 +41,7 @@ with DAG(
     max_active_runs=1,
     description='TODO DAG, collect and generate TODOs from takeaways and Journal. config: {"targets": "notion"}',
     # schedule_interval=timedelta(minutes=60),
-    schedule_interval="*/30 * * * *",  # Every 30 minutes
+    schedule_interval="*/60 * * * *",  # Every 60 minutes
     # schedule_interval=None,
     start_date=days_ago(1),
     tags=['NewsBot'],

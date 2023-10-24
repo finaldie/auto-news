@@ -690,6 +690,7 @@ class NotionAgent:
                 # extract user rating (frequent used field)
                 "user_rating": rating_prop["name"] if rating_prop else None,
                 "source": source,
+                "tags": self.extractMultiSelect(page["properties"]["Tags"]),
 
                 "properties": props,
                 "blocks": blocks,
