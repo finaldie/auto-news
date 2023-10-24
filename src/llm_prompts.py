@@ -97,6 +97,7 @@ Generate a concise SEO-optimized 'Title', which is at most eight words for the b
 
 LLM_PROMPT_ACTION_ITEM = """
 Analyze the user input content carefully and generate concise 'Action Items' at most eight words:
+- DO NOT generate 'action item' unless necessary.
 - Please carefully review and avoid generating duplicated 'action items'.
 - If no action items can be found, return "None" as the response.
 
