@@ -8,13 +8,14 @@ See this [Blog post](https://finaldie.com/blog/auto-news-an-automated-news-aggre
 
 https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105aa8ee0ea9
 
-## Goals
-The Auto-News was born for the following goals:
-- Automatically pull feed sources, including RSS, Tweets, Reddit, and personal Journal notes.
-- Support clip content from source directly, later generate summary and translation, including random web articles, YouTube videos
+## Features
+- Pull from Feed sources (including RSS, Reddit, Tweets, etc) and summarize them
+- Summarize YouTube videos (generate transcript if needed)
 - Filter content based on personal interests and remove 80%+ noises
+- Generate `TODO` list from Takeaways/Journal-notes
+- Weekly top-k aggregations
+- Journal notes summarization and insights generating
 - A unified/central reading experience (e.g., RSS reader-like style, Notion based)
-- Weekly/Monthly top-k aggregations
 
 
 ![image](https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639)
@@ -27,12 +28,12 @@ The Auto-News was born for the following goals:
 
 
 ## Backend System Requirements
-| Component | Minimum Requirements | Recommended |
-| --------- | -----------          | ----        |
-| OS        | Linux, MacOS         |             |
-| CPU       | 2 cores              | 4 cores     |
-| Memory    | 6GB                  | 12GB        |
-| Disk      | 20GB                 | 50GB        |
+| Component | Minimum Requirements | Recommended  |
+| --------- | -----------          | ----         |
+| OS        | Linux, MacOS         | Linux, MacOS |
+| CPU       | 2 cores              | 4 cores      |
+| Memory    | 6GB                  | 12GB         |
+| Disk      | 20GB                 | 50GB         |
 
 # Installation
 ## Preparison
