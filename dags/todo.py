@@ -36,10 +36,10 @@ default_args = {
 
 
 with DAG(
-    'todo',
+    'action',
     default_args=default_args,
     max_active_runs=1,
-    description='TODO DAG, collect and generate TODOs from takeaways and Journal. config: {"targets": "notion"}',
+    description='Action DAG, for generating TODO, Q&A, deep-dive, etc. config: {"targets": "notion"}',
     # schedule_interval=timedelta(minutes=60),
     schedule_interval="*/60 * * * *",  # Every 60 minutes
     # schedule_interval=None,
@@ -54,27 +54,27 @@ with DAG(
 
     t2 = BashOperator(
         task_id='prepare',
-        bash_command='mkdir -p ~/airflow/data/todo/{{ run_id }}',
+        bash_command='mkdir -p ~/airflow/data/action/{{ run_id }}',
     )
 
     t3 = BashOperator(
         task_id='pull',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_todo_pull.py '
+        bash_command='cd ~/airflow/run/auto-news/src && python3 af_action_pull.py '
         '--start {{ ds }} '
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder=data/todo '
+        '--data-folder=data/action '
     )
 
     t4 = BashOperator(
         task_id='save',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_todo_save.py '
+        bash_command='cd ~/airflow/run/auto-news/src && python3 af_action_save.py '
         '--start {{ ds }} '
         '--prefix=./run '
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
-        '--data-folder=data/todo '
+        '--data-folder=data/action '
         '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
     )
 
