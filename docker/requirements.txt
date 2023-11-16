@@ -40,3 +40,8 @@ yt-dlp
 # Arvix
 arxiv
 pymupdf
+
+# AutoGen
+pyautogen
+docker
+duckduckgo_search

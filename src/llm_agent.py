@@ -15,6 +15,9 @@ from langchain.utilities.arxiv import ArxivAPIWrapper
 import llm_prompts
 
 
+#######################################################################
+# Loaders
+#######################################################################
 class LLMWebLoader:
     def load(self, url: str) -> list:
         if not url:
@@ -154,6 +157,9 @@ class LLMArxivLoader:
         return docs
 
 
+#######################################################################
+# Agents
+#######################################################################
 class LLMAgentBase:
     def __init__(self, api_key, model_name):
         self.api_key = api_key
