@@ -5,6 +5,7 @@ from datetime import date, datetime
 from dotenv import load_dotenv
 
 from ops_todo import OperatorTODO
+from ops_deepdive import OperatorDeepDive
 import utils
 
 
@@ -30,7 +31,7 @@ def process(args, op):
     print("#####################################################")
     print("# TODO: generate todo items")
     print("#####################################################")
-    data = op.readFromJson(args.data_folder, args.run_id, "todo.json")
+    data = op.readFromJson(args.data_folder, args.run_id, "action.json")
     dedup_pages = op.dedup(data)
     todo_pages: list = op.generate(dedup_pages)
 
@@ -48,6 +49,33 @@ def publish(args, op, data, targets):
     op.push(data, targets, start_date=args.start)
 
 
+def process_dd(args, op):
+    print("#####################################################")
+    print("# Process deep dive")
+    print("#####################################################")
+    data = op.readFromJson(args.data_folder, args.run_id, "action.json")
+    dedup_pages = op.dedup(data)
+
+    workdir = os.getenv("WORKDIR")
+    workspace = f"{workdir}/{args.data_folder}"
+
+    collection_pages = op.collect(dedup_pages, work_dir=workspace)
+    deepdive_pages = op.deepdive(collection_pages, work_dir=workspace)
+
+    return deepdive_pages
+
+
+def publish_dd(args, op, pages, targets):
+    """
+    Push to targets
+    """
+    print("#####################################################")
+    print(f"# DeepDive: Data publish, target: {targets}, start_date: {args.start}")
+    print("#####################################################")
+
+    op.push(pages, targets, start_date=args.start)
+
+
 def run(args):
     print(f"environment: {os.environ}")
     targets = args.targets.split(",")
@@ -57,9 +85,23 @@ def run(args):
 
     print(f"targets: {targets}, exec_date: {exec_date}, workdir: {workdir}, dedup: {dedup}")
 
-    op = OperatorTODO()
-    todo_pages = process(args, op)
-    publish(args, op, todo_pages, targets)
+    # Action 'TODO'
+    try:
+        op = OperatorTODO()
+        todo_pages = process(args, op)
+        publish(args, op, todo_pages, targets)
+
+    except Exception as e:
+        print(f"[ERROR] Exception occurred during Action TODO: {e}")
+
+    # Action 'DeepDive'
+    try:
+        op = OperatorDeepDive()
+        dd_pages = process_dd(args, op)
+        publish_dd(args, op, dd_pages, targets)
+
+    except Exception as e:
+        print(f"[ERROR] Exception occurred during Action DeepDive: {e}")
 
 
 if __name__ == "__main__":

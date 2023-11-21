@@ -1661,6 +1661,47 @@ class NotionAgent:
                 properties,
                 blocks)
 
+    def createDatabaseItem_ToRead_DeepDive(
+        self,
+        database_id: str,
+        page: dict,
+        **kwargs
+    ):
+        print(f"[Notion.createDatabaseItem_ToRead_DeepDive] page: {page}")
+
+        takeaways = page["__content"]
+        deepdive = page["__deepdive"]
+        translation = page.get("__translation_deepdive") or ""
+
+        print(f"takeaways: {takeaways}")
+        print(f"deepdive: {deepdive}")
+        print(f"translation: {translation}")
+
+        properties, blocks = self._createDatabaseItem_CollectionBase(
+            takeaways, "DeepDive", [], [], **kwargs)
+
+        text_blocks = self._createBlock_RichText("paragraph", deepdive)
+        blocks.extend(text_blocks)
+
+        if translation:
+            blocks.append(self._createBlock_Toggle(
+                "Translation", translation))
+
+        # Append orginal notion link
+        if page.get("id"):
+            blocks.append({
+                "type": "link_to_page",
+                "link_to_page": {
+                    "type": "page_id",
+                    "page_id": page['id']
+                }
+            })
+
+        self.createPage(
+            {"database_id": database_id},
+            properties,
+            blocks)
+
     def createDatabaseItem_ToRead_Reddit(
         self,
         database_id,

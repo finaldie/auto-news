@@ -8,6 +8,7 @@ from duckduckgo_search import DDGS
 import autogen
 
 from llm_agent import (
+    LLMAgentBase,
     LLMAgentSummary,
 )
 
@@ -102,7 +103,7 @@ def arxiv_search(query: str, days_ago=30, max_results=10):
 
 def write_to_file(text: str, filename: str, work_dir: str):
     work_dir = work_dir or os.getenv("AN_CURRENT_WORKDIR", "./")
-    filename = filename or "output.txt"
+    filename = os.getenv("AN_FILENAME", filename)
     filepath = f"{work_dir}/{filename}"
 
     print(f"[write_to_file] filename: {filename}, work_dir: {work_dir}, filepath: {filepath}, text: {text}")
@@ -111,14 +112,16 @@ def write_to_file(text: str, filename: str, work_dir: str):
     f.write(text)
     f.close()
 
-    return f"{text}\n\nTERMINATE {filename}"
+    return f"{text}\n\n{filename} TERMINATE"
 
 
 #######################################################################
 # Agents
 #######################################################################
-class LLMAgentAutoGen:
+class LLMAgentAutoGen(LLMAgentBase):
     def __init__(self):
+        super().__init__("", "")
+
         _gpt4_model_name = os.getenv("AUTOGEN_GPT4_MODEL", "gpt-4-1106-preview")
         _gpt4_api_version = os.getenv("AUTOGEN_GPT4_API_VERSION", "2023-08-01-preview")
         _gpt4_api_key = os.getenv("AUTOGEN_GPT4_API_KEY", "")
@@ -320,14 +323,19 @@ class LLMAgentAutoGen:
 
         return user_proxy.last_message()["content"]
 
-    def gen_article(self, query: str, work_dir: str):
-        print(f"[gen_report] query: {query}, work_dir: {work_dir}")
+    def gen_article(
+        self,
+        query: str,
+        work_dir: str,
+        filename: str = "llm_article.txt"
+    ):
+        print(f"[gen_report] query: {query}, work_dir: {work_dir}, filename: {filename}")
 
         user_proxy = autogen.UserProxyAgent(
             name="UserProxy",
-            is_termination_msg=lambda x: x.get("content", "") and "TERMINATE" in "\n".join(x.get("content", "").rstrip().split("\n")[-2:]),
+            is_termination_msg=lambda x: x.get("content", "") and x.get("content", "").rstrip().endswith("TERMINATE"),
             human_input_mode="NEVER",
-            max_consecutive_auto_reply=2,
+            max_consecutive_auto_reply=1,
             code_execution_config=False,
             llm_config=self.llm_config_gpt3,
             system_message="A human admin. Interact with the editor to discuss the plan.",
@@ -335,6 +343,10 @@ class LLMAgentAutoGen:
 
         agent_executor = autogen.UserProxyAgent(
             name="Executor",
+
+            # The whole group chat will be ended after receiving the TERMINATE message
+            is_termination_msg=lambda x: x.get("content", "") and x.get("content", "").rstrip().endswith("TERMINATE"),
+
             system_message="Executor. Execute the task by provided functions and report the result.",
             human_input_mode="NEVER",
             code_execution_config={
@@ -371,6 +383,7 @@ class LLMAgentAutoGen:
 
         # Set current workdir first
         os.environ["AN_CURRENT_WORKDIR"] = work_dir
+        os.environ["AN_FILENAME"] = filename
 
         user_proxy.initiate_chat(
             manager,

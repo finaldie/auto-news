@@ -27,6 +27,8 @@ def pull(args, op):
     print(f"environment: {os.environ}")
 
     # Pull from non-TODO sources (past N days)
+    # - Takeaways
+    # - Journal notes
     data = op.pull()
     return data
 
@@ -38,7 +40,7 @@ def save(args, op, data):
     print("######################################################")
     print("# TODO: Save data to json")
     print("######################################################")
-    op.save2json(args.data_folder, args.run_id, "todo.json", data)
+    op.save2json(args.data_folder, args.run_id, "action.json", data)
 
 
 def run(args):
