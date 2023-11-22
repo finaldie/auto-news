@@ -114,7 +114,8 @@ def write_to_file(text: str, filename: str, work_dir: str = ""):
     f.write(text)
     f.close()
 
-    return f"{text}\n\n{filename} TERMINATE"
+    # return f"{text}\n\n{filename} TERMINATE"
+    return "TERMINATE"
 
 
 #######################################################################
