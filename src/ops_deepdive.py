@@ -166,7 +166,7 @@ class OperatorDeepDive(OperatorBase):
                 err += 1
                 print(f"[ERROR] Exception occurred during LLM_Agent.generate: {e}")
 
-        print("Returns pages: {len(dd_pages)}, total {tot}, errors {err}")
+        print(f"Returns pages: {len(dd_pages)}, total {tot}, errors {err}")
         return dd_pages
 
     def _get_takeaways_from_pages(self, pages, **kwargs):
