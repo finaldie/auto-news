@@ -110,7 +110,7 @@ class OperatorDeepDive(OperatorBase):
                     err += 1
                     print(f"[ERROR] Exception occurred during deep dive collection, skip it: {e}")
 
-        print(f"Collected pages {cnt}, errors {err}")
+        print(f"Collected pages {tot}, errors {err}")
         return collected_pages
 
     def deepdive(self, pages, work_dir):
