@@ -30,7 +30,9 @@ def search(query: str, max_results=3, max_attempts=3, timelimit="m"):
 
     with DDGS() as ddgs:
         while attempts < max_attempts:
-            response = ddgs.text(query, max_results=max_results, timelimit=timelimit)
+            # Tips: max_results=max_results only available when
+            #       duckduckgo-search >= 3.9.x
+            response = ddgs.text(query, timelimit=timelimit)
             results = list(islice(response, max_results))
 
             if results:
