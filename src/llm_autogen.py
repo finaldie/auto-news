@@ -219,16 +219,14 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         print(f"[LLMAgentAutoGen] Initialize GPT3 model_name: {_gpt3_model_name}, api_version: {_gpt3_api_version}")
 
-        self.llm_cfg_timeout = 120         # seconds
+        self.llm_cfg_timeout = 120  # seconds
         self.llm_cfg_max_retries = 3
-        self.llm_cfg_retry_wait_time = 30  # seconds
 
         print(f"[LLMAgentAutoGen] Initialize config: timeout: {self.llm_cfg_timeout}, max_retries: {self.llm_cfg_max_retries}")
 
         self.llm_config_gpt4 = {
             "timeout": self.llm_cfg_timeout,
             "max_retries": self.llm_cfg_max_retries,
-            "retry_wait_time": self.llm_cfg_retry_wait_time,
             "cache_seed": 42,
             "temperature": 0,
             "config_list": self.gpt4_config_list,
@@ -237,7 +235,6 @@ class LLMAgentAutoGen(LLMAgentBase):
         self.llm_config_gpt3 = {
             "timeout": self.llm_cfg_timeout,
             "max_retries": self.llm_cfg_max_retries,
-            "retry_wait_time": self.llm_cfg_retry_wait_time,
             "cache_seed": 42,
             "temperature": 0,
             "config_list": self.gpt3_config_list,
@@ -246,7 +243,6 @@ class LLMAgentAutoGen(LLMAgentBase):
         self.llm_config_gpt3_pub = {
             "timeout": self.llm_cfg_timeout,
             "max_retries": self.llm_cfg_max_retries,
-            "retry_wait_time": self.llm_cfg_retry_wait_time,
             "cache_seed": 42,
             "temperature": 0,
             "config_list": self.gpt3_config_list,
@@ -256,7 +252,6 @@ class LLMAgentAutoGen(LLMAgentBase):
         self.llm_config_gpt3_collection = {
             "timeout": self.llm_cfg_timeout,
             "max_retries": self.llm_cfg_max_retries,
-            "retry_wait_time": self.llm_cfg_retry_wait_time,
             "cache_seed": 42,
             "temperature": 0,
             "config_list": self.gpt3_config_list,
