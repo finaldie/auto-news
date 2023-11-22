@@ -160,7 +160,7 @@ class LLMAgentAutoGen(LLMAgentBase):
 
             {
                 "name": "scrape",
-                "description": "Scraping website content based on url",
+                "description": "Scraping and summarize website content based on url",
                 "parameters": {
                     "type": "object",
                     "properties": {
