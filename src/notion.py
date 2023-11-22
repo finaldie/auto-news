@@ -628,6 +628,7 @@ class NotionAgent:
         source: str,
         last_edited_time=None,
         extraction_interval=0,
+        require_user_rating=True,
     ):
         query_data = {
             "database_id": database_id,
@@ -646,12 +647,6 @@ class NotionAgent:
                             "equals": source,
                         }
                     },
-                    {
-                        "property": "User Rating",
-                        "select": {
-                            "is_not_empty": True,
-                        }
-                    },
                 ]
             }
         }
@@ -662,6 +657,14 @@ class NotionAgent:
                 "property": "Last edited time",
                 "date": {
                     "on_or_after": last_edited_time,
+                }
+            })
+
+        if require_user_rating:
+            query_data["filter"]["and"].append({
+                "property": "User Rating",
+                "select": {
+                    "is_not_empty": True,
                 }
             })
 
