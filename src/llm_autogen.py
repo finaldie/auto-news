@@ -101,7 +101,7 @@ def arxiv_search(query: str, days_ago=30, max_results=10):
     return json.dumps(json_res, ensure_ascii=False, indent=4)
 
 
-def write_to_file(text: str, filename: str, work_dir: str):
+def write_to_file(text: str, filename: str, work_dir: str = ""):
     work_dir = work_dir or os.getenv("AN_CURRENT_WORKDIR", "./")
     filename = os.getenv("AN_FILENAME", filename)
     filepath = f"{work_dir}/{filename}"
@@ -260,7 +260,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         self.agent_collector = autogen.AssistantAgent(
             name="Collector",
             system_message="Information Collector. For the given query, collect as much information as possible. You can get the data from the web search or Arxiv, then scrape the content; Add TERMINATE to the end of the research report.",
-            llm_config=self.llm_config_gpt3,
+            llm_config=self.llm_config_gpt3_collection,
         )
 
         self.agent_editor = autogen.AssistantAgent(
@@ -299,12 +299,12 @@ class LLMAgentAutoGen(LLMAgentBase):
             name="UserProxy",
             is_termination_msg=lambda x: x.get("content", "") and "TERMINATE" in "\n".join(x.get("content", "").rstrip().split("\n")[-2:]),
             human_input_mode="NEVER",
-            max_consecutive_auto_reply=2,
+            max_consecutive_auto_reply=1,
             code_execution_config={
                 "last_n_messages": 2,
                 "work_dir": work_dir,
             },
-            llm_config=self.llm_config_gpt3_collection,
+            llm_config=self.llm_config_gpt3,
             system_message="A human admin. Interact with the editor to discuss the plan.",
         )
 
