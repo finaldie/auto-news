@@ -295,7 +295,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             name="UserProxy",
             is_termination_msg=lambda x: x.get("content", "") and "TERMINATE" in "\n".join(x.get("content", "").rstrip().split("\n")[-2:]),
             human_input_mode="NEVER",
-            max_consecutive_auto_reply=1,
+            max_consecutive_auto_reply=10,
             code_execution_config={
                 "last_n_messages": 2,
                 "work_dir": work_dir,
