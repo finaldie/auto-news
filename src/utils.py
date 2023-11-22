@@ -53,6 +53,22 @@ def read_data_json(full_path):
     return data
 
 
+def read_file(full_path="."):
+    if not os.path.exists(full_path):
+        return ""
+
+    if not os.path.isfile(full_path):
+        return ""
+
+    output = ""
+
+    f = open(full_path, "r")
+    output = f.read()
+    f.close()
+
+    return output
+
+
 def bytes2str(data):
     """
     If input data is bytes type, then convert it to str

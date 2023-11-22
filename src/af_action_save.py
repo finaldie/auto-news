@@ -57,7 +57,7 @@ def process_dd(args, op):
     dedup_pages = op.dedup(data)
 
     workdir = os.getenv("WORKDIR")
-    workspace = f"{workdir}/{args.data_folder}"
+    workspace = f"{workdir}/{args.data_folder}/{args.run_id}"
 
     collection_pages = op.collect(dedup_pages, work_dir=workspace)
     deepdive_pages = op.deepdive(collection_pages, work_dir=workspace)

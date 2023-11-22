@@ -155,7 +155,12 @@ class OperatorDeepDive(OperatorBase):
             try:
                 query = f"Write an article about the \'{content}\', do in-depth research based on all the information provided. There is the material: {collected_data}"
 
-                article = agent_autogen.gen_article(query, work_dir=work_dir)
+                article = agent_autogen.gen_article(
+                    query,
+                    work_dir=work_dir,
+                    filename="action_deepdive.txt"
+                )
+
                 print(f"[AutoGen]: article: {article}")
 
                 dd_page = copy.deepcopy(page)

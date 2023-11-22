@@ -394,7 +394,18 @@ class LLMAgentAutoGen(LLMAgentBase):
         )
 
         # after group chat finished, the result will be saved to a file
-        article = user_proxy.last_message()["content"]
-        print(f"generated article:\n{article}")
+        article_from_ret = user_proxy.last_message()["content"]
+        print(f"generated article (from group return value):\n{article_from_ret}")
 
-        return article
+        # Tips: the group chat may not ended correctly, in the case
+        # the return value may not be reliable to use, here we read
+        # it from the saved file instead until we figured a reliable
+        # way to terminate the group chat
+        full_path = f"{work_dir}/{filename}"
+
+        article_from_file = utils.prun(utils.read_file, full_path=full_path)
+
+        print()
+        print(f"generated article (from file):\n{article_from_file}")
+
+        return article_from_file
