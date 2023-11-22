@@ -239,18 +239,26 @@ class LLMAgentSummary(LLMAgentBase):
     def __init__(self, api_key="", model_name="gpt-3.5-turbo"):
         super().__init__(api_key, model_name)
 
-    def init_prompt(self, map_prompt=None, combine_prompt=None):
+    def init_prompt(
+        self,
+        map_prompt=None,
+        combine_prompt=None,
+        translation_enabled=True
+    ):
         self.map_prompt = map_prompt
         self.combine_prompt = combine_prompt
 
         if not self.combine_prompt:
             translation_lang = os.getenv("TRANSLATION_LANG")
-            print(f"[LLMAgentSummary] translation language: {translation_lang}")
+            print(f"[LLMAgentSummary] translation language: {translation_lang}, translation_enabled: {translation_enabled}")
 
             prompt_no_translation = llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT
             prompt_with_translation = llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2 + llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2_SUFFIX.format(translation_lang, translation_lang)
 
-            prompt_tpl = prompt_with_translation if translation_lang else prompt_no_translation
+            # When user specific translation language in the config AND
+            # translation_enabled=True, we use combined translation
+            # prompt
+            prompt_tpl = prompt_with_translation if translation_lang and translation_enabled else prompt_no_translation
             self.combine_prompt = prompt_tpl
 
         self.combine_prompt_tpl = PromptTemplate(

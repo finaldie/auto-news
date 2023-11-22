@@ -61,7 +61,9 @@ def scrape(url: str):
         return False
 
     llm_agent = LLMAgentSummary()
-    llm_agent.init_prompt(llm_prompts.LLM_PROMPT_SUMMARY_SIMPLE)
+    llm_agent.init_prompt(
+        llm_prompts.LLM_PROMPT_SUMMARY_SIMPLE,
+        translation_enabled=False)
     llm_agent.init_llm()
 
     SUMMARY_MAX_LENGTH = int(os.getenv("SUMMARY_MAX_LENGTH", 20000))
