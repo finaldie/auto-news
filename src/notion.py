@@ -519,7 +519,7 @@ class NotionAgent:
                 "name": page["properties"]["Name"]["title"][0]["text"]["content"],
                 "to": page["properties"]["To"]["rich_text"][0]["text"]["content"],
                 # pdt timezone
-                "created_at": page["properties"]["Created at"]["date"]["start"],
+                "created_at": page["properties"]["Created at"]["date"]["start"] if page["properties"]["Created at"].get("date") else "",
                 "created_time": page["created_time"],
                 "preview": page["properties"]["Preview"]["rich_text"][0]["text"]["content"],
                 "notion_url": page["url"],
@@ -685,7 +685,7 @@ class NotionAgent:
                 # backward compatible with database page creation
                 "title": page["properties"]["Name"]["title"][0]["text"]["content"],
                 # pdt timezone
-                "created_at": page["properties"]["Created at"]["date"]["start"],
+                "created_at": page["properties"]["Created at"]["date"]["start"] if page["properties"]["Created at"].get("date") else "",
                 "created_time": page["created_time"],
                 "last_edited_time": props["last_edited_time"],
                 "notion_url": page["url"],
