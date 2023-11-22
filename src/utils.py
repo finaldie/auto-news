@@ -246,16 +246,16 @@ def hashcode_md5(data: bytes):
     return hash_obj.hexdigest()
 
 
-def prun(func):
+def prun(func, **kwargs):
     try:
-        return func()
+        return func(**kwargs)
 
     except Exception as e:
         print(f"[ERROR] Exception from prun: {e}")
         traceback.print_exc()
 
 
-def retry(func, retries=3):
+def retry(func, retries=3, **kwargs):
     retries = retries if retries > 0 else 3
 
     while retries > 0:
@@ -263,7 +263,7 @@ def retry(func, retries=3):
 
         try:
             st = time.time()
-            ret = func()
+            ret = func(**kwargs)
             print(f"Function executed successfully, time used: {time.time() - st:.2f}s")
             return ret
 
