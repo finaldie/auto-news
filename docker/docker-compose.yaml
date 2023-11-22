@@ -337,7 +337,7 @@ services:
         airflow dags unpause collection_weekly
         airflow dags unpause upgrade
         airflow dags unpause journal_daily
-        airflow dags unpause todo
+        airflow dags unpause action
         echo "Enable DAGs finished"
     environment:
       <<: *airflow-common-env
