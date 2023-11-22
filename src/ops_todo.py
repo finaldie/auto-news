@@ -47,7 +47,7 @@ class OperatorTODO(OperatorBase):
         print("#####################################################")
         print("# Pulling Pages: Takeaways ...")
         print("#####################################################")
-        sources = kwargs.setdefault("sources", ["Youtube", "Article", "Twitter", "RSS", "Reddit"])
+        sources = kwargs.setdefault("sources", ["Youtube", "Article", "Twitter", "RSS", "Reddit", "Journal"])
         now = datetime.now()
         start_time = now
 
@@ -110,7 +110,7 @@ class OperatorTODO(OperatorBase):
 
     def _pull_journal(self, **kwargs):
         print("#####################################################")
-        print("# Pulling Pages: Journal ...")
+        print("# Pulling Pages: Journal Inbox ...")
         print("#####################################################")
         client = DBClient()
         last_edited_time = client.get_notion_last_edited_time(
@@ -243,6 +243,10 @@ class OperatorTODO(OperatorBase):
             print(f"Content: {content}")
 
             try:
+                if page["source"] == "Journal":
+                    print(f"Skip the Journal page")
+                    continue
+
                 todo_list = llm_agent_todo.run(content)
                 print(f"LLM: TODO list: {todo_list}")
 
