@@ -25,7 +25,7 @@ class OperatorDeepDive(OperatorBase):
     - save to local json
     - restore from local json
     - dedup
-    - generate todo list
+    - generate deep dive
     - publish
     """
     def dedup(self, pages):

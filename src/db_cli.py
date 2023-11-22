@@ -168,7 +168,7 @@ class DBClient(DBClientBase):
 
     # TODO: Switch to MySQL driver
     def get_action_item_id(self, item_id):
-        key_tpl = data_model.TODO_ITEM_ID
+        key_tpl = data_model.ACTION_ITEM_ID
         key = key_tpl.format(item_id)
         return self.driver.get(key)
 
@@ -178,6 +178,6 @@ class DBClient(DBClientBase):
         json_data: str,
         **kwargs
     ):
-        key_tpl = data_model.TODO_ITEM_ID
+        key_tpl = data_model.ACTION_ITEM_ID
         key = key_tpl.format(item_id)
         self.driver.set(key, json_data, **kwargs)
