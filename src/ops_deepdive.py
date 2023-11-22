@@ -101,6 +101,7 @@ class OperatorDeepDive(OperatorBase):
                     print(f"Deep dive query: {query}")
 
                     collected_data = agent_autogen.collect(
+                        query=query,
                         work_dir=work_dir
                     )
 
