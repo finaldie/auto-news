@@ -191,7 +191,7 @@ class OperatorTODO(OperatorBase):
             last_edited_time = page["last_edited_time"]
 
             page_todo_meta = client.get_todo_item_id(page_id)
-            print(f"_dedup: page_id: {page_id}, returned meta: {page_todo_meta}")
+            print(f"_dedup: page_id: {page_id}, returned meta: {page_todo_meta}, current page last_edited_time: {last_edited_time}")
 
             page_todo_meta = utils.fix_and_parse_json(page_todo_meta)
 
@@ -354,6 +354,7 @@ class OperatorTODO(OperatorBase):
                                 "last_edited_time": last_edited_time,
                                 "todo": todo_list,
                             }),
+                            overwrite=True
                         )
 
                         self.updateLastEditedTime(
