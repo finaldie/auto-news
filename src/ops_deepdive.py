@@ -106,7 +106,7 @@ class OperatorDeepDive(OperatorBase):
                         work_dir=work_dir
                     )
 
-                    new_page["__deepdive_collection"] = collected_data
+                    new_page["__deepdive_collection"] = collected_data or ""
 
                     collected_pages.append(new_page)
 
@@ -148,7 +148,9 @@ class OperatorDeepDive(OperatorBase):
             collected_data = page["__deepdive_collection"]
 
             print(f"Content: {content}")
-            print(f"Collected_data (first 30chars): {collected_data[:30]}")
+
+            if collected_data:
+                print(f"Collected_data (first 30chars): {collected_data[:30]}")
 
             try:
                 query = f"Write an article about the \'{content}\', do in-depth research based on all the information provided. There is the material: {collected_data}"
