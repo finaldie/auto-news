@@ -96,7 +96,8 @@ class OperatorDeepDive(OperatorBase):
 
                 try:
                     agent_autogen = LLMAgentAutoGen()
-                    query = f"For the \'{takeaways}\', search from Internet to get top 3 articles and search papers from Arxiv, scrape the content and return the aggregated results with reference link attached",
+
+                    query = f"For the topic \'{takeaways}\', search from Internet to get top 3 articles and search papers from Arxiv, scrape the content and return the aggregated results with reference link attached"
 
                     print(f"Deep dive query: {query}")
 
