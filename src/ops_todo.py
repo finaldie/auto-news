@@ -47,7 +47,7 @@ class OperatorTODO(OperatorBase):
         print("#####################################################")
         print("# Pulling Pages: Takeaways ...")
         print("#####################################################")
-        sources = kwargs.setdefault("sources", ["Youtube", "Article", "Twitter", "RSS", "Reddit", "Journal"])
+        sources = kwargs.setdefault("sources", ["Youtube", "Article", "Twitter", "RSS", "Reddit", "Journal", "TODO", "DeepDive"])
         now = datetime.now()
         start_time = now
 
@@ -235,6 +235,8 @@ class OperatorTODO(OperatorBase):
 
         todo_pages = []
 
+        excluded_sources = ["TODO", "Journal"]
+
         for page in extracted_pages:
             print(f"======= [Generating] page id: {page['id']}, title: {page['title']}")
             # This is the takeaways or journal content
@@ -243,8 +245,8 @@ class OperatorTODO(OperatorBase):
             print(f"Content: {content}")
 
             try:
-                if page["source"] == "Journal":
-                    print(f"Skip the Journal page")
+                if page["source"] in excluded_sources:
+                    print(f"Skip the page due to source excluded: {page['source']}")
                     continue
 
                 todo_list = llm_agent_todo.run(content)
