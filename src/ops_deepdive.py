@@ -239,13 +239,14 @@ class OperatorDeepDive(OperatorBase):
                             database_id,
                             page)
 
-                        # mark this todo as visited
+                        # mark this action:deepdive as visited
                         client.set_action_item_id(
                             page["id"],
                             json.dumps({
                                 "last_edited_time": last_edited_time,
                                 "title": takeaways,
                             }),
+                            overwrite=True
                         )
 
                         self.updateLastEditedTime(
