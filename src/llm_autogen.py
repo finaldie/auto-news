@@ -293,7 +293,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         return self
 
     def collect(self, query: str, work_dir: str):
-        print(f"[LLMAgentAutoGen] query: {query}, work_dir: {work_dir}")
+        print(f"[LLMAgentAutoGen.collect] query: {query}, work_dir: {work_dir}")
 
         user_proxy = autogen.UserProxyAgent(
             name="UserProxy",
@@ -321,7 +321,10 @@ class LLMAgentAutoGen(LLMAgentBase):
             message=query,
         )
 
-        return user_proxy.last_message()["content"]
+        data = user_proxy.last_message()["content"]
+        print(f"collected: {data}")
+
+        return data
 
     def gen_article(
         self,
@@ -329,7 +332,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         work_dir: str,
         filename: str = "llm_article.txt"
     ):
-        print(f"[gen_report] query: {query}, work_dir: {work_dir}, filename: {filename}")
+        print(f"[LLMAgentAutoGen.gen_report] query: {query}, work_dir: {work_dir}, filename: {filename}")
 
         user_proxy = autogen.UserProxyAgent(
             name="UserProxy",
@@ -391,6 +394,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         )
 
         # after group chat finished, the result will be saved to a file
-        article = self.agent_user_proxy.last_message()["content"]
+        article = user_proxy.last_message()["content"]
+        print(f"generated article:\n{article}")
 
         return article
