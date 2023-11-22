@@ -21,13 +21,10 @@ import arxiv
 # Utils
 #######################################################################
 def search(query: str, max_results=3, max_attempts=3, timelimit="m"):
-    print(f"[utils.search] query: {query}, max_results: {max_results}")
+    print(f"[utils.search] query: {query}, max_results: {max_results}, timelimit: {timelimit}")
 
     if not query:
-        return {
-            "status": "ERROR",  # OK | ERROR | TIMEOUT
-            "body": []
-        }
+        return "[]"
 
     attempts = 0
 
@@ -37,21 +34,17 @@ def search(query: str, max_results=3, max_attempts=3, timelimit="m"):
             results = list(islice(response, max_results))
 
             if results:
-                return {
-                    "status": "OK",
-                    "body": results,
-                }
+                return json.dumps(results, ensure_ascii=False, indent=4)
 
             attempts += 1
             time.sleep(1)
 
-    return {
-        "status": "ERROR",
-        "body": [],
-    }
+    return "[]"
 
 
 def scrape(url: str):
+    print(f"[scrape] url: {url}")
+
     content = ""
 
     try:
