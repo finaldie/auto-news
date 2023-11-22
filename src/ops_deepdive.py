@@ -81,8 +81,11 @@ class OperatorDeepDive(OperatorBase):
         extracted_pages = self._get_takeaways_from_pages(takeaways_pages)
 
         collected_pages = []
+        tot = 0
+        err = 0
 
         for page in extracted_pages:
+            tot += 1
             tags = page["tags"]
             takeaways = page["__content"]
 
@@ -104,8 +107,10 @@ class OperatorDeepDive(OperatorBase):
                     collected_pages.append(new_page)
 
                 except Exception as e:
+                    err += 1
                     print(f"[ERROR] Exception occurred during deep dive collection, skip it: {e}")
 
+        print(f"Collected pages {cnt}, errors {err}")
         return collected_pages
 
     def deepdive(self, pages, work_dir):
@@ -114,15 +119,10 @@ class OperatorDeepDive(OperatorBase):
         print("#####################################################")
         print(f"work_dir: {work_dir}")
 
-        takeaways_pages = pages["takeaways"]
-
-        print(f"Total takeaways pages: {len(takeaways_pages)}")
-
-        extracted_takeaways_pages = self._get_takeaways_from_pages(takeaways_pages)
-        print(f"Pages contains takeaways: {len(extracted_takeaways_pages)}")
+        print(f"Total takeaways pages: {len(pages)}")
 
         extracted_pages = []
-        extracted_pages.extend(extracted_takeaways_pages)
+        extracted_pages.extend(pages)
 
         agent_autogen = LLMAgentAutoGen()
 
@@ -131,9 +131,13 @@ class OperatorDeepDive(OperatorBase):
         llm_agent_trans.init_llm()
 
         dd_pages = []
+        tot = 0
+        err = 0
 
         for page in extracted_pages:
+            tot += 1
             print(f"======= [Generating DeepDive] page id: {page['id']}, title: {page['title']}")
+
             # This is the takeaways or journal content
             content = page["__content"]
 
@@ -159,9 +163,10 @@ class OperatorDeepDive(OperatorBase):
                 dd_pages.append(dd_page)
 
             except Exception as e:
+                err += 1
                 print(f"[ERROR] Exception occurred during LLM_Agent.generate: {e}")
 
-        print("Returns pages: {len(dd_pages)}")
+        print("Returns pages: {len(dd_pages)}, total {tot}, errors {err}")
         return dd_pages
 
     def _get_takeaways_from_pages(self, pages, **kwargs):
