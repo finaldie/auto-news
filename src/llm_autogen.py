@@ -70,8 +70,13 @@ def scrape(url: str):
     print(f"Summary max length: {SUMMARY_MAX_LENGTH}")
 
     content = content[:SUMMARY_MAX_LENGTH]
-    summary = llm_agent.run(content)
-    return summary
+
+    # Summarize when > 2k chars
+    if len(content) > 2000:
+        print(f"[scrape] content length: {len(content)}, summarize it...")
+        return llm_agent.run(content)
+
+    return content
 
 
 def arxiv_search(query: str, days_ago=30, max_results=10):
@@ -261,8 +266,6 @@ class LLMAgentAutoGen(LLMAgentBase):
         # Tips: for gpt 3.5 agent keep thanking each other, append this one to the prompt to avoid it. ref: https://microsoft.github.io/autogen/docs/FAQ#agents-keep-thanking-each-other-when-using-gpt-35-turbo
         self.termination_notice = (
             '\n\nDo not show appreciation in your responses, say only what is necessary. '
-            'if "Thank you" or "You\'re welcome" are said in the conversation, then say TERMINATE '
-            'to indicate the conversation is finished and this is your last message.'
         )
 
         # agents
