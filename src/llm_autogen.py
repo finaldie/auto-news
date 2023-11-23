@@ -258,22 +258,29 @@ class LLMAgentAutoGen(LLMAgentBase):
             "functions": self.functions_collection,
         }
 
+        # Tips: for gpt 3.5 agent keep thanking each other, append this one to the prompt to avoid it. ref: https://microsoft.github.io/autogen/docs/FAQ#agents-keep-thanking-each-other-when-using-gpt-35-turbo
+        self.termination_notice = (
+            '\n\nDo not show appreciation in your responses, say only what is necessary. '
+            'if "Thank you" or "You\'re welcome" are said in the conversation, then say TERMINATE '
+            'to indicate the conversation is finished and this is your last message.'
+        )
+
         # agents
         self.agent_planner = autogen.AssistantAgent(
             name="Planner",
-            system_message="Planner. Suggest a plan. Revise the plan based on feedback from admin and critic, until admin approval. The plan may involve and engineer who can excute the task by provided tools/functions, or write the code only when provided functions cannot finish the task. Explain the plan first. Be clearwhich step is performed by an engineer, which step is performed by a scientist, which step is performed by a collector, and which step is performed by an editor.",
+            system_message="Planner. Suggest a plan. Revise the plan based on feedback from admin and critic, until admin approval. The plan may involve and engineer who can excute the task by provided tools/functions, or write the code only when provided functions cannot finish the task. Explain the plan first. Be clearwhich step is performed by an engineer, which step is performed by a scientist, which step is performed by a collector, and which step is performed by an editor." + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
         self.agent_collector = autogen.AssistantAgent(
             name="Collector",
-            system_message="Information Collector. For the given query, collect as much information as possible. You can get the data from the web search or Arxiv, then scrape the content; Add TERMINATE to the end of the research report.",
+            system_message="Information Collector. For the given query, collect as much information as possible. You can get the data from the web search or Arxiv, then scrape the content; Add TERMINATE to the end of the research report." + self.termination_notice,
             llm_config=self.llm_config_gpt3_collection,
         )
 
         self.agent_editor = autogen.AssistantAgent(
             name="Editor",
-            system_message="You are a senior editor. You will define the structure based on user's query and material provided, and give it to the Writer to write the article.",
+            system_message="You are a senior editor. You will define the structure based on user's query and material provided, and give it to the Writer to write the article." + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
@@ -285,13 +292,13 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         self.agent_reviewer = autogen.AssistantAgent(
             name="Reviewer",
-            system_message="You are a world-class tech article critic, you will review and critique the written article and provide feedback to Writer. After 2 rounds of reviewihng iteration with the Writer, pass the article to the Publisher.",
+            system_message="You are a world-class tech article critic, you will review and critique the written article and provide feedback to Writer. After 2 rounds of reviewihng iteration with the Writer, pass the article to the Publisher." + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
         self.agent_publisher = autogen.AssistantAgent(
             name="Publisher",
-            system_message="Publisher. You will get the article after reviewer's review, then save the article to a file.",
+            system_message="Publisher. You will get the article after reviewer's review, then save the article to a file." + self.termination_notice,
             llm_config=self.llm_config_gpt3_pub,
         )
 
@@ -313,7 +320,7 @@ class LLMAgentAutoGen(LLMAgentBase):
                 "work_dir": work_dir,
             },
             llm_config=self.llm_config_gpt3,
-            system_message="A human admin. Interact with the editor to discuss the plan.",
+            system_message="A human admin. Interact with the editor to discuss the plan." + self.termination_notice,
         )
 
         user_proxy.register_function(
@@ -349,7 +356,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             max_consecutive_auto_reply=1,
             code_execution_config=False,
             llm_config=self.llm_config_gpt3,
-            system_message="A human admin. Interact with the editor to discuss the plan.",
+            system_message="A human admin. Interact with the editor to discuss the plan." + self.termination_notice,
         )
 
         agent_executor = autogen.UserProxyAgent(
@@ -358,7 +365,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             # The whole group chat will be ended after receiving the TERMINATE message
             is_termination_msg=lambda x: x.get("content", "") and x.get("content", "").rstrip().endswith("TERMINATE"),
 
-            system_message="Executor. Execute the task by provided functions and report the result.",
+            system_message="Executor. Execute the task by provided functions and report the result." + self.termination_notice,
             human_input_mode="NEVER",
             code_execution_config={
                 "last_n_messages": 2,
