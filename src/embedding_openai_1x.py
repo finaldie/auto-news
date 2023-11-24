@@ -34,7 +34,6 @@ class EmbeddingOpenAI_1x(Embedding):
         """
         It creates the embedding with 1536 dimentions by default
         """
-        api_key = os.getenv("OPENAI_API_KEY")
         retry_wait_time = 10  # seconds to wait
         error_wait_time = 5   # seconds to wait
         emb = None
@@ -43,7 +42,6 @@ class EmbeddingOpenAI_1x(Embedding):
             try:
                 emb = self.client.embeddings.create(
                     input=[text],
-                    api_key=api_key,
                     model=model_name)
 
             except openai.RateLimitError as e:
