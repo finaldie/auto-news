@@ -20,11 +20,17 @@ import arxiv
 #######################################################################
 # Utils
 #######################################################################
-def search(query: str, max_results=3, max_attempts=3, timelimit="m"):
+def search(
+    query: str,
+    max_results=3,
+    max_attempts=3,
+    timelimit="m",
+    output_format="json_string"  # json_string | json_object
+):
     print(f"[utils.search] query: {query}, max_results: {max_results}, timelimit: {timelimit}")
 
     if not query:
-        return "[]"
+        return "[]" if output_format == "json_string" else []
 
     attempts = 0
 
@@ -40,12 +46,15 @@ def search(query: str, max_results=3, max_attempts=3, timelimit="m"):
             results = list(islice(response, max_results))
 
             if results:
-                return json.dumps(results, ensure_ascii=False, indent=4)
+                if output_format == "json_string":
+                    return json.dumps(results, ensure_ascii=False, indent=4)
+                else:
+                    return results
 
             attempts += 1
             time.sleep(1)
 
-    return "[]"
+    return "[]" if output_format == "json_string" else []
 
 
 def scrape(url: str):
@@ -79,7 +88,12 @@ def scrape(url: str):
     return content
 
 
-def arxiv_search(query: str, days_ago=30, max_results=10):
+def arxiv_search(
+    query: str,
+    days_ago=30,
+    max_results=10,
+    output_format="json_string"  # json_string | json_object
+):
     start_time = (datetime.datetime.now() - datetime.timedelta(days=days_ago)).strftime('%Y%m%d%H%M%S')
     print(f"[arxiv_search] query: {query}, days_ago: {days_ago}, start_time: {start_time}, max_results: {max_results}")
 
@@ -105,7 +119,10 @@ def arxiv_search(query: str, days_ago=30, max_results=10):
                 "URL": result.entry_id,
             }
 
-    return json.dumps(json_res, ensure_ascii=False, indent=4)
+    if output_format == "json_string":
+        return json.dumps(json_res, ensure_ascii=False, indent=4)
+    else:
+        return json_res
 
 
 def write_to_file(text: str, filename: str, work_dir: str = ""):
@@ -277,26 +294,26 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         self.agent_collector = autogen.AssistantAgent(
             name="Collector",
-            system_message="Information Collector. For the given query, collect as much information as possible. You can get the data from the web search or Arxiv, then scrape the content; Add TERMINATE to the end of the research report." + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_COLLECTOR + self.termination_notice,
             llm_config=self.llm_config_gpt3_collection,
         )
 
         self.agent_editor = autogen.AssistantAgent(
             name="Editor",
-            system_message="You are a senior editor. You will define the structure based on user's query and material provided, and give it to the Writer to write the article." + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_EDITOR + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
         self.agent_writer = autogen.AssistantAgent(
             name="Writer",
-            system_message="You are a professional article writer, you will write an article with in-depth insights based on the structure provided by the editor and the feedback from the Reviewer.",
+            system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
         self.agent_reviewer = autogen.AssistantAgent(
             name="Reviewer",
-            system_message="You are a world-class tech article critic, you will review and critique the written article and provide feedback to Writer. After 2 rounds of reviewihng iteration with the Writer, pass the article to the Publisher." + self.termination_notice,
-            llm_config=self.llm_config_gpt3,
+            system_message=llm_prompts.AUTOGEN_REVIEWER + self.termination_notice,
+            llm_config=self.llm_config_gpt3_collection,
         )
 
         self.agent_publisher = autogen.AssistantAgent(
@@ -357,7 +374,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             human_input_mode="NEVER",
             # max_consecutive_auto_reply=1,
             code_execution_config=False,
-            system_message="A human admin. Interact with the editor to discuss the plan." + self.termination_notice,
+            system_message="A human admin. Interact with the Editor to discuss the structure." + self.termination_notice,
         )
 
         agent_executor = autogen.UserProxyAgent(
@@ -376,6 +393,9 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         agent_executor.register_function(
             function_map={
+                "search": search,
+                "scrape": scrape,
+                "arxiv": arxiv_search,
                 "write_to_file": write_to_file,
             }
         )

@@ -153,7 +153,7 @@ class OperatorDeepDive(OperatorBase):
                 print(f"Collected_data (first 30chars): {collected_data[:30]}")
 
             try:
-                query = f"Write an article about the \'{content}\', do in-depth research based on all the information provided. There is the material: {collected_data}"
+                query = f"Write an article about the \'{content}\', do in-depth research based on the material below:\n\n{collected_data}"
 
                 article = agent_autogen.gen_article(
                     query,
