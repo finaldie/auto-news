@@ -68,7 +68,7 @@ class EmbeddingOpenAI_1x(Embedding):
 
                 time.sleep(error_wait_time)
 
-        return emb["data"][0]["embedding"]
+        return emb.data[0].embedding
 
     def get_or_create(
         self,
