@@ -57,7 +57,10 @@ def search(
     return "[]" if output_format == "json_string" else []
 
 
-def scrape(url: str):
+def scrape(
+    url: str,
+    output_format="json_string"  # json_string | json_object
+):
     print(f"[scrape] url: {url}")
 
     content = ""
@@ -69,23 +72,36 @@ def scrape(url: str):
         print(f"[ERROR] Exception occurred: url: {url}, error: {e}")
         return False
 
-    llm_agent = LLMAgentSummary()
-    llm_agent.init_prompt(
-        llm_prompts.LLM_PROMPT_SUMMARY_SIMPLE,
-        translation_enabled=False)
-    llm_agent.init_llm()
+    print(f"[scrape] content length: {len(content)}, first 20 chars: {content[:20]} ...")
 
-    SUMMARY_MAX_LENGTH = int(os.getenv("SUMMARY_MAX_LENGTH", 20000))
-    print(f"Summary max length: {SUMMARY_MAX_LENGTH}")
-
-    content = content[:SUMMARY_MAX_LENGTH]
+    output = content
 
     # Summarize when > 2k chars
     if len(content) > 2000:
         print(f"[scrape] content length: {len(content)}, summarize it...")
-        return llm_agent.run(content)
+        llm_agent = LLMAgentSummary()
+        llm_agent.init_prompt(
+            llm_prompts.LLM_PROMPT_SUMMARY_SIMPLE,
+            translation_enabled=False)
+        llm_agent.init_llm()
 
-    return content
+        SUMMARY_MAX_LENGTH = int(os.getenv("SUMMARY_MAX_LENGTH", 20000))
+        print(f"Summary max length: {SUMMARY_MAX_LENGTH}")
+
+        content = content[:SUMMARY_MAX_LENGTH]
+        output = llm_agent.run(content)
+
+    res = [
+        {
+            "href": url,
+            "body": output,
+        }
+    ]
+
+    if output_format == "json_string":
+        return json.dumps(res, ensure_ascii=False, indent=4)
+    else:
+        return res
 
 
 def arxiv_search(
