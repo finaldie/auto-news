@@ -241,11 +241,11 @@ class OperatorTODO(OperatorBase):
         for page in extracted_pages:
             tags = page.get("tags") or []
 
-            print(f"======= [Generating] page id: {page['id']}, title: {page['title']}")
+            print(f"======= [Generating] page id: {page['id']}, title: {page['title']}, tags: {tags}")
             # This is the takeaways or journal content
             content = page["__content"]
 
-            print(f"Content: {content}")
+            print(f"Content (Takeaways or Journal-notes): {content}")
 
             try:
                 if page["source"] in excluded_sources:
