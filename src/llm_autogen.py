@@ -64,6 +64,11 @@ def scrape(
 ):
     print(f"[scrape] url: {url}")
 
+    work_dir = os.getenv("AN_CURRENT_WORKDIR", "./")
+    filename = os.getenv("AN_COLLECTION_FILENAME", "")
+    filepath = f"{work_dir}/{filename}"
+    print(f"[scrape] collection file path: {filepath}")
+
     content = ""
 
     try:
@@ -71,7 +76,7 @@ def scrape(
 
     except Exception as e:
         print(f"[ERROR] Exception occurred: url: {url}, error: {e}")
-        return False
+        return "[]" if output_format == "json_string" else []
 
     print(f"[scrape] content length: {len(content)}, first 20 chars: {content[:20]} ...")
 
@@ -99,6 +104,10 @@ def scrape(
         }
     ]
 
+    with open(filepath, "a+") as f:
+        f.write(f"{json.dumps(res, ensure_ascii=False, indent=4)}\n")
+        f.write("\n")
+
     if output_format == "json_string":
         return json.dumps(res, ensure_ascii=False, indent=4)
     else:
@@ -114,6 +123,11 @@ def arxiv_search(
     start_time = (datetime.datetime.now() - datetime.timedelta(days=days_ago)).strftime('%Y%m%d%H%M%S')
     print(f"[arxiv_search] query: {query}, days_ago: {days_ago}, start_time: {start_time}, max_results: {max_results}")
 
+    work_dir = os.getenv("AN_CURRENT_WORKDIR", "./")
+    filename = os.getenv("AN_COLLECTION_FILENAME", "")
+    filepath = f"{work_dir}/{filename}"
+    print(f"[arxiv_search] collection file path: {filepath}")
+
     # Search for papers
     results = arxiv.Search(
         query=query,
@@ -128,13 +142,20 @@ def arxiv_search(
         print(f"processed arxiv result: {result}, published time: {result.published.strftime('%Y%m%d%H%M%S')}, start_time: {start_time}")
         # Check if the paper was published >= start_time
         if result.published.strftime('%Y%m%d%H%M%S') >= start_time:
-            print(f"| {result.title} | {', '.join(author.name for author in result.authors)} | {result.summary} | {result.entry_id} |")
+            authors = ', '.join(author.name for author in result.authors)
+            print(f"| {result.title} | {authors} | {result.summary} | {result.entry_id} |")
 
             json_res[result.title] = {
-                "authors": ', '.join(author.name for author in result.authors),
+                "authors": authors,
                 "summary": result.summary,
                 "URL": result.entry_id,
             }
+
+            if filepath:
+                print(f"[arxiv_search] save collections into {filepath}")
+                with open(filepath, "a+") as f:
+                    f.write(f"{json.dumps(json_res, ensure_ascii=False, indent=4)}\n")
+                    f.write("\n")
 
     if output_format == "json_string":
         return json.dumps(json_res, ensure_ascii=False, indent=4)
@@ -144,7 +165,7 @@ def arxiv_search(
 
 def write_to_file(text: str, filename: str, work_dir: str = ""):
     work_dir = work_dir or os.getenv("AN_CURRENT_WORKDIR", "./")
-    filename = os.getenv("AN_FILENAME", filename)
+    filename = os.getenv("AN_OUTPUT_FILENAME", filename)
     filepath = f"{work_dir}/{filename}"
 
     print(f"[write_to_file] filename: {filename}, work_dir: {work_dir}, filepath: {filepath}, text: {text}")
@@ -348,8 +369,13 @@ class LLMAgentAutoGen(LLMAgentBase):
     def init_prompt(self, prompt):
         return self
 
-    def collect(self, query: str, work_dir: str):
-        print(f"[LLMAgentAutoGen.collect] query: {query}, work_dir: {work_dir}")
+    def collect(
+        self,
+        query: str,
+        work_dir: str,
+        filename: str = "llm_collection.txt",
+    ):
+        print(f"[LLMAgentAutoGen.collect] query: {query}, work_dir: {work_dir}, filename: {filename}")
 
         user_proxy = autogen.UserProxyAgent(
             name="UserProxy",
@@ -371,23 +397,34 @@ class LLMAgentAutoGen(LLMAgentBase):
             }
         )
 
+        # pass values to functions via env
+        os.environ["AN_CURRENT_WORKDIR"] = work_dir
+        os.environ["AN_COLLECTION_FILENAME"] = filename
+
         user_proxy.initiate_chat(
             self.agent_collector,
             message=query,
         )
 
         data = user_proxy.last_message()["content"]
-        print(f"collected: {data}")
+        print(f"collected (returned): {data}")
 
-        return data
+        # Tips: agent returned value may not reliable to use,
+        # use file-based output instead
+        full_path = f"{work_dir}/{filename}"
+        data_from_file = utils.prun(utils.read_file, full_path=full_path)
+        print(f"collected (from file): {data_from_file}")
+
+        return data_from_file
 
     def gen_article(
         self,
         query: str,
         work_dir: str,
-        filename: str = "llm_article.txt"
+        filename: str = "llm_article.txt",
+        collection_filename: str = "llm_collection.txt",
     ):
-        print(f"[LLMAgentAutoGen.gen_report] query: {query}, work_dir: {work_dir}, filename: {filename}")
+        print(f"[LLMAgentAutoGen.gen_report] query: {query}, work_dir: {work_dir}, output filename: {filename}, collection filename: {collection_filename}")
 
         user_proxy = autogen.UserProxyAgent(
             name="UserProxy",
@@ -450,7 +487,8 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         # Set current workdir first
         os.environ["AN_CURRENT_WORKDIR"] = work_dir
-        os.environ["AN_FILENAME"] = filename
+        os.environ["AN_OUTPUT_FILENAME"] = filename
+        os.environ["AN_COLLECTION_FILENAME"] = collection_filename
 
         user_proxy.initiate_chat(
             manager,

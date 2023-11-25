@@ -102,12 +102,17 @@ class OperatorDeepDive(OperatorBase):
 
                     print(f"Deep dive data collection query: {query}")
 
+                    collection_filename = f"llm_collection_{new_page['id']}"
+                    print(f"Deep dive data collection filename: {collection_filename}")
+
                     collected_data = agent_autogen.collect(
                         query=query,
-                        work_dir=work_dir
+                        work_dir=work_dir,
+                        filename=collection_filename
                     )
 
                     new_page["__deepdive_collection"] = collected_data or ""
+                    new_page["__deepdive_collection_filename"] = collection_filename
 
                     collected_pages.append(new_page)
 
@@ -147,6 +152,7 @@ class OperatorDeepDive(OperatorBase):
             content = page["__content"]
 
             collected_data = page["__deepdive_collection"]
+            collection_filename = page["__deepdive_collection_filename"]
 
             print(f"Content: {content}")
 
@@ -156,6 +162,7 @@ class OperatorDeepDive(OperatorBase):
             try:
                 # query = f"Write an article about the \'{content}\', do in-depth research based on the material below:\n\n{collected_data}"
 
+                # TODO: use RAG instead of passing entire reference data
                 query = llm_prompts.AUTOGEN_DEEPDIVE_ARTICLE.format(
                     content, collected_data)
 
@@ -164,7 +171,8 @@ class OperatorDeepDive(OperatorBase):
                 article = agent_autogen.gen_article(
                     query,
                     work_dir=work_dir,
-                    filename="action_deepdive.txt"
+                    filename="action_deepdive.txt",
+                    collection_filename=collection_filename
                 )
 
                 print(f"[AutoGen]: article: {article}")
