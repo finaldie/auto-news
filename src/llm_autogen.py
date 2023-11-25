@@ -421,10 +421,10 @@ class LLMAgentAutoGen(LLMAgentBase):
             }
         )
 
-        editor = autogen.AssistantAgent(
-            name="Editor",
-            # system_message=llm_prompts.AUTOGEN_EDITOR + self.termination_notice,
-            system_message=llm_prompts.AUTOGEN_EDITOR3.format(query) + self.termination_notice,
+        writer = autogen.AssistantAgent(
+            name="Writer",
+            # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_WRITER3.format(query) + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
@@ -466,6 +466,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         # it from the saved file instead until we figured a reliable
         # way to terminate the group chat
         full_path = f"{work_dir}/{filename}"
+        print(f"generated article full path: {full_path}")
 
         article_from_file = utils.prun(utils.read_file, full_path=full_path)
 
