@@ -27,12 +27,16 @@ def search(
     timelimit="y",
     output_format="json_string"  # json_string | json_object
 ):
-    print(f"[utils.search] query: {query}, max_results: {max_results}, timelimit: {timelimit}")
+    auto_scrape = os.getenv("AN_AUTO_SCRAPE_ENABLED", False)
+    auto_scrape = utils.str2bool(auto_scrape)
+
+    print(f"[utils.search] query: {query}, max_results: {max_results}, timelimit: {timelimit}, auto_scrape: {auto_scrape}")
 
     if not query:
         return "[]" if output_format == "json_string" else []
 
     attempts = 0
+    results = []
 
     with DDGS() as ddgs:
         while attempts < max_attempts:
@@ -47,15 +51,26 @@ def search(
             results = list(islice(response, max_results))
 
             if results:
-                if output_format == "json_string":
-                    return json.dumps(results, ensure_ascii=False, indent=4)
-                else:
-                    return results
+                break
 
             attempts += 1
             time.sleep(1)
 
-    return "[]" if output_format == "json_string" else []
+    if auto_scrape:
+        for result in results:
+            title = result["title"]
+            url = result["href"]
+            details = utils.prun(scrape, url=url)
+
+            print(f"[search auto_scape] title: {title}, url: {url}, details: {details}")
+
+            if details:
+                result["details"] = details
+
+    if output_format == "json_string":
+        return json.dumps(results, ensure_ascii=False, indent=4)
+    else:
+        return results
 
 
 def scrape(
@@ -499,6 +514,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         os.environ["AN_CURRENT_WORKDIR"] = work_dir
         os.environ["AN_OUTPUT_FILENAME"] = filename
         os.environ["AN_COLLECTION_FILENAME"] = collection_filename
+        os.environ["AN_AUTO_SCRAPE_ENABLED"] = True
 
         user_proxy.initiate_chat(
             manager,
