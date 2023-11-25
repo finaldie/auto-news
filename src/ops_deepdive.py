@@ -102,7 +102,7 @@ class OperatorDeepDive(OperatorBase):
 
                     print(f"Deep dive data collection query: {query}")
 
-                    collection_filename = f"llm_collection_{new_page['id']}.txt"
+                    collection_filename = f"action_deepdive_collection_{new_page['id']}.txt"
                     print(f"Deep dive data collection filename: {collection_filename}")
 
                     collected_data = agent_autogen.collect(
@@ -168,15 +168,18 @@ class OperatorDeepDive(OperatorBase):
 
                 print(f"Deep dive article query: {query}")
 
+                output_filename = f"action_deepdive_article_{page['id']}.txt"
+                print(f"Deep dive article filename: {output_filename}")
+
                 article = agent_autogen.gen_article(
                     raw_query=content,
                     query=query,
                     work_dir=work_dir,
-                    filename="action_deepdive.txt",
+                    filename=output_filename,
                     collection_filename=collection_filename
                 )
 
-                print(f"[AutoGen]: article: {article}")
+                print(f"[AutoGen]: generated article: {article}")
 
                 full_path = f"{work_dir}/{collection_filename}"
                 collection_updated = utils.prun(utils.read_file, full_path=full_path)
