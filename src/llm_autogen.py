@@ -459,7 +459,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             }
         )
 
-        self.agent_editor = autogen.AssistantAgent(
+        editor = autogen.AssistantAgent(
             name="Editor",
             # system_message=llm_prompts.AUTOGEN_EDITOR + self.termination_notice,
             # system_message=llm_prompts.AUTOGEN_EDITOR2 + self.termination_notice,
@@ -470,8 +470,8 @@ class LLMAgentAutoGen(LLMAgentBase):
         writer = autogen.AssistantAgent(
             name="Writer",
             # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
-            # system_message=llm_prompts.AUTOGEN_WRITER2.format(query) + self.termination_notice,
-            system_message=llm_prompts.AUTOGEN_WRITER3.format(raw_query) + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_WRITER2 + self.termination_notice,
+            # system_message=llm_prompts.AUTOGEN_WRITER3.format(raw_query) + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
@@ -479,8 +479,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         agents = [
             user_proxy,
             agent_executor,
-            self.agent_editor,
-            # self.agent_writer,
+            editor,
             writer,
             self.agent_reviewer,
             self.agent_publisher,
