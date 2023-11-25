@@ -133,7 +133,7 @@ Information Collector. For the given query, collect as much information as possi
 
 AUTOGEN_COLLECTOR2 = """
 Information Collector. For the given query, do a research on that.
-You can search from Internet to get top 5 articles and search papers from Arxiv, then scrape the content to generate detailed research report with loads of technique details and all reference links attached.
+You can search from Internet to get top 5 most relevant articles and search papers from Arxiv, then scrape the content to generate detailed research report with loads of technique details and all reference links attached.
 After collect all information, add TERMINATE to the end of the report.
 """
 
