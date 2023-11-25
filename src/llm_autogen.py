@@ -46,7 +46,7 @@ def _write_arxiv_refs(
     with open(ref_fullpath, "a+") as f:
         f.write(f"Arxiv query: {query}\n")
 
-        for result in arxiv.Client().results(results):
+        for result in results:
             title = result.title
             url = result.entry_id
             f.write(f"- [{title}]({url})\n")
