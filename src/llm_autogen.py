@@ -300,19 +300,22 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         self.agent_editor = autogen.AssistantAgent(
             name="Editor",
-            system_message=llm_prompts.AUTOGEN_EDITOR + self.termination_notice,
+            # system_message=llm_prompts.AUTOGEN_EDITOR + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_EDITOR2 + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
         self.agent_writer = autogen.AssistantAgent(
             name="Writer",
-            system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
+            # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_WRITER2 + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
         self.agent_reviewer = autogen.AssistantAgent(
             name="Reviewer",
-            system_message=llm_prompts.AUTOGEN_REVIEWER + self.termination_notice,
+            # system_message=llm_prompts.AUTOGEN_REVIEWER + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_REVIEWER2 + self.termination_notice,
             llm_config=self.llm_config_gpt3_collection,
         )
 

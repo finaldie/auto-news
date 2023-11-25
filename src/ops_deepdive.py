@@ -97,9 +97,10 @@ class OperatorDeepDive(OperatorBase):
                 try:
                     agent_autogen = LLMAgentAutoGen()
 
-                    query = f"For the topic \'{takeaways}\', search from Internet to get top 3 articles and search papers from Arxiv, scrape the content, then return the aggregated results with reference link attached."
+                    # query = f"For the topic \'{takeaways}\', search from Internet to get top 3 articles and search papers from Arxiv, scrape the content, then return the aggregated results with reference link attached."
+                    query = llm_prompts.AUTOGEN_DEEPDIVE_COLLECTION.format(takeaways)
 
-                    print(f"Deep dive query: {query}")
+                    print(f"Deep dive data collection query: {query}")
 
                     collected_data = agent_autogen.collect(
                         query=query,
@@ -153,7 +154,12 @@ class OperatorDeepDive(OperatorBase):
                 print(f"Collected_data (first 30chars): {collected_data[:30]}")
 
             try:
-                query = f"Write an article about the \'{content}\', do in-depth research based on the material below:\n\n{collected_data}"
+                # query = f"Write an article about the \'{content}\', do in-depth research based on the material below:\n\n{collected_data}"
+
+                query = llm_prompts.AUTOGEN_DEEPDIVE_ARTICLE.format(
+                    content, collected_data)
+
+                print(f"Deep dive article query: {query}")
 
                 article = agent_autogen.gen_article(
                     query,
