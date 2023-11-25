@@ -171,7 +171,7 @@ You are an essay writer. You will need to do a detailed research the user's quer
 - Emphasize the importance of statistical evidence, research findings, and concrete examples to support your narrative.
 - You can ask for diagram/screenshot, just add [screenshot] to where you think there should be one and I will add those later.
 - Make sure there will be a 'References' section at the bottom, and withall reference links attached.
-According to the feedback from the Reviewer and the potential additional information provided, please describe what you have changed first, then reply the latest full refined article.
+According to the feedback from the Reviewer and the potential additional information provided, present both the initial and refined versions to showcase the evolution of the content first, then reply the latest full refined article.
 """
 
 # Parameter: {topic}
