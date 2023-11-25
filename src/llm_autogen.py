@@ -294,7 +294,8 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         self.agent_collector = autogen.AssistantAgent(
             name="Collector",
-            system_message=llm_prompts.AUTOGEN_COLLECTOR + self.termination_notice,
+            # system_message=llm_prompts.AUTOGEN_COLLECTOR + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_COLLECTOR2 + self.termination_notice,
             llm_config=self.llm_config_gpt3_collection,
         )
 
