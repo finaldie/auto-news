@@ -178,8 +178,12 @@ class OperatorDeepDive(OperatorBase):
 
                 print(f"[AutoGen]: article: {article}")
 
+                full_path = f"{work_dir}/{collection_filename}"
+                collection_updated = utils.prun(utils.read_file, full_path=full_path)
+
                 dd_page = copy.deepcopy(page)
                 dd_page["__deepdive"] = f"{content}\n\n{article}"
+                dd_page["__deepdive_collection_updated"] = collection_updated
 
                 if os.getenv("TRANSLATION_LANG"):
                     llm_translation_response = llm_agent_trans.run(dd_page["__deepdive"])

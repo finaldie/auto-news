@@ -1675,7 +1675,7 @@ class NotionAgent:
         takeaways = page["__content"]
         deepdive = page["__deepdive"]
         translation = page.get("__translation_deepdive") or ""
-        references = page.get("__deepdive_collection") or ""
+        references = page.get("__deepdive_collection_updated") or ""
 
         print(f"takeaways: {takeaways}")
         print(f"deepdive: {deepdive}")
