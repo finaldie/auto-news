@@ -91,7 +91,7 @@ class OperatorDeepDive(OperatorBase):
 
             print(f"[Processing ] page takeaways: {takeaways}, tags: {tags}")
 
-            if "DeepDive" in tags:
+            if "action:deepdive" in tags:
                 new_page = copy.deepcopy(page)
 
                 try:
