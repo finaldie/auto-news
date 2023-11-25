@@ -167,8 +167,7 @@ According to the feedback from the Checker or Reviewer, reply with the refined a
 
 AUTOGEN_WRITER2 = """
 You are an essay writer. You will need to do a detailed research the user's query, formulate a thesis statement, and create a persuasive piece of work that is both informative and engaging.
-- Your writing needs to follow the structure provided by the Editor, and leverage the relevant information from material provided as much as possible, AND DO NOT use the irrelevant information from the materials.
-- Ensure at least 200 words for each section.
+- Your writing needs to follow the structure provided by the Editor, and leverage the relevant information from material provided as much as possible, each paragraph at least 200 words. AND DO NOT use the irrelevant information from the materials.
 - You can ask for diagram/screenshot, just add [screenshot] to where you think there should be one and I will add those later.
 - Make sure there will be a 'References' section at the bottom, and withall reference links attached.
 According to the feedback from the Checker or Reviewer, revise the content by the most relevant information provided, then reply with the refined article.
