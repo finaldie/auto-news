@@ -30,7 +30,7 @@ def search(
     auto_scrape = os.getenv("AN_AUTO_SCRAPE_ENABLED", "False")
     auto_scrape = utils.str2bool(auto_scrape)
 
-    print(f"[utils.search] query: {query}, max_results: {max_results}, timelimit: {timelimit}, auto_scrape: {auto_scrape}")
+    print(f"[search] query: {query}, max_results: {max_results}, timelimit: {timelimit}, auto_scrape: {auto_scrape}")
 
     if not query:
         return "[]" if output_format == "json_string" else []
@@ -55,6 +55,8 @@ def search(
 
             attempts += 1
             time.sleep(1)
+
+    print(f"[search] results: {results}")
 
     if auto_scrape:
         for result in results:
