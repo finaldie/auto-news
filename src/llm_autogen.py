@@ -476,7 +476,7 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         self.agent_publisher = autogen.AssistantAgent(
             name="Publisher",
-            system_message="Publisher. You will get the article after reviewer's review, then save the article to a file." + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_PUBLISHER + self.termination_notice,
             llm_config=self.llm_config_gpt3_pub,
         )
 
@@ -607,7 +607,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         groupchat = autogen.GroupChat(
             agents=agents,
             messages=[],
-            max_round=50)
+            max_round=100)
 
         manager = autogen.GroupChatManager(
             groupchat=groupchat,

@@ -170,7 +170,7 @@ You are an essay writer. You will need to do a detailed research the user's quer
 - Your writing needs to follow the structure provided by the Editor, and leverage the relevant information from material provided as much as possible, AND DO NOT use the irrelevant information from the materials.
 - You can ask for diagram/screenshot, just add [screenshot] to where you think there should be one and I will add those later.
 - Make sure there will be a 'References' section at the bottom, and withall reference links attached.
-According to the feedback from the Reviewer and the potential additional information provided, acknowledge the part will be refined, focusing on REVISE the content by the most relevant information, then reply with the latest full refined article.
+According to the feedback from the Reviewer and the potential additional information provided, highlight the part will be refined, focusing on REVISE the content by the most relevant information, then reply with the latest full refined article. Please highlight the refined part in the replied article with '[]' wrapped.
 """
 
 # Parameter: {topic}
@@ -198,6 +198,10 @@ You are a world-class blog content critic, you will review and critique the give
 - Critically assess the content, structure, and overall quality of the article.
 - If there are any uncertainties, gaps, or low-quality part in the article, feel free to leverage functions to search from Internet or search papers from Arxiv, then scrape more information with all reference links attached, and send back to Writer for the further improvement.
 - After at most 15 rounds of reviewing iterations with the Writer, stop the review, and pass the latest full refined article from the Writer to the Publisher.
+"""
+
+AUTOGEN_PUBLISHER = """
+Publisher. After reviewer's review, ask for the latest full refined article, then save the article to a file.
 """
 
 # Parameter: {topic}
