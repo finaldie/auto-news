@@ -239,7 +239,7 @@ class OperatorTODO(OperatorBase):
         excluded_sources = ["TODO", "Journal"]
 
         for page in extracted_pages:
-            tags = page["tags"]
+            tags = page.get("tags") or []
 
             print(f"======= [Generating] page id: {page['id']}, title: {page['title']}")
             # This is the takeaways or journal content
@@ -253,7 +253,7 @@ class OperatorTODO(OperatorBase):
                     continue
 
                 if "action:deepdive" in tags:
-                    print(f"Skip the page due to tag excluded: action:deepdive")
+                    print("Skip the page due to tag excluded: action:deepdive")
                     continue
 
                 todo_list = llm_agent_todo.run(content)

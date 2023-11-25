@@ -88,23 +88,21 @@ def run(args):
     print(f"targets: {targets}, exec_date: {exec_date}, workdir: {workdir}, dedup: {dedup}, action_deepdive_enabled: {action_deepdive_enabled}")
 
     # Action 'TODO'
-    try:
+    def action_todo():
         op = OperatorTODO()
         todo_pages = process(args, op)
         publish(args, op, todo_pages, targets)
 
-    except Exception as e:
-        print(f"[ERROR] Exception occurred during Action TODO: {e}")
+    utils.prun(action_todo)
 
     # Action 'DeepDive'
     if action_deepdive_enabled:
-        try:
+        def action_deepdive():
             op = OperatorDeepDive()
             dd_pages = process_dd(args, op)
             publish_dd(args, op, dd_pages, targets)
 
-        except Exception as e:
-            print(f"[ERROR] Exception occurred during Action DeepDive: {e}")
+        utils.prun(action_deepdive)
 
 
 if __name__ == "__main__":
