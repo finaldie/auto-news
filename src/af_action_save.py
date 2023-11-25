@@ -82,8 +82,10 @@ def run(args):
     exec_date = date.fromisoformat(args.start)
     workdir = os.getenv("WORKDIR")
     dedup = utils.str2bool(args.dedup)
+    action_deepdive_enabled = os.getenv("ACTION_DEEPDIVE_ENABLED", False)
+    action_deepdive_enabled = utils.str2bool(action_deepdive_enabled)
 
-    print(f"targets: {targets}, exec_date: {exec_date}, workdir: {workdir}, dedup: {dedup}")
+    print(f"targets: {targets}, exec_date: {exec_date}, workdir: {workdir}, dedup: {dedup}, action_deepdive_enabled: {action_deepdive_enabled}")
 
     # Action 'TODO'
     try:
@@ -95,13 +97,14 @@ def run(args):
         print(f"[ERROR] Exception occurred during Action TODO: {e}")
 
     # Action 'DeepDive'
-    try:
-        op = OperatorDeepDive()
-        dd_pages = process_dd(args, op)
-        publish_dd(args, op, dd_pages, targets)
+    if action_deepdive_enabled:
+        try:
+            op = OperatorDeepDive()
+            dd_pages = process_dd(args, op)
+            publish_dd(args, op, dd_pages, targets)
 
-    except Exception as e:
-        print(f"[ERROR] Exception occurred during Action DeepDive: {e}")
+        except Exception as e:
+            print(f"[ERROR] Exception occurred during Action DeepDive: {e}")
 
 
 if __name__ == "__main__":
