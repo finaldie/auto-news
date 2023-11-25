@@ -202,6 +202,7 @@ def arxiv_search(
     )
 
     json_res = {}
+    valid_papers = []
 
     for result in arxiv.Client().results(results):
         print(f"processed arxiv result: {result}, published time: {result.published.strftime('%Y%m%d%H%M%S')}, start_time: {start_time}")
@@ -209,6 +210,8 @@ def arxiv_search(
         if result.published.strftime('%Y%m%d%H%M%S') >= start_time:
             authors = ', '.join(author.name for author in result.authors)
             print(f"| {result.title} | {authors} | {result.summary} | {result.entry_id} |")
+
+            valid_papers.append(result)
 
             json_res[result.title] = {
                 "authors": authors,
@@ -227,7 +230,7 @@ def arxiv_search(
                     f.write("\n")
 
     # Save refs
-    _write_arxiv_refs(query, results, ref_fullpath)
+    _write_arxiv_refs(query, valid_papers, ref_fullpath)
 
     if output_format == "json_string":
         return json.dumps(json_res, ensure_ascii=False, indent=4)
