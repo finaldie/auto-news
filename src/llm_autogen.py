@@ -470,8 +470,8 @@ class LLMAgentAutoGen(LLMAgentBase):
         self.agent_reviewer = autogen.AssistantAgent(
             name="Reviewer",
             # system_message=llm_prompts.AUTOGEN_REVIEWER + self.termination_notice,
-            system_message=llm_prompts.AUTOGEN_REVIEWER2 + self.termination_notice,
-            llm_config=self.llm_config_gpt3_review,
+            system_message=llm_prompts.AUTOGEN_REVIEWER3 + self.termination_notice,
+            llm_config=self.llm_config_gpt3,
         )
 
         self.agent_publisher = autogen.AssistantAgent(
@@ -569,6 +569,13 @@ class LLMAgentAutoGen(LLMAgentBase):
             },
         )
 
+        checker = autogen.AssistantAgent(
+            name="Checker",
+            # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
+            system_message="Content Quality Checker. According to the Reviewer's feedback, for content missing, gaps or low-quality part, find it from the provided materials first, if cannot find, leverage functions to search the content from Internet or search papers from Arxiv." + self.termination_notice,
+            llm_config=self.llm_config_gpt3_review,
+        )
+
         agent_executor.register_function(
             function_map={
                 "search": search,
@@ -600,6 +607,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             agent_executor,
             editor,
             writer,
+            checker,
             self.agent_reviewer,
             self.agent_publisher,
         ]
