@@ -271,6 +271,38 @@ class LLMAgentAutoGen(LLMAgentBase):
             },
         ]
 
+        self.functions_review = [
+            {
+                "name": "search",
+                "description": "google search for relevant information",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "Google search query",
+                        }
+                    },
+                    "required": ["query"],
+                },
+            },
+
+            {
+                "name": "arxiv",
+                "description": "arxiv search for relevant papers",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "Arxiv search query",
+                        }
+                    },
+                    "required": ["query"],
+                },
+            },
+        ]
+
         self.functions_pub = [
             {
                 "name": "write_to_file",
@@ -333,6 +365,15 @@ class LLMAgentAutoGen(LLMAgentBase):
             "functions": self.functions_collection,
         }
 
+        self.llm_config_gpt3_review = {
+            "timeout": self.llm_cfg_timeout,
+            "max_retries": self.llm_cfg_max_retries,
+            "cache_seed": 42,
+            "temperature": 0,
+            "config_list": self.gpt3_config_list,
+            "functions": self.functions_review,
+        }
+
         # Tips: for gpt 3.5 agent keep thanking each other, append this one to the prompt to avoid it. ref: https://microsoft.github.io/autogen/docs/FAQ#agents-keep-thanking-each-other-when-using-gpt-35-turbo
         self.termination_notice = (
             '\n\nDo not show appreciation in your responses, say only what is necessary. '
@@ -370,7 +411,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             name="Reviewer",
             # system_message=llm_prompts.AUTOGEN_REVIEWER + self.termination_notice,
             system_message=llm_prompts.AUTOGEN_REVIEWER2 + self.termination_notice,
-            llm_config=self.llm_config_gpt3_collection,
+            llm_config=self.llm_config_gpt3_review,
         )
 
         self.agent_publisher = autogen.AssistantAgent(
