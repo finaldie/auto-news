@@ -471,7 +471,8 @@ class LLMAgentAutoGen(LLMAgentBase):
             user_proxy,
             agent_executor,
             self.agent_editor,
-            self.agent_writer,
+            # self.agent_writer,
+            writer,
             self.agent_reviewer,
             self.agent_publisher,
         ]
