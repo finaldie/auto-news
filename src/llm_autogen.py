@@ -27,7 +27,7 @@ def search(
     timelimit="y",
     output_format="json_string"  # json_string | json_object
 ):
-    auto_scrape = os.getenv("AN_AUTO_SCRAPE_ENABLED", False)
+    auto_scrape = os.getenv("AN_AUTO_SCRAPE_ENABLED", "False")
     auto_scrape = utils.str2bool(auto_scrape)
 
     print(f"[utils.search] query: {query}, max_results: {max_results}, timelimit: {timelimit}, auto_scrape: {auto_scrape}")
@@ -555,7 +555,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         os.environ["AN_CURRENT_WORKDIR"] = work_dir
         os.environ["AN_OUTPUT_FILENAME"] = filename
         os.environ["AN_COLLECTION_FILENAME"] = collection_filename
-        os.environ["AN_AUTO_SCRAPE_ENABLED"] = True
+        os.environ["AN_AUTO_SCRAPE_ENABLED"] = "True"
 
         user_proxy.initiate_chat(
             manager,

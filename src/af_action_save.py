@@ -82,7 +82,7 @@ def run(args):
     exec_date = date.fromisoformat(args.start)
     workdir = os.getenv("WORKDIR")
     dedup = utils.str2bool(args.dedup)
-    action_deepdive_enabled = os.getenv("ACTION_DEEPDIVE_ENABLED", False)
+    action_deepdive_enabled = os.getenv("ACTION_DEEPDIVE_ENABLED", "False")
     action_deepdive_enabled = utils.str2bool(action_deepdive_enabled)
 
     print(f"targets: {targets}, exec_date: {exec_date}, workdir: {workdir}, dedup: {dedup}, action_deepdive_enabled: {action_deepdive_enabled}")
