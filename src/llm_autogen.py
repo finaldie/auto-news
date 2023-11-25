@@ -20,6 +20,42 @@ import arxiv
 #######################################################################
 # Utils
 #######################################################################
+def _write_search_refs(
+    query,
+    results,
+    ref_fullpath
+):
+    with open(ref_fullpath, "a+") as f:
+        f.write(f"Search query: {query}\n")
+
+        for result in results:
+            title = result["title"]
+            url = result["href"]
+            f.write(f"- [{title}]({url})\n")
+
+        f.write("\n")
+
+    print("[_write_search_refs] finished")
+
+
+def _write_arxiv_refs(
+    query,
+    results,
+    ref_fullpath
+):
+    with open(ref_fullpath, "a+") as f:
+        f.write(f"Arxiv query: {query}\n")
+
+        for result in arxiv.Client().results(results):
+            title = result.title
+            url = result.entry_id
+            f.write(f"- [{title}]({url})\n")
+
+        f.write("\n")
+
+    print("[_write_arxiv_refs] finished")
+
+
 def search(
     query: str,
     max_results=5,
@@ -30,7 +66,11 @@ def search(
     auto_scrape = os.getenv("AN_AUTO_SCRAPE_ENABLED", "False")
     auto_scrape = utils.str2bool(auto_scrape)
 
-    print(f"[search] query: {query}, max_results: {max_results}, timelimit: {timelimit}, auto_scrape: {auto_scrape}")
+    work_dir = os.getenv("AN_CURRENT_WORKDIR", "./")
+    ref_filename = os.getenv("AN_REF_FILENAME", "")
+    ref_fullpath = f"{work_dir}/{ref_filename}"
+
+    print(f"[search] query: {query}, max_results: {max_results}, timelimit: {timelimit}, auto_scrape: {auto_scrape}, ref_fullpath: {ref_fullpath}")
 
     if not query:
         return "[]" if output_format == "json_string" else []
@@ -68,6 +108,9 @@ def search(
 
             if details:
                 result["details"] = details
+
+    # Save refs
+    _write_search_refs(query, results, ref_fullpath)
 
     if output_format == "json_string":
         return json.dumps(results, ensure_ascii=False, indent=4)
@@ -122,7 +165,9 @@ def scrape(
     ]
 
     with open(filepath, "a+") as f:
-        f.write(f"{json.dumps(res, ensure_ascii=False, indent=4)}\n")
+        f.write(f"URL: {url}\n")
+        f.write(f"Body: {output}\n")
+        f.write("=========")
         f.write("\n")
 
     if output_format == "json_string":
@@ -143,7 +188,10 @@ def arxiv_search(
     work_dir = os.getenv("AN_CURRENT_WORKDIR", "./")
     filename = os.getenv("AN_COLLECTION_FILENAME", "")
     filepath = f"{work_dir}/{filename}"
-    print(f"[arxiv_search] collection file path: {filepath}")
+
+    ref_filename = os.getenv("AN_REF_FILENAME", "")
+    ref_fullpath = f"{work_dir}/{ref_filename}"
+    print(f"[arxiv_search] collection file path: {filepath}, ref path: {ref_fullpath}")
 
     # Search for papers
     results = arxiv.Search(
@@ -168,11 +216,18 @@ def arxiv_search(
                 "URL": result.entry_id,
             }
 
+            # Save collection full content
             if filepath:
                 print(f"[arxiv_search] save collections into {filepath}")
                 with open(filepath, "a+") as f:
-                    f.write(f"{json.dumps(json_res, ensure_ascii=False, indent=4)}\n")
+                    f.write(f"Title: {result.title}\n")
+                    f.write(f"URL: {result.entry_id}\n")
+                    f.write(f"Summary: {result.summary}\n")
+                    f.write("=========")
                     f.write("\n")
+
+    # Save refs
+    _write_arxiv_refs(query, results, ref_fullpath)
 
     if output_format == "json_string":
         return json.dumps(json_res, ensure_ascii=False, indent=4)
@@ -432,6 +487,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         query: str,
         work_dir: str,
         filename: str = "llm_collection.txt",
+        ref_filename: str = "llm_ref.txt",
     ):
         print(f"[LLMAgentAutoGen.collect] query: {query}, work_dir: {work_dir}, filename: {filename}")
 
@@ -458,6 +514,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         # pass values to functions via env
         os.environ["AN_CURRENT_WORKDIR"] = work_dir
         os.environ["AN_COLLECTION_FILENAME"] = filename
+        os.environ["AN_REF_FILENAME"] = ref_filename
 
         user_proxy.initiate_chat(
             self.agent_collector,
@@ -482,6 +539,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         work_dir: str,
         filename: str = "llm_article.txt",
         collection_filename: str = "llm_collection.txt",
+        ref_filename: str = "llm_ref.txt",
     ):
         print(f"[LLMAgentAutoGen.gen_report] raw_query: {raw_query}, query: {query}, work_dir: {work_dir}, output filename: {filename}, collection filename: {collection_filename}")
 
@@ -557,6 +615,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         os.environ["AN_CURRENT_WORKDIR"] = work_dir
         os.environ["AN_OUTPUT_FILENAME"] = filename
         os.environ["AN_COLLECTION_FILENAME"] = collection_filename
+        os.environ["AN_REF_FILENAME"] = ref_filename
         os.environ["AN_AUTO_SCRAPE_ENABLED"] = "True"
 
         user_proxy.initiate_chat(

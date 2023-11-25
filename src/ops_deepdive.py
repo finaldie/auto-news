@@ -105,14 +105,19 @@ class OperatorDeepDive(OperatorBase):
                     collection_filename = f"action_deepdive_collection_{new_page['id']}.txt"
                     print(f"Deep dive data collection filename: {collection_filename}")
 
+                    ref_filename = f"action_deepdive_refs_{new_page['id']}.txt"
+                    print(f"Deep dive ref filename: {ref_filename}")
+
                     collected_data = agent_autogen.collect(
                         query=query,
                         work_dir=work_dir,
-                        filename=collection_filename
+                        filename=collection_filename,
+                        ref_filename=ref_filename,
                     )
 
                     new_page["__deepdive_collection"] = collected_data or ""
                     new_page["__deepdive_collection_filename"] = collection_filename
+                    new_page["__deepdive_ref_filename"] = ref_filename
 
                     collected_pages.append(new_page)
 
@@ -153,6 +158,7 @@ class OperatorDeepDive(OperatorBase):
 
             collected_data = page["__deepdive_collection"]
             collection_filename = page["__deepdive_collection_filename"]
+            ref_filename = page["__deepdive_ref_filename"]
 
             print(f"Content: {content}")
 
@@ -176,17 +182,22 @@ class OperatorDeepDive(OperatorBase):
                     query=query,
                     work_dir=work_dir,
                     filename=output_filename,
-                    collection_filename=collection_filename
+                    collection_filename=collection_filename,
+                    ref_filename=ref_filename,
                 )
 
                 print(f"[AutoGen]: generated article: {article}")
 
-                full_path = f"{work_dir}/{collection_filename}"
-                collection_updated = utils.prun(utils.read_file, full_path=full_path)
+                collection_path = f"{work_dir}/{collection_filename}"
+                collection_updated = utils.prun(utils.read_file, full_path=collection_path)
+
+                ref_path = f"{work_dir}/{ref_filename}"
+                ref_data = utils.prun(utils.read_file, full_path=ref_path)
 
                 dd_page = copy.deepcopy(page)
                 dd_page["__deepdive"] = f"{content}\n\n{article}"
                 dd_page["__deepdive_collection_updated"] = collection_updated
+                dd_page["__deepdive_ref_data"] = ref_data
 
                 if os.getenv("TRANSLATION_LANG"):
                     llm_translation_response = llm_agent_trans.run(dd_page["__deepdive"])

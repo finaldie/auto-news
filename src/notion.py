@@ -1675,7 +1675,8 @@ class NotionAgent:
         takeaways = page["__content"]
         deepdive = page["__deepdive"]
         translation = page.get("__translation_deepdive") or ""
-        references = page.get("__deepdive_collection_updated") or ""
+        collection = page.get("__deepdive_collection_updated") or ""
+        references = page.get("__deepdive_ref_data") or ""
 
         print(f"takeaways: {takeaways}")
         print(f"deepdive: {deepdive}")
@@ -1694,6 +1695,10 @@ class NotionAgent:
         if references:
             blocks.append(self._createBlock_Toggle(
                 "References", references))
+
+        if collection:
+            blocks.append(self._createBlock_Toggle(
+                "Appendix", collection))
 
         # Append orginal notion link
         if page.get("id"):
