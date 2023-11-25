@@ -269,7 +269,7 @@ class OperatorTODO(OperatorBase):
             except Exception as e:
                 print(f"[ERROR] Exception occurred during LLM_Agent todo.run, {e}")
 
-        print("Returns todo pages: {len(todo_pages)}")
+        print(f"Returns todo pages: {len(todo_pages)}")
         return todo_pages
 
     def _get_takeaways_from_pages(self, pages, **kwargs):
