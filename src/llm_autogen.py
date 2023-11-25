@@ -419,12 +419,13 @@ class LLMAgentAutoGen(LLMAgentBase):
 
     def gen_article(
         self,
+        raw_query: str,
         query: str,
         work_dir: str,
         filename: str = "llm_article.txt",
         collection_filename: str = "llm_collection.txt",
     ):
-        print(f"[LLMAgentAutoGen.gen_report] query: {query}, work_dir: {work_dir}, output filename: {filename}, collection filename: {collection_filename}")
+        print(f"[LLMAgentAutoGen.gen_report] raw_query: {raw_query}, query: {query}, work_dir: {work_dir}, output filename: {filename}, collection filename: {collection_filename}")
 
         user_proxy = autogen.UserProxyAgent(
             name="UserProxy",
@@ -458,11 +459,19 @@ class LLMAgentAutoGen(LLMAgentBase):
             }
         )
 
+        self.agent_editor = autogen.AssistantAgent(
+            name="Editor",
+            # system_message=llm_prompts.AUTOGEN_EDITOR + self.termination_notice,
+            # system_message=llm_prompts.AUTOGEN_EDITOR2 + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_EDITOR3.format(raw_query) + self.termination_notice,
+            llm_config=self.llm_config_gpt3,
+        )
+
         writer = autogen.AssistantAgent(
             name="Writer",
             # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
             # system_message=llm_prompts.AUTOGEN_WRITER2.format(query) + self.termination_notice,
-            system_message=llm_prompts.AUTOGEN_WRITER3.format(query) + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_WRITER3.format(raw_query) + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
 
