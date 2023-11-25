@@ -22,9 +22,9 @@ import arxiv
 #######################################################################
 def search(
     query: str,
-    max_results=3,
+    max_results=5,
     max_attempts=3,
-    timelimit="m",
+    timelimit="y",
     output_format="json_string"  # json_string | json_object
 ):
     print(f"[utils.search] query: {query}, max_results: {max_results}, timelimit: {timelimit}")
@@ -41,7 +41,8 @@ def search(
             response = ddgs.text(
                 query,
                 max_results=max_results,
-                timelimit=timelimit)
+                # timelimit=timelimit
+            )
 
             results = list(islice(response, max_results))
 
@@ -418,6 +419,13 @@ class LLMAgentAutoGen(LLMAgentBase):
                 "arxiv": arxiv_search,
                 "write_to_file": write_to_file,
             }
+        )
+
+        editor = autogen.AssistantAgent(
+            name="Editor",
+            # system_message=llm_prompts.AUTOGEN_EDITOR + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_EDITOR3.format(query) + self.termination_notice,
+            llm_config=self.llm_config_gpt3,
         )
 
         # create group
