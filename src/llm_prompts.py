@@ -171,7 +171,7 @@ You are an essay writer. You will need to do a detailed research the user's quer
 - Emphasize the importance of statistical evidence, research findings, and concrete examples to support your narrative.
 - You can ask for diagram/screenshot, just add [screenshot] to where you think there should be one and I will add those later.
 - Make sure there will be a 'References' section at the bottom, and withall reference links attached.
-According to the feedback from the Reviewer and the potential additional information provided, highlight the refined part with '*' wrapped first, example: 'Today is beautiful.' -> 'Today is *very* beautiful.'; Last, reply the latest full refined article (includes highlights).
+According to the feedback from the Reviewer and the potential additional information provided, please describe what you have changed first, then reply the latest full refined article.
 """
 
 # Parameter: {topic}
@@ -204,7 +204,7 @@ You are a world-class blog content critic, you will review and critique the give
 AUTOGEN_REVIEWER3 = """
 You are a world-class blog content critic, you will review and critique the given article content (not the structure) and provide feedback to the Writer.
 Critically assess the content, structure, and overall quality of the article, and offer specific suggestions for improvement and highlight both strengths and weaknesses. Ensure your feedback is detailed and geared towards enhancing the article's clarity, rigor, and impact within the field.
-After 15 rounds of reviewing iterations with the Writer, stop the review, and ask for the latest full refined article from the Writer, then pass it to the Publisher.
+After 2 rounds of reviewing iterations with the Writer, stop the review, and ask for the latest full refined article from the Writer, then pass it to the Publisher.
 """
 
 AUTOGEN_PUBLISHER = """

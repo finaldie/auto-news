@@ -572,7 +572,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         checker = autogen.AssistantAgent(
             name="Checker",
             # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
-            system_message="Content Quality Checker. According to the Reviewer's feedback, for content missing, gaps or low-quality part, find it from the provided materials first, if cannot find, leverage functions to search the content from Internet or search papers from Arxiv." + self.termination_notice,
+            system_message="Content Checker. According to the Reviewer's feedback, for content missing, gaps or low-quality part, find it from the provided materials first, if cannot find, leverage functions to search the content from Internet or search papers from Arxiv." + self.termination_notice,
             llm_config=self.llm_config_gpt3_review,
         )
 
