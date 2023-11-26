@@ -470,13 +470,13 @@ class LLMAgentAutoGen(LLMAgentBase):
         self.agent_reviewer = autogen.AssistantAgent(
             name="Reviewer",
             # system_message=llm_prompts.AUTOGEN_REVIEWER + self.termination_notice,
-            system_message=llm_prompts.AUTOGEN_REVIEWER3 + self.termination_notice,
-            llm_config=self.llm_config_gpt3,
+            system_message=llm_prompts.AUTOGEN_REVIEWER2 + self.termination_notice,
+            llm_config=self.llm_config_gpt3_review,
         )
 
         self.agent_publisher = autogen.AssistantAgent(
             name="Publisher",
-            system_message=llm_prompts.AUTOGEN_PUBLISHER + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_PUBLISHER2 + self.termination_notice,
             llm_config=self.llm_config_gpt3_pub,
         )
 
@@ -607,7 +607,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             agent_executor,
             editor,
             writer,
-            checker,
+            # checker,
             self.agent_reviewer,
             self.agent_publisher,
         ]
