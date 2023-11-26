@@ -185,7 +185,7 @@ According to the feedback from the Checker or Reviewer, focuing on REVISE the co
 """
 
 AUTOGEN_WRITER4 = """
-You are an essay writer. You will need to do a detailed research the user's query, formulate a thesis statement, and create a persuasive piece of work that is both informative, detailed and engaging.
+You are a professional blogger. You will need to do a detailed research the user's query, formulate a thesis statement, and create a persuasive piece of work that is both informative, detailed and engaging.
 Your writing needs to follow the structure provided by the Editor, and leverage the relevant information from the material provided.
 Emphasize the importance of statistical evidence, research findings, and concrete examples to support your narrative.
 According to the feedback from the Reviewer and the potential additional information provided, please explain the changes one by one with the reasoning first, then reply with the refined article.
