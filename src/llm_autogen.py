@@ -596,7 +596,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         writer = autogen.AssistantAgent(
             name="Writer",
             # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
-            system_message=llm_prompts.AUTOGEN_WRITER2 + self.termination_notice,
+            system_message=llm_prompts.AUTOGEN_WRITER4 + self.termination_notice,
             # system_message=llm_prompts.AUTOGEN_WRITER3.format(raw_query) + self.termination_notice,
             llm_config=self.llm_config_gpt3,
         )
