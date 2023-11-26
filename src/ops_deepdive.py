@@ -28,22 +28,28 @@ class OperatorDeepDive(OperatorBase):
     - generate deep dive
     - publish
     """
+    def pull(self, **kwargs):
+        """
+        @return pages <id, page>
+        """
+        takeaways_pages = self.pull_takeaways(**kwargs)
+
+        return {
+            "takeaways": takeaways_pages,
+        }
+
     def dedup(self, pages):
         print("#####################################################")
         print("# DeepDive: dedup")
         print("#####################################################")
         takeaways_pages = pages["takeaways"]
-        journal_pages = pages["journal"]
 
         dedup_takeaways_pages = self._dedup(takeaways_pages)
-        dedup_journal_pages = self._dedup(journal_pages)
 
         print(f"Total takeaways {len(takeaways_pages)}, post dedup {len(dedup_takeaways_pages)}")
-        print(f"Total journal {len(journal_pages)}, post dedup {len(dedup_journal_pages)}")
 
         return {
             "takeaways": dedup_takeaways_pages,
-            "journal": dedup_journal_pages,
         }
 
     def _dedup(self, pages):
@@ -290,7 +296,7 @@ class OperatorDeepDive(OperatorBase):
                         self.updateLastEditedTime(
                             last_edited_time,
                             source,
-                            "DeepDive",
+                            "deepdive",
                             client)
 
                     except Exception as e:

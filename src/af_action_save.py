@@ -31,7 +31,7 @@ def process(args, op):
     print("#####################################################")
     print("# TODO: generate todo items")
     print("#####################################################")
-    data = op.readFromJson(args.data_folder, args.run_id, "action.json")
+    data = op.readFromJson(args.data_folder, args.run_id, "action_todo.json")
     dedup_pages = op.dedup(data)
     todo_pages: list = op.generate(dedup_pages)
 
@@ -53,7 +53,7 @@ def process_dd(args, op):
     print("#####################################################")
     print("# Process deep dive")
     print("#####################################################")
-    data = op.readFromJson(args.data_folder, args.run_id, "action.json")
+    data = op.readFromJson(args.data_folder, args.run_id, "action_deepdive.json")
     dedup_pages = op.dedup(data)
 
     workdir = os.getenv("WORKDIR")

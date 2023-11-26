@@ -29,142 +29,17 @@ class OperatorTODO(OperatorBase):
     - generate todo list
     - publish
     """
-
     def pull(self, **kwargs):
         """
         @return pages <id, page>
         """
-        takeaways_pages = self._pull_takeaways(**kwargs)
-
-        journal_pages = self._pull_journal(**kwargs)
+        takeaways_pages = self.pull_takeaways(**kwargs)
+        journal_pages = self.pull_journal(**kwargs)
 
         return {
             "takeaways": takeaways_pages,
             "journal": journal_pages,
         }
-
-    def _pull_takeaways(self, **kwargs):
-        print("#####################################################")
-        print("# Pulling Pages: Takeaways ...")
-        print("#####################################################")
-        sources = kwargs.setdefault("sources", ["Youtube", "Article", "Twitter", "RSS", "Reddit", "Journal", "TODO", "DeepDive"])
-        now = datetime.now()
-        start_time = now
-
-        print(f"start_time: {start_time}")
-
-        # 1. prepare notion agent and db connection
-        notion_api_key = os.getenv("NOTION_TOKEN")
-        notion_agent = NotionAgent(notion_api_key)
-        op_notion = OperatorNotion()
-
-        # 2. get toread database indexes
-        # db_index_id = os.getenv("NOTION_DATABASE_ID_INDEX_TOREAD")
-        db_index_id = op_notion.get_index_toread_dbid()
-
-        db_pages = utils.get_notion_database_pages_toread(
-            notion_agent, db_index_id)
-        print(f"The database pages founded: {db_pages}")
-
-        # 2. get latest two databases and collect recent items
-        db_pages = db_pages[:2]
-        print(f"The latest 2 databases: {db_pages}")
-
-        page_list = {}
-
-        for db_page in db_pages:
-            database_id = db_page["database_id"]
-            print(f"Pulling from database_id: {database_id}...")
-
-            for source in sources:
-                print(f"====== Pulling source: {source} ======")
-                client = DBClient()
-
-                last_edited_time = client.get_notion_last_edited_time(
-                    source, "todo")
-                last_edited_time = utils.bytes2str(last_edited_time)
-
-                if not last_edited_time:
-                    last_edited_time = (datetime.now() - timedelta(days=1)).isoformat()
-
-                print(f"Notion last_edited_time: {last_edited_time}, source: {source}")
-
-                # Pull the pages with user_ratings >= last_edited_time
-                # format dict(<page_id, page>)
-                pages = notion_agent.queryDatabaseToRead(
-                    database_id,
-                    source,
-                    last_edited_time=last_edited_time,
-                    extraction_interval=0.1,
-                    require_user_rating=False)
-
-                print(f"Pulled {len(pages)} pages for source: {source}")
-                page_list.update(pages)
-
-                # Wait a moment to mitigate rate limiting
-                wait_for_secs = 5
-                print(f"Wait for a moment: {wait_for_secs}s")
-                time.sleep(wait_for_secs)
-
-        print(f"Pulled total {len(page_list)} items")
-        return page_list
-
-    def _pull_journal(self, **kwargs):
-        print("#####################################################")
-        print("# Pulling Pages: Journal Inbox ...")
-        print("#####################################################")
-        client = DBClient()
-        last_edited_time = client.get_notion_last_edited_time(
-            "Journal", "todo")
-
-        last_edited_time = utils.bytes2str(last_edited_time)
-        print(f"Get last_edited_time from redis: {last_edited_time}")
-
-        if not last_edited_time:
-            last_edited_time = (datetime.now() - timedelta(days=1)).isoformat()
-
-        print(f"last_edited_time: {last_edited_time}")
-
-        # 1. prepare notion agent and db connection
-        notion_api_key = os.getenv("NOTION_TOKEN")
-        notion_agent = NotionAgent(notion_api_key)
-        op_notion = OperatorNotion()
-
-        # 2. get inbox database indexes
-        db_index_id = op_notion.get_index_inbox_dbid()
-
-        db_pages = utils.get_notion_database_pages_inbox(
-            notion_agent, db_index_id, "Journal")
-        print(f"The database pages founded: {db_pages}")
-
-        # 2. get latest two databases and collect recent items
-        db_pages = db_pages[:2]
-        print(f"The latest 2 databases: {db_pages}")
-
-        page_list = {}
-        sources = kwargs.setdefault("sources", ["Journal"])
-
-        for db_page in db_pages:
-            database_id = db_page["database_id"]
-            print(f"Pulling from database_id: {database_id}...")
-
-            for source in sources:
-                print(f"Querying source: {source} ...")
-                # The api will return the pages and sort by "created time" asc
-                # format dict(<page_id, page>)
-                pages = notion_agent.queryDatabaseInbox_Journal(
-                    database_id,
-                    filter_last_edited_time=last_edited_time)
-
-                page_list.update(pages)
-
-                # Wait a moment to mitigate rate limiting
-                wait_for_secs = 5
-                print(f"Wait for a moment: {wait_for_secs}s")
-                time.sleep(wait_for_secs)
-
-        print(f"Pulled total {len(page_list)} items")
-        return page_list
 
     def dedup(self, pages):
         print("#####################################################")
