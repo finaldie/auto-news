@@ -70,18 +70,26 @@ def save_deepdive(args, op, data):
 
 
 def run(args):
+    action_deepdive_enabled = os.getenv("ACTION_DEEPDIVE_ENABLED", "False")
+    action_deepdive_enabled = utils.str2bool(action_deepdive_enabled)
+    print(f"[Feature flag] deep dive enabled: {action_deepdive_enabled}")
+
+    # Action 'TODO'
     def run_todo():
         op = OperatorTODO()
         data = pull_todo(args, op)
         save_todo(args, op, data)
 
-    def run_deepdive():
-        op = OperatorDeepDive()
-        data = pull_deepdive(args, op)
-        save_deepdive(args, op, data)
-
     utils.prun(run_todo)
-    utils.prun(run_deepdive)
+
+    # Action 'DeepDive'
+    if action_deepdive_enabled:
+        def run_deepdive():
+            op = OperatorDeepDive()
+            data = pull_deepdive(args, op)
+            save_deepdive(args, op, data)
+
+        utils.prun(run_deepdive)
 
 
 if __name__ == "__main__":
