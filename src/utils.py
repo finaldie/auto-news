@@ -325,6 +325,14 @@ def load_video_transcript(
     langs = transcript_langs.split(",")
     print(f"Loading Youtube transcript, supported language list: {langs}, video_url: {url}, audio_url: {audio_url}, page_id: {page_id}, audio2text: {audio2text}, enable_cache: {enable_cache}")
 
+    # For the below sites, skip load from them as it may lead infinite loop and never ends
+    excluded_list = ["twitch.tv"]
+
+    for excluded_site in excluded_list:
+        if excluded_site in url:
+            print(f"[WARN] Doesn't support load video transcript from {excluded_site}, SKIP and RETURN")
+            return "", {}
+
     client = DBClient()
     redis_key_expire_time = os.getenv(
         "BOT_REDIS_KEY_EXPIRE_TIME", 604800)
