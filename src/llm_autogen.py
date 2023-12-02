@@ -147,7 +147,6 @@ def scrape(
         print(f"[scrape] content length: {len(content)}, summarize it...")
         llm_agent = LLMAgentSummary()
         llm_agent.init_prompt(
-            llm_prompts.LLM_PROMPT_SUMMARY_SIMPLE,
             translation_enabled=False)
         llm_agent.init_llm()
 

@@ -252,8 +252,8 @@ class LLMAgentSummary(LLMAgentBase):
             translation_lang = os.getenv("TRANSLATION_LANG")
             print(f"[LLMAgentSummary] translation language: {translation_lang}, translation_enabled: {translation_enabled}")
 
-            prompt_no_translation = llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT
-            prompt_with_translation = llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2 + llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT2_SUFFIX.format(translation_lang, translation_lang)
+            prompt_no_translation = llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT3
+            prompt_with_translation = llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT3 + llm_prompts.LLM_PROMPT_SUMMARY_COMBINE_PROMPT_SUFFIX.format(translation_lang, translation_lang)
 
             # When user specific translation language in the config AND
             # translation_enabled=True, we use combined translation
@@ -279,7 +279,7 @@ class LLMAgentSummary(LLMAgentBase):
 
         # TODO: support non-openAI llm
         if provider == "openai":
-            model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+            model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo-1106")
         else:
             print(f"[ERROR] Non-supported LLM provider: {provider}")
             raise

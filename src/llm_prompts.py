@@ -67,6 +67,17 @@ LLM_PROMPT_SUMMARY_COMBINE_PROMPT2_SUFFIX = """
 NUMBERED LIST SUMMARY IN BOTH ENGLISH AND {}, AFTER FINISHING ALL ENGLISH PART, THEN FOLLOW BY {} PART, USE '===' AS THE SEPARATOR:
 """
 
+LLM_PROMPT_SUMMARY_COMBINE_PROMPT3 = """
+Write a concise numbered list summary of the following text delimited by triple backquotes, keep all the numbers, and English numbers need to convert to digital numbers.
+Return your response in numbered list which covers the key points of the text and ensure that a 5 year old would understand.
+
+```{text}```
+"""
+
+LLM_PROMPT_SUMMARY_COMBINE_PROMPT_SUFFIX = """
+NUMBERED LIST SUMMARY IN BOTH ENGLISH AND {}, AFTER FINISHING ALL ENGLISH PART, THEN FOLLOW BY {} PART, USE '===' AS THE SEPARATOR:
+"""
+
 LLM_PROMPT_JOURNAL_PREFIX = """
 You have a series of random journal notes that need refinement and rewriting without altering their original meaning.
 
@@ -121,6 +132,11 @@ Analyze the below content carefully and generate concise 'Takeaways':
 
 LLM_PROMPT_SUMMARY_SIMPLE = """
 Analyze the below content carefully and generate concise 'Summary':
+{content}
+"""
+
+LLM_PROMPT_SUMMARY_SIMPLE2 = """
+Analyze the below content carefully and generate concise 'Summary' without losing any numbers, and English numbers need to convert to digital numbers:
 {content}
 """
 
