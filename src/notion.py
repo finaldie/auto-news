@@ -767,7 +767,10 @@ class NotionAgent:
 
                 # utc timezone (notion auto-created)
                 "last_edited_time": props["last_edited_time"],
-                "source": "Journal",
+
+                # Use 'Inbox-Journal' since in ToRead database,
+                # we have the 'Journal' source already
+                "source": "Inbox-Journal",
 
                 "props": props,
                 "blocks": blocks,
