@@ -68,14 +68,18 @@ NUMBERED LIST SUMMARY IN BOTH ENGLISH AND {}, AFTER FINISHING ALL ENGLISH PART, 
 """
 
 LLM_PROMPT_SUMMARY_COMBINE_PROMPT3 = """
-Write a concise numbered list summary of the following text delimited by triple backquotes, keep all the numbers, and English numbers need to convert to digital numbers.
-Return your response in numbered list which covers the key points of the text and ensure that a 5 year old would understand.
-
+Write a concise and precise numbered list summary of the following text without losing any numbers and key points (English numbers need to be converted to digital numbers):
 ```{text}```
 """
 
 LLM_PROMPT_SUMMARY_COMBINE_PROMPT_SUFFIX = """
 NUMBERED LIST SUMMARY IN BOTH ENGLISH AND {}, AFTER FINISHING ALL ENGLISH PART, THEN FOLLOW BY {} PART, USE '===' AS THE SEPARATOR:
+"""
+
+# One-liner summary
+LLM_PROMPT_SUMMARY_ONE_LINER = """
+Write a concise and precise one-liner summary of the following text without losing any numbers and key points (English numbers need to be converted to digital numbers):
+{text}
 """
 
 LLM_PROMPT_JOURNAL_PREFIX = """
