@@ -72,6 +72,15 @@ Write a concise and precise numbered list summary of the following text without 
 ```{text}```
 """
 
+LLM_PROMPT_SUMMARY_COMBINE_PROMPT4 = """
+As a professional summarizer, create a concise and comprehensive summary of the provided text, be it an article, post, conversation, or passage, while adhering to these guidelines:
+- Craft a summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness.
+- Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects.
+- Rely strictly on the provided text, without including external information.
+- Format the summary in paragraph form for easy understanding, and use the numbered list as the output format:
+{text}
+"""
+
 LLM_PROMPT_SUMMARY_COMBINE_PROMPT_SUFFIX = """
 NUMBERED LIST SUMMARY IN BOTH ENGLISH AND {}, AFTER FINISHING ALL ENGLISH PART, THEN FOLLOW BY {} PART, USE '===' AS THE SEPARATOR:
 """
