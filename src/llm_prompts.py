@@ -263,3 +263,16 @@ User's query: {}
 User-Provided Materials:
 {}
 """
+
+# AUTOGEN additional iteration prompt
+# Parameter: {topic}, {article}, {user-provided materials}
+AUTOGEN_DEEPDIVE_FOLLOWUP = """
+Refine the article below based on the user query, and the user has provided the draft and some initial materials, improve the article with more details, examples and numbers to support:
+
+User's query: {}
+
+User drafted article: {}
+
+User-Provided Materials: {}
+
+"""

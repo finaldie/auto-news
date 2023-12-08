@@ -134,6 +134,55 @@ class OperatorDeepDive(OperatorBase):
         print(f"Collected pages {tot}, errors {err}")
         return collected_pages
 
+    def _deepdive(
+        self,
+        iter_cnt,
+        agent_autogen,
+        work_dir,
+        collection_filename,
+        ref_filename,
+        raw_query,
+        full_query,
+        dd_page,
+    ):
+        """
+        dd_page: Output page for holding deepdive
+        """
+        print(f"Deep dive article query: {full_query}")
+
+        output_filename = f"action_deepdive_article_{dd_page['id']}_v{iter_cnt}.txt"
+        print(f"Deep dive article filename: {output_filename}")
+
+        article = agent_autogen.gen_article(
+            raw_query=raw_query,
+            query=full_query,
+            work_dir=work_dir,
+            filename=output_filename,
+            collection_filename=collection_filename,
+            ref_filename=ref_filename,
+        )
+
+        collection_path = f"{work_dir}/{collection_filename}"
+        collection_updated = utils.prun(utils.read_file, full_path=collection_path)
+
+        ref_path = f"{work_dir}/{ref_filename}"
+        ref_data = utils.prun(utils.read_file, full_path=ref_path)
+
+        deepdive_content = f"{raw_query} (version {iter_cnt})\n\n{article}"
+        print(f"[AutoGen]: generated deepdive article: {deepdive_content}")
+
+        # keep each iteration version
+        dd_page[f"__deepdive_v{iter_cnt}"] = deepdive_content
+
+        # __deepdive is the latest one for publishing
+        dd_page["__deepdive"] = deepdive_content
+
+        dd_page["__deepdive_collection_updated"] = collection_updated
+        dd_page["__deepdive_ref_data"] = ref_data
+
+        # Return the raw article
+        return article
+
     def deepdive(self, pages, work_dir):
         print("#####################################################")
         print("# DeepDive: Generating result for pages")
@@ -161,50 +210,57 @@ class OperatorDeepDive(OperatorBase):
 
             # This is the takeaways or journal content
             content = page["__content"]
+            print(f"Raw query: {content}")
 
             collected_data = page["__deepdive_collection"]
             collection_filename = page["__deepdive_collection_filename"]
             ref_filename = page["__deepdive_ref_filename"]
 
-            print(f"Content: {content}")
-
             if collected_data:
                 print(f"Collected_data (first 30chars): {collected_data[:30]}")
 
+            # Start deepdive iterations
             try:
-                # query = f"Write an article about the \'{content}\', do in-depth research based on the material below:\n\n{collected_data}"
-
-                # TODO: use RAG instead of passing entire reference data
-                query = llm_prompts.AUTOGEN_DEEPDIVE_ARTICLE.format(
-                    content, collected_data)
-
-                print(f"Deep dive article query: {query}")
-
-                output_filename = f"action_deepdive_article_{page['id']}.txt"
-                print(f"Deep dive article filename: {output_filename}")
-
-                article = agent_autogen.gen_article(
-                    raw_query=content,
-                    query=query,
-                    work_dir=work_dir,
-                    filename=output_filename,
-                    collection_filename=collection_filename,
-                    ref_filename=ref_filename,
-                )
-
-                print(f"[AutoGen]: generated article: {article}")
-
-                collection_path = f"{work_dir}/{collection_filename}"
-                collection_updated = utils.prun(utils.read_file, full_path=collection_path)
-
-                ref_path = f"{work_dir}/{ref_filename}"
-                ref_data = utils.prun(utils.read_file, full_path=ref_path)
+                iter_max_cnt = os.getenv("ACTION_DEEPDIVE_ITERATIONS", 3)
+                print(f"Iteration max count: {iter_max_cnt}")
 
                 dd_page = copy.deepcopy(page)
-                dd_page["__deepdive"] = f"{content}\n\n{article}"
-                dd_page["__deepdive_collection_updated"] = collection_updated
-                dd_page["__deepdive_ref_data"] = ref_data
 
+                latest_deepdive_content = ""
+                latest_collection_content = ""
+
+                for iter_cnt in range(iter_max_cnt):
+                    print(f"------ [Generating DeepDive] Iteration {iter_cnt + 1}")
+
+                    # TODO: For very long deep dive article, use RAG
+                    # instead of passing entire reference data
+                    query = ""
+
+                    if iter_cnt == 0:
+                        query = llm_prompts.AUTOGEN_DEEPDIVE_ARTICLE.format(
+                            content, collected_data)
+
+                    else:
+                        query = llm_prompts.AUTOGEN_DEEPDIVE_FOLLOWUP.format(
+                            content,
+                            latest_deepdive_content,
+                            latest_collection_content)
+
+                    article = self._deepdive(
+                        iter_cnt + 1,
+                        agent_autogen,
+                        work_dir,
+                        collection_filename,
+                        ref_filename,
+                        content,
+                        query,
+                        dd_page
+                    )
+
+                    latest_deepdive_content = article
+                    latest_collection_content = dd_page["__deepdive_collection_updated"]
+
+                # After all iterations, do translation if needed
                 if os.getenv("TRANSLATION_LANG"):
                     llm_translation_response = llm_agent_trans.run(dd_page["__deepdive"])
                     print(f"LLM: Translation response: {llm_translation_response}")
