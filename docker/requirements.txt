@@ -18,8 +18,11 @@ redis
 youtube-transcript-api
 pytube
 
+# RAG
+llama-index>=0.9.*
+
 # Vector database
-# chromadb
+chromadb>=0.4.*
 pymilvus===2.2.8
 pinecone-client
 
