@@ -221,7 +221,7 @@ class OperatorDeepDive(OperatorBase):
 
             # Start deepdive iterations
             try:
-                iter_max_cnt = os.getenv("ACTION_DEEPDIVE_ITERATIONS", 3)
+                iter_max_cnt = int(os.getenv("ACTION_DEEPDIVE_ITERATIONS", 3))
                 print(f"Iteration max count: {iter_max_cnt}")
 
                 dd_page = copy.deepcopy(page)
