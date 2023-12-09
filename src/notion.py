@@ -519,7 +519,7 @@ class NotionAgent:
                 "name": page["properties"]["Name"]["title"][0]["text"]["content"],
                 "to": page["properties"]["To"]["rich_text"][0]["text"]["content"],
                 # pdt timezone
-                "created_at": page["properties"]["Created at"]["date"]["start"],
+                "created_at": page["properties"]["Created at"]["date"]["start"] if page["properties"]["Created at"].get("date") else "",
                 "created_time": page["created_time"],
                 "preview": page["properties"]["Preview"]["rich_text"][0]["text"]["content"],
                 "notion_url": page["url"],
@@ -628,6 +628,7 @@ class NotionAgent:
         source: str,
         last_edited_time=None,
         extraction_interval=0,
+        require_user_rating=True,
     ):
         query_data = {
             "database_id": database_id,
@@ -646,12 +647,6 @@ class NotionAgent:
                             "equals": source,
                         }
                     },
-                    {
-                        "property": "User Rating",
-                        "select": {
-                            "is_not_empty": True,
-                        }
-                    },
                 ]
             }
         }
@@ -662,6 +657,14 @@ class NotionAgent:
                 "property": "Last edited time",
                 "date": {
                     "on_or_after": last_edited_time,
+                }
+            })
+
+        if require_user_rating:
+            query_data["filter"]["and"].append({
+                "property": "User Rating",
+                "select": {
+                    "is_not_empty": True,
                 }
             })
 
@@ -682,7 +685,7 @@ class NotionAgent:
                 # backward compatible with database page creation
                 "title": page["properties"]["Name"]["title"][0]["text"]["content"],
                 # pdt timezone
-                "created_at": page["properties"]["Created at"]["date"]["start"],
+                "created_at": page["properties"]["Created at"]["date"]["start"] if page["properties"]["Created at"].get("date") else "",
                 "created_time": page["created_time"],
                 "last_edited_time": props["last_edited_time"],
                 "notion_url": page["url"],
@@ -764,7 +767,10 @@ class NotionAgent:
 
                 # utc timezone (notion auto-created)
                 "last_edited_time": props["last_edited_time"],
-                "source": "Journal",
+
+                # Use 'Inbox-Journal' since in ToRead database,
+                # we have the 'Journal' source already
+                "source": "Inbox-Journal",
 
                 "props": props,
                 "blocks": blocks,
@@ -1660,6 +1666,57 @@ class NotionAgent:
                 {"database_id": database_id},
                 properties,
                 blocks)
+
+    def createDatabaseItem_ToRead_DeepDive(
+        self,
+        database_id: str,
+        page: dict,
+        **kwargs
+    ):
+        print(f"[Notion.createDatabaseItem_ToRead_DeepDive] page: {page}")
+
+        takeaways = page["__content"]
+        deepdive = page["__deepdive"]
+        translation = page.get("__translation_deepdive") or ""
+        collection = page.get("__deepdive_collection_updated") or ""
+        references = page.get("__deepdive_ref_data") or ""
+
+        print(f"takeaways: {takeaways}")
+        print(f"deepdive: {deepdive}")
+        print(f"translation: {translation}")
+
+        properties, blocks = self._createDatabaseItem_CollectionBase(
+            takeaways, "DeepDive", [], [], **kwargs)
+
+        text_blocks = self._createBlock_RichText("paragraph", deepdive)
+        blocks.extend(text_blocks)
+
+        if translation:
+            blocks.append(self._createBlock_Toggle(
+                "Translation", translation))
+
+        if references:
+            blocks.append(self._createBlock_Toggle(
+                "References", references))
+
+        if collection:
+            blocks.append(self._createBlock_Toggle(
+                "Appendix", collection))
+
+        # Append orginal notion link
+        if page.get("id"):
+            blocks.append({
+                "type": "link_to_page",
+                "link_to_page": {
+                    "type": "page_id",
+                    "page_id": page['id']
+                }
+            })
+
+        self.createPage(
+            {"database_id": database_id},
+            properties,
+            blocks)
 
     def createDatabaseItem_ToRead_Reddit(
         self,

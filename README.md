@@ -35,7 +35,7 @@ https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105
 | Memory    | 6GB                  | 12GB         |
 | Disk      | 20GB                 | 50GB         |
 
-# Installation
+# Quick Start Guide
 ## Preparison
 * [Required] [Notion token](https://www.notion.so/my-integrations)
 * [Required] [OpenAI token](https://openai.com/blog/openai-api)

@@ -77,6 +77,7 @@ class RedditAgent:
 
             response.raise_for_status()
             self._save_ratelimit_info(response=response)
+
             return self._extractSubredditPosts(
                 response, data_folder, run_id)
 
@@ -85,8 +86,11 @@ class RedditAgent:
     def _extractSubredditPosts(self, response, data_folder, run_id):
         posts = response.json()["data"]["children"]
         ret = []
+        tot = 0
+        err = 0
 
         for post in posts:
+            tot += 1
             ts = post["data"]["created_utc"]
             dt_utc = datetime.fromtimestamp(ts).isoformat()
             dt_pdt = utils.convertUTC2PDT_str(dt_utc).isoformat()
@@ -130,6 +134,7 @@ class RedditAgent:
 
                     except Exception as e:
                         print(f"[ERROR] Load web content failed from {page_url}, use empty string instead: {e}")
+                        err += 1
 
                 print(f"Post from external link (non-video/image), load from source {page_url}, text: {text[:200]}...")
 
@@ -151,6 +156,7 @@ class RedditAgent:
 
                 except Exception as e:
                     print(f"[ERROR] Load video {video_url}, audio {audio_url} failed: {e}")
+                    err += 1
 
             extracted_post = {
                 "id": post_hash_id,
@@ -189,6 +195,7 @@ class RedditAgent:
 
             ret.append(extracted_post)
 
+        print(f"Reddit post loaded total {tot}, error {err}")
         return ret
 
     def _is_video(self, post, page_url):

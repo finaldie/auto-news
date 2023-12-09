@@ -162,7 +162,7 @@ class OperatorJournal(OperatorBase):
 
         # Generate action items
         llm_agent_summary = LLMAgentGeneric()
-        llm_agent_summary.init_prompt(llm_prompts.LLM_PROMPT_SUMMARY_SIMPLE)
+        llm_agent_summary.init_prompt(llm_prompts.LLM_PROMPT_SUMMARY_SIMPLE2)
         llm_agent_summary.init_llm()
 
         summary = llm_agent_summary.run(llm_response)

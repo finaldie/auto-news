@@ -165,3 +165,19 @@ class DBClient(DBClientBase):
         key_tpl = data_model.TODO_ITEM_ID
         key = key_tpl.format(item_id)
         self.driver.set(key, json_data, **kwargs)
+
+    # TODO: Switch to MySQL driver
+    def get_action_item_id(self, item_id):
+        key_tpl = data_model.ACTION_ITEM_ID
+        key = key_tpl.format(item_id)
+        return self.driver.get(key)
+
+    def set_action_item_id(
+        self,
+        item_id,
+        json_data: str,
+        **kwargs
+    ):
+        key_tpl = data_model.ACTION_ITEM_ID
+        key = key_tpl.format(item_id)
+        self.driver.set(key, json_data, **kwargs)

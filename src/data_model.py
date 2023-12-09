@@ -56,3 +56,7 @@ PAGE_ITEM_ID = "page_item_id_{}"
 # key: page_id
 # val: json format: {"last_edited_time": xx, "todo": xx}
 TODO_ITEM_ID = "todo_item_id_{}"
+
+# key: page_id
+# val: json format: {"last_edited_time": xx, "action": xx}
+ACTION_ITEM_ID = "action_item_id_{}"
