@@ -47,7 +47,7 @@ pymupdf
 # AutoGen
 pyautogen~=0.2.1
 docker
-duckduckgo_search==3.9.6
+duckduckgo_search
 
 # Remove it once httpx fix the dependency issue
 httpcore>=1.*
