@@ -80,18 +80,22 @@ def search(
 
     with DDGS() as ddgs:
         while attempts < max_attempts:
-            # Tips: max_results=max_results only available when
-            #       duckduckgo-search >= 3.9.x
-            response = ddgs.text(
-                query,
-                max_results=max_results,
-                # timelimit=timelimit
-            )
+            try:
+                # Tips: max_results=max_results only available when
+                #       duckduckgo-search >= 3.9.x
+                response = ddgs.text(
+                    query,
+                    max_results=max_results,
+                    # timelimit=timelimit
+                )
 
-            results = list(islice(response, max_results))
+                results = list(islice(response, max_results))
 
-            if results:
-                break
+                if results:
+                    break
+
+            except Exception as e:
+                print(f"[search] Exception occurred during searching: {e}")
 
             attempts += 1
             time.sleep(1)
@@ -614,7 +618,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         groupchat = autogen.GroupChat(
             agents=agents,
             messages=[],
-            max_round=100)
+            max_round=30)
 
         manager = autogen.GroupChatManager(
             groupchat=groupchat,
