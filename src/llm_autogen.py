@@ -30,7 +30,7 @@ def _write_search_refs(
 
         for result in results:
             title = result["title"]
-            url = result["href"]
+            url = result["href"].strip().replace(" ", "")
             f.write(f"- [{title}]({url})\n")
 
         f.write("\n")
@@ -48,7 +48,7 @@ def _write_arxiv_refs(
 
         for result in results:
             title = result.title
-            url = result.entry_id
+            url = result.entry_id.strip().replace(" ", "")
             f.write(f"- [{title}]({url})\n")
 
         f.write("\n")
@@ -105,7 +105,7 @@ def search(
     if auto_scrape:
         for result in results:
             title = result["title"]
-            url = result["href"]
+            url = result["href"].strip().replace(" ", "")
             details = utils.prun(scrape, url=url)
 
             print(f"[search auto_scape] title: {title}, url: {url}, details: {details}")
@@ -219,7 +219,7 @@ def arxiv_search(
             json_res[result.title] = {
                 "authors": authors,
                 "summary": result.summary,
-                "URL": result.entry_id,
+                "URL": result.entry_id.strip().replace(" ", ""),
             }
 
             # Save collection full content
