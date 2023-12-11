@@ -123,7 +123,7 @@ def search(
 
 
 def scrape(
-    url: str,
+    url: str = "",
     output_format="json_string"  # json_string | json_object
 ):
     url = url.strip().replace(" ", "")
