@@ -126,6 +126,7 @@ def scrape(
     url: str,
     output_format="json_string"  # json_string | json_object
 ):
+    url = url.strip().replace(" ", "")
     print(f"[scrape] url: {url}")
 
     work_dir = os.getenv("AN_CURRENT_WORKDIR", "./")
@@ -181,7 +182,7 @@ def scrape(
 
 def arxiv_search(
     query: str,
-    days_ago=30,
+    days_ago=365 * 10,
     max_results=10,
     output_format="json_string"  # json_string | json_object
 ):
