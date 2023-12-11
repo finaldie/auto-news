@@ -390,7 +390,7 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         print(f"[LLMAgentAutoGen] Initialize GPT3 model_name: {_gpt3_model_name}, api_version: {_gpt3_api_version}")
 
-        self.llm_cfg_timeout = 120  # seconds
+        self.llm_cfg_timeout = 180  # seconds
         self.llm_cfg_max_retries = 5
 
         print(f"[LLMAgentAutoGen] Initialize config: timeout: {self.llm_cfg_timeout}, max_retries: {self.llm_cfg_max_retries}")
