@@ -209,7 +209,7 @@ def arxiv_search(
     valid_papers = []
 
     for result in arxiv.Client().results(results):
-        print(f"processed arxiv result: {result}, published time: {result.published.strftime('%Y%m%d%H%M%S')}, start_time: {start_time}")
+        print(f"processed arxiv result: {result}, {result.title}, published time: {result.published.strftime('%Y%m%d%H%M%S')}, start_time: {start_time}")
         # Check if the paper was published >= start_time
         if result.published.strftime('%Y%m%d%H%M%S') >= start_time:
             authors = ', '.join(author.name for author in result.authors)
