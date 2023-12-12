@@ -123,9 +123,10 @@ def search(
 
 
 def scrape(
-    url: str,
+    url: str = "",
     output_format="json_string"  # json_string | json_object
 ):
+    url = url.strip().replace(" ", "")
     print(f"[scrape] url: {url}")
 
     work_dir = os.getenv("AN_CURRENT_WORKDIR", "./")
@@ -181,7 +182,7 @@ def scrape(
 
 def arxiv_search(
     query: str,
-    days_ago=30,
+    days_ago=365 * 10,
     max_results=10,
     output_format="json_string"  # json_string | json_object
 ):
@@ -208,7 +209,7 @@ def arxiv_search(
     valid_papers = []
 
     for result in arxiv.Client().results(results):
-        print(f"processed arxiv result: {result}, published time: {result.published.strftime('%Y%m%d%H%M%S')}, start_time: {start_time}")
+        print(f"processed arxiv result: {result}, {result.title}, published time: {result.published.strftime('%Y%m%d%H%M%S')}, start_time: {start_time}")
         # Check if the paper was published >= start_time
         if result.published.strftime('%Y%m%d%H%M%S') >= start_time:
             authors = ', '.join(author.name for author in result.authors)
@@ -389,8 +390,8 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         print(f"[LLMAgentAutoGen] Initialize GPT3 model_name: {_gpt3_model_name}, api_version: {_gpt3_api_version}")
 
-        self.llm_cfg_timeout = 120  # seconds
-        self.llm_cfg_max_retries = 3
+        self.llm_cfg_timeout = 180  # seconds
+        self.llm_cfg_max_retries = 5
 
         print(f"[LLMAgentAutoGen] Initialize config: timeout: {self.llm_cfg_timeout}, max_retries: {self.llm_cfg_max_retries}")
 
