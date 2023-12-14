@@ -3,6 +3,8 @@ pytz
 requests
 
 langchain
+langchain-google-genai
+pillow
 tiktoken
 openai
 

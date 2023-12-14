@@ -11,6 +11,7 @@ from langchain.document_loaders import YoutubeLoader
 from langchain.document_loaders import WebBaseLoader
 from langchain.document_loaders import ArxivLoader
 from langchain.utilities.arxiv import ArxivAPIWrapper
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 import llm_prompts
 
@@ -184,21 +185,29 @@ class LLMAgentBase:
         temperature=0
     ):
         provider = provider or os.getenv("LLM_PROVIDER", "openai")
+        llm = None
 
         # TODO: support non-openAI llm
         if provider == "openai":
             model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 
+            llm = ChatOpenAI(
+                # model_name="text-davinci-003"
+                model_name=model_name,
+                # temperature dictates how whacky the output should be
+                # for fixed response format task, set temperature = 0
+                temperature=temperature)
+
+        elif provider == "google":
+            model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")
+
+            llm = ChatGoogleGenerativeAI(
+                model=model_name,
+                temperature=temperature)
+
         else:
             print(f"[ERROR] Non-supported LLM provider: {provider}")
             raise
-
-        llm = ChatOpenAI(
-            # model_name="text-davinci-003"
-            model_name=model_name,
-            # temperature dictates how whacky the output should be
-            # for fixed response format task, set temperature = 0
-            temperature=temperature)
 
         self.llm = llm
         self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
