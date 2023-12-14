@@ -4,6 +4,7 @@ requests
 
 langchain
 langchain-google-genai
+transformers
 pillow
 tiktoken
 openai

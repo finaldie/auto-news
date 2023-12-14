@@ -182,7 +182,8 @@ class LLMAgentBase:
         self,
         provider=None,
         model_name=None,
-        temperature=0
+        temperature=0,
+        create_default_chain=True
     ):
         provider = provider or os.getenv("LLM_PROVIDER", "openai")
         llm = None
@@ -212,7 +213,9 @@ class LLMAgentBase:
         self.llm = llm
 
         # Create a default chain
-        self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
+        if create_default_chain:
+            self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
+
         print(f"LLM chain initalized, provider: {provider}, model_name: {model_name}, temperature: {temperature}")
 
     def get_num_tokens(self, text):
@@ -286,7 +289,11 @@ class LLMAgentSummary(LLMAgentBase):
         chain_type="map_reduce",
         verbose=False
     ):
-        super().init_llm(provider, model_name, temperature)
+        super().init_llm(
+            provider,
+            model_name,
+            temperature,
+            create_default_chain=False)
 
         self.llmchain = load_summarize_chain(
             self.llm,
