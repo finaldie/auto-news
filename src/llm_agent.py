@@ -210,6 +210,8 @@ class LLMAgentBase:
             raise
 
         self.llm = llm
+
+        # Create a default chain
         self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
         print(f"LLM chain initalized, provider: {provider}, model_name: {model_name}, temperature: {temperature}")
 
@@ -284,23 +286,8 @@ class LLMAgentSummary(LLMAgentBase):
         chain_type="map_reduce",
         verbose=False
     ):
-        provider = provider or os.getenv("LLM_PROVIDER", "openai")
+        super().init_llm(provider, model_name, temperature)
 
-        # TODO: support non-openAI llm
-        if provider == "openai":
-            model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo-1106")
-        else:
-            print(f"[ERROR] Non-supported LLM provider: {provider}")
-            raise
-
-        llm = ChatOpenAI(
-            # model_name="text-davinci-003"
-            model_name=model_name,
-            # temperature dictates how whacky the output should be
-            # for fixed response format task, set temperature = 0
-            temperature=temperature)
-
-        self.llm = llm
         self.llmchain = load_summarize_chain(
             self.llm,
             combine_prompt=self.combine_prompt_tpl,
