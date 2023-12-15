@@ -151,8 +151,7 @@ def scrape(
     if len(content) > 2000:
         print(f"[scrape] content length: {len(content)}, summarize it...")
         llm_agent = LLMAgentSummary()
-        llm_agent.init_prompt(
-            translation_enabled=False)
+        llm_agent.init_prompt(translation_enabled=False)
         llm_agent.init_llm()
 
         SUMMARY_MAX_LENGTH = int(os.getenv("SUMMARY_MAX_LENGTH", 20000))

@@ -11,6 +11,7 @@ from langchain.document_loaders import YoutubeLoader
 from langchain.document_loaders import WebBaseLoader
 from langchain.document_loaders import ArxivLoader
 from langchain.utilities.arxiv import ArxivAPIWrapper
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 import llm_prompts
 
@@ -181,27 +182,40 @@ class LLMAgentBase:
         self,
         provider=None,
         model_name=None,
-        temperature=0
+        temperature=0,
+        create_default_chain=True
     ):
         provider = provider or os.getenv("LLM_PROVIDER", "openai")
+        llm = None
 
         # TODO: support non-openAI llm
         if provider == "openai":
             model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 
+            llm = ChatOpenAI(
+                # model_name="text-davinci-003"
+                model_name=model_name,
+                # temperature dictates how whacky the output should be
+                # for fixed response format task, set temperature = 0
+                temperature=temperature)
+
+        elif provider == "google":
+            model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")
+
+            llm = ChatGoogleGenerativeAI(
+                model=model_name,
+                temperature=temperature)
+
         else:
             print(f"[ERROR] Non-supported LLM provider: {provider}")
             raise
 
-        llm = ChatOpenAI(
-            # model_name="text-davinci-003"
-            model_name=model_name,
-            # temperature dictates how whacky the output should be
-            # for fixed response format task, set temperature = 0
-            temperature=temperature)
-
         self.llm = llm
-        self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
+
+        # Create a default chain
+        if create_default_chain:
+            self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
+
         print(f"LLM chain initalized, provider: {provider}, model_name: {model_name}, temperature: {temperature}")
 
     def get_num_tokens(self, text):
@@ -275,23 +289,12 @@ class LLMAgentSummary(LLMAgentBase):
         chain_type="map_reduce",
         verbose=False
     ):
-        provider = provider or os.getenv("LLM_PROVIDER", "openai")
+        super().init_llm(
+            provider,
+            model_name,
+            temperature,
+            create_default_chain=False)
 
-        # TODO: support non-openAI llm
-        if provider == "openai":
-            model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo-1106")
-        else:
-            print(f"[ERROR] Non-supported LLM provider: {provider}")
-            raise
-
-        llm = ChatOpenAI(
-            # model_name="text-davinci-003"
-            model_name=model_name,
-            # temperature dictates how whacky the output should be
-            # for fixed response format task, set temperature = 0
-            temperature=temperature)
-
-        self.llm = llm
         self.llmchain = load_summarize_chain(
             self.llm,
             combine_prompt=self.combine_prompt_tpl,
