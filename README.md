@@ -37,10 +37,11 @@ https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105
 
 # Quick Start Guide
 ## Preparison
-* [Required] [Notion token](https://www.notion.so/my-integrations)
-* [Required] [OpenAI token](https://openai.com/blog/openai-api)
 * [Required] [Docker](https://www.docker.com/)
-* [Optional] Highly Recommended! [Notion Web Clipper](https://chrome.google.com/webstore/detail/notion-web-clipper/knheggckgoiihginacbkhaalnibhilkk)
+* [Required] [Notion Token](https://www.notion.so/my-integrations)
+* [Required] [OpenAI API KEY](https://openai.com/blog/openai-api)
+* [Optional] [Google API KEY](https://makersuite.google.com/app/apikey)
+* [Optional] [Notion Web Clipper](https://chrome.google.com/webstore/detail/notion-web-clipper/knheggckgoiihginacbkhaalnibhilkk) Highly Recommended! 
 * [Optional] [Reddit Tokens](https://www.reddit.com/prefs/apps)
 * [Optional] [Twitter Developer Tokens](https://developer.twitter.com/en), **Paid Account Only**
 
