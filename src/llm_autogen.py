@@ -512,7 +512,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         user_proxy.register_function(
             function_map={
                 "search": search,
-                "scrape": scrape,
+                # "scrape": scrape,
                 "arxiv": arxiv_search,
             }
         )
@@ -521,6 +521,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         os.environ["AN_CURRENT_WORKDIR"] = work_dir
         os.environ["AN_COLLECTION_FILENAME"] = filename
         os.environ["AN_REF_FILENAME"] = ref_filename
+        os.environ["AN_AUTO_SCRAPE_ENABLED"] = "True"
 
         user_proxy.initiate_chat(
             self.agent_collector,
