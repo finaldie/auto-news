@@ -58,7 +58,7 @@ def _write_arxiv_refs(
 
 def search(
     query: str,
-    max_results=5,
+    max_results=3,
     max_attempts=3,
     timelimit="y",
     output_format="json_string"  # json_string | json_object
@@ -182,7 +182,7 @@ def scrape(
 def arxiv_search(
     query: str,
     days_ago=365 * 10,
-    max_results=10,
+    max_results=5,
     output_format="json_string"  # json_string | json_object
 ):
     start_time = (datetime.datetime.now() - datetime.timedelta(days=days_ago)).strftime('%Y%m%d%H%M%S')
