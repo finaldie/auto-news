@@ -58,7 +58,7 @@ def _write_arxiv_refs(
 
 def search(
     query: str,
-    max_results=5,
+    max_results=3,
     max_attempts=3,
     timelimit="y",
     output_format="json_string"  # json_string | json_object
@@ -182,7 +182,7 @@ def scrape(
 def arxiv_search(
     query: str,
     days_ago=365 * 10,
-    max_results=10,
+    max_results=5,
     output_format="json_string"  # json_string | json_object
 ):
     start_time = (datetime.datetime.now() - datetime.timedelta(days=days_ago)).strftime('%Y%m%d%H%M%S')
@@ -512,7 +512,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         user_proxy.register_function(
             function_map={
                 "search": search,
-                "scrape": scrape,
+                # "scrape": scrape,
                 "arxiv": arxiv_search,
             }
         )
@@ -521,6 +521,7 @@ class LLMAgentAutoGen(LLMAgentBase):
         os.environ["AN_CURRENT_WORKDIR"] = work_dir
         os.environ["AN_COLLECTION_FILENAME"] = filename
         os.environ["AN_REF_FILENAME"] = ref_filename
+        os.environ["AN_AUTO_SCRAPE_ENABLED"] = "True"
 
         user_proxy.initiate_chat(
             self.agent_collector,
