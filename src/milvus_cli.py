@@ -160,7 +160,7 @@ class MilvusClient:
             return []
 
         search_params = {
-            "metrics_type": "IP",
+            "metric_type": "IP",
             "params": {"nprobe": 8},
         }
 

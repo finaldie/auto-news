@@ -9,6 +9,7 @@ from notion import NotionAgent
 from llm_agent import (
     LLMAgentCategoryAndRanking,
     LLMAgentSummary,
+    LLMAgentGemini,
 )
 import utils
 from ops_base import OperatorBase
@@ -178,6 +179,7 @@ class OperatorYoutube(OperatorBase):
             print(f"Page content ({len(content)} chars): {content[:200]}...")
 
             st = time.time()
+            summary = ""
 
             llm_summary_resp = client.get_notion_summary_item_id(
                 "youtube", "default", page_id)
@@ -188,13 +190,26 @@ class OperatorYoutube(OperatorBase):
                     continue
 
                 content = content[:SUMMARY_MAX_LENGTH]
-                summary = llm_agent.run(content)
 
-                print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")
+                try:
+                    summary = llm_agent.run(content)
 
-                client.set_notion_summary_item_id(
-                    "youtube", "default", page_id, summary,
-                    expired_time=int(redis_key_expire_time))
+                    print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")
+
+                    client.set_notion_summary_item_id(
+                        "youtube", "default", page_id, summary,
+                        expired_time=int(redis_key_expire_time))
+
+                except Exception as e:
+                    print(f"[ERROR] Exception during llm_agent.run(): {e}")
+
+                    print("Fallback to Gemini model")
+                    gemini = LLMAgentGemini()
+                    gemini.init_prompt()
+                    gemini.init_llm()
+
+                    response = gemini.run(content)
+                    summary = response.text
 
             else:
                 print("Found llm summary from cache, decoding (utf-8) ...")
