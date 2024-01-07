@@ -203,13 +203,13 @@ class OperatorYoutube(OperatorBase):
                 except Exception as e:
                     print(f"[ERROR] Exception during llm_agent.run(): {e}")
 
-                    print("Fallback to Gemini model")
-                    gemini = LLMAgentGemini()
-                    gemini.init_prompt()
-                    gemini.init_llm()
+                if not summary and os.getenv("LLM_PROVIDER", "") != "openai":
+                    print("Fallback to OpenAI")
+                    fallback_agent = LLMAgentSummary()
+                    fallback_agent.init_prompt(provider="openai")
+                    fallback_agent.init_llm()
 
-                    response = gemini.run(content)
-                    summary = response.text
+                    summary = fallback_agent.run(content)
 
             else:
                 print("Found llm summary from cache, decoding (utf-8) ...")

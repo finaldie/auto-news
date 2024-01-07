@@ -391,19 +391,17 @@ class LLMAgentGeneric(LLMAgentBase):
         return response
 
 
-class LLMAgentGemini(LLMAgentBase):
+class LLMAgentGemini:
     """
     A Gemini standalone LLM
     """
     def __init__(self, api_key="", model_name="gemini-pro", temperature=0):
-        api_key = api_key if api_key else os.getenv("GOOGLE_API_KEY")
-        model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")
-
-        super().__init__(api_key, model_name)
+        self.api_key = api_key if api_key else os.getenv("GOOGLE_API_KEY")
+        self.model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")
 
         genai.configure(api_key=self.api_key)
+        self.model = genai.GenerativeModel(self.model_name)
         self.temperature = temperature
-        self.model = genai.GenerativeModel(model_name)
 
     def init_prompt(self, prompt=""):
         self.default_prompt = """
