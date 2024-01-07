@@ -206,8 +206,8 @@ class OperatorYoutube(OperatorBase):
                 if not summary and os.getenv("LLM_PROVIDER", "") != "openai":
                     print("Fallback to OpenAI")
                     fallback_agent = LLMAgentSummary()
-                    fallback_agent.init_prompt(provider="openai")
-                    fallback_agent.init_llm()
+                    fallback_agent.init_prompt()
+                    fallback_agent.init_llm(provider="openai")
 
                     summary = fallback_agent.run(content)
 
