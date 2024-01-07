@@ -420,6 +420,7 @@ class OperatorReddit(OperatorBase):
                 print(f"Page content ({len(content)} chars): {content[:200]}...")
 
                 st = time.time()
+                summary = ""
 
                 llm_summary_resp = client.get_notion_summary_item_id(
                     "reddit", list_name, page_id)
@@ -430,13 +431,26 @@ class OperatorReddit(OperatorBase):
                         continue
 
                     content = content[:SUMMARY_MAX_LENGTH]
-                    summary = llm_agent.run(content)
 
-                    print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")
+                    try:
+                        summary = llm_agent.run(content)
 
-                    client.set_notion_summary_item_id(
-                        "reddit", list_name, page_id, summary,
-                        expired_time=int(redis_key_expire_time))
+                        print(f"Cache llm response for {redis_key_expire_time}s, page_id: {page_id}, summary: {summary}")
+
+                        client.set_notion_summary_item_id(
+                            "reddit", list_name, page_id, summary,
+                            expired_time=int(redis_key_expire_time))
+
+                    except Exception as e:
+                        print(f"[ERROR] Exception from llm_agent.run(): {e}")
+
+                    if not summary and os.getenv("LLM_PROVIDER", "") != "openai":
+                        print("Fallback to OpenAI")
+                        fallback_agent = LLMAgentSummary()
+                        fallback_agent.init_prompt()
+                        fallback_agent.init_llm(provider="openai")
+
+                        summary = fallback_agent.run(content)
 
                 else:
                     print("Found llm summary from cache, decoding (utf-8) ...")
