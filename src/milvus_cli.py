@@ -40,7 +40,8 @@ class MilvusClient:
         self,
         name="embedding_table",
         desc="embeddings",
-        dim=1536
+        dim=1536,
+        distance_metric="L2",
     ):
         # Create table schema
         self.fields = [
@@ -72,7 +73,7 @@ class MilvusClient:
         )
 
         # Create index
-        self._create_index(collection)
+        self._create_index(collection, distance_metric)
 
         # Let server load the collection data into memory before actual search
         collection.load()
@@ -98,7 +99,7 @@ class MilvusClient:
         self.collections[name] = collection
         return collection
 
-    def _create_index(self, collection):
+    def _create_index(self, collection, distance_metric):
         if collection.has_index():
             print("[INFO] The collection has index already, skip")
             return
@@ -106,7 +107,7 @@ class MilvusClient:
         # create index if not exist.
         collection.release()
         collection.create_index("embeddings", {
-            "metric_type": "IP",
+            "metric_type": distance_metric,
             "index_type": "HNSW",
             "params": {"M": 8, "efConstruction": 64},
         }, index_name="embeddings")
@@ -139,7 +140,8 @@ class MilvusClient:
         text: str,
         topk=1,
         fallback=None,
-        emb=None
+        emb=None,
+        distance_metric="L2",
     ):
         collection = None
 
@@ -160,7 +162,7 @@ class MilvusClient:
             return []
 
         search_params = {
-            "metric_type": "IP",
+            "metric_type": distance_metric,
             "params": {"nprobe": 8},
         }
 
