@@ -12,6 +12,7 @@ from langchain.document_loaders import WebBaseLoader
 from langchain.document_loaders import ArxivLoader
 from langchain.utilities.arxiv import ArxivAPIWrapper
 from langchain_google_genai import ChatGoogleGenerativeAI
+import google.generativeai as genai
 
 import llm_prompts
 
@@ -387,4 +388,49 @@ class LLMAgentGeneric(LLMAgentBase):
         print(f"[LLMAgentGeneric] number of tokens: {tokens}")
 
         response = self.llmchain.run(text)
+        return response
+
+
+class LLMAgentGemini:
+    """
+    A Gemini standalone LLM
+    """
+    def __init__(self, api_key="", model_name="gemini-pro", temperature=0):
+        self.api_key = api_key if api_key else os.getenv("GOOGLE_API_KEY")
+        self.model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")
+
+        genai.configure(api_key=self.api_key)
+        self.model = genai.GenerativeModel(self.model_name)
+        self.temperature = temperature
+
+    def init_prompt(self, prompt=""):
+        self.default_prompt = """
+        Write a concise and precise numbered list summary of the following text without losing any numbers and key points (English numbers need to be converted to digital numbers): {}
+        """
+
+        self.prompt = prompt or self.default_prompt
+
+    def init_llm(self):
+        pass
+
+    def run(self, text: str):
+        prompt = self.prompt.format(text)
+        print(f"[LLMAgentGemini] prompt: {prompt}")
+
+        response = self.model.generate_content(
+            prompt,
+
+            # pass a config
+            generation_config=genai.types.GenerationConfig(
+                temperature=self.temperature),
+
+            # safety settings
+            safety_settings={
+                'HARASSMENT'        : 'block_none',
+                'HATE_SPEECH'       : 'block_none',
+                'DANGEROUS_CONTENT' : 'block_none',
+                'SEXUALLY_EXPLICIT' : 'block_none',
+            }
+        )
+
         return response
