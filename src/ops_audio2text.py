@@ -15,9 +15,14 @@ class OperatorAudioToText:
     def extract_audio(self, page_id, url, data_folder="", run_id=""):
         workdir = os.getenv("WORKDIR")
         data_path = f"{workdir}/{data_folder}/{run_id}"
-
         output_audio_filename = f"{data_path}/{page_id}_audio.mp3"
-        cmd = f"yt-dlp --extract-audio --audio-format mp3 --output {output_audio_filename} {url}"
+
+        # V1: this may download a very high resolution one
+        # cmd = f"yt-dlp --extract-audio --audio-format mp3 --output {output_audio_filename} {url}"
+
+        # V2: Super fast download a smallest while maintain
+        # a good quality of audio
+        cmd = f"yt-dlp --extract-audio -S +size,+res,+br,+fps --output {output_audio_filename} {url}"
 
         if utils.run_shell_command(cmd):
             return output_audio_filename
