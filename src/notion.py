@@ -1918,7 +1918,7 @@ class NotionAgent:
             }
         }
 
-        return self.createPage(parent, props, None)
+        return self.createPage(parent, props, [])
 
     def createPage(self, parent, props, blocks):
         new_page = self.api.pages.create(
