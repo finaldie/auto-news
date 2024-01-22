@@ -322,7 +322,8 @@ class OperatorRSS(OperatorBase):
         print("#####################################################")
         print("# Rank RSS Articles")
         print("#####################################################")
-        print(f"Number of pages: {len(pages)}")
+        ENABLED = utils.str2bool(os.getenv("RSS_ENABLE_CLASSIFICATION", "False"))
+        print(f"Number of pages: {len(pages)}, enabled: {ENABLED}")
 
         llm_agent = LLMAgentCategoryAndRanking()
         llm_agent.init_prompt()
@@ -344,6 +345,17 @@ class OperatorRSS(OperatorBase):
 
             # Let LLM to category and rank
             st = time.time()
+
+            # Parse LLM response and assemble category and rank
+            ranked_page = copy.deepcopy(page)
+
+            if not ENABLED:
+                ranked_page["__topics"] = []
+                ranked_page["__categories"] = []
+                ranked_page["__rate"] = -0.02
+
+                ranked.append(ranked_page)
+                continue
 
             llm_ranking_resp = client.get_notion_ranking_item_id(
                 "rss", list_name, page_id)
@@ -368,9 +380,6 @@ class OperatorRSS(OperatorBase):
 
             category_and_rank = utils.fix_and_parse_json(category_and_rank_str)
             print(f"LLM ranked result (json parsed): {category_and_rank}")
-
-            # Parse LLM response and assemble category and rank
-            ranked_page = copy.deepcopy(page)
 
             if not category_and_rank:
                 print("[ERROR] Cannot parse json string, assign default rating -0.01")

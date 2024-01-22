@@ -140,8 +140,9 @@ class OperatorReddit(OperatorBase):
         print("#####################################################")
         print("# Rank Reddit Post")
         print("#####################################################")
+        ENABLED = utils.str2bool(os.getenv("REDDIT_ENABLE_CLASSIFICATION", "False"))
         min_score = kwargs.setdefault("min_score", 4)
-        print(f"Minimum score to rank: {min_score}")
+        print(f"Minimum score to rank: {min_score}, enabled: {ENABLED}")
 
         llm_agent = LLMAgentCategoryAndRanking()
         llm_agent.init_prompt()
@@ -173,7 +174,8 @@ class OperatorReddit(OperatorBase):
 
                 ranked_post = copy.deepcopy(post)
 
-                if ((relevant_score and relevant_score >= 0 and relevant_score < min_score) or len(content) > 2000):
+                # Skip the ranking steps for now, to save the tokens
+                if (not ENABLED or (relevant_score and relevant_score >= 0 and relevant_score < min_score) or len(content) > 2000):
                     print(f"Skip the low score {relevant_score} or long content ({len(content)}) to rank")
                     skipped += 1
 
