@@ -43,5 +43,5 @@ class EmbeddingFactory:
     def create(self, text: str):
         return self.model.create(text)
 
-    def get_or_create(self, text: str, source="", page_id="", db_client=None):
-        return self.model.get_or_create(text, source, page_id, db_client)
+    def get_or_create(self, text: str, source="", page_id="", db_client=None, key_ttl=86400 * 30):
+        return self.model.get_or_create(text, source, page_id, db_client, key_ttl)
