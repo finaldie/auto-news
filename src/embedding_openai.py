@@ -6,7 +6,7 @@ from embedding_openai_1x import EmbeddingOpenAI_1x
 
 
 class EmbeddingOpenAI(Embedding):
-    def __init__(self, model_name="openai"):
+    def __init__(self, model_name=""):
         super().__init__(model_name)
 
         self.instance = None

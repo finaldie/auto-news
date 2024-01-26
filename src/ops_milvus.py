@@ -6,7 +6,7 @@ from datetime import date, timedelta
 from db_cli import DBClient
 from notion import NotionAgent
 from milvus_cli import MilvusClient
-from embedding_openai import EmbeddingOpenAI
+from embedding_factory import EmbeddingFactory
 import utils
 
 
@@ -131,7 +131,7 @@ class OperatorMilvus:
         # print("# Get relevant Milvus pages")
         # print("#####################################################")
 
-        emb_agent = EmbeddingOpenAI()
+        emb_agent = EmbeddingFactory()
 
         collection_name = emb_agent.getname(start_date)
         print(f"[get_relevant] collection_name: {collection_name}")
@@ -228,7 +228,7 @@ class OperatorMilvus:
 
         client = DBClient()
         notion_agent = NotionAgent()
-        emb_agent = EmbeddingOpenAI()
+        emb_agent = EmbeddingFactory()
         milvus_client = MilvusClient(emb_agent=emb_agent)
 
         collection_name = emb_agent.getname(start_date)
