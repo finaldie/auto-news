@@ -7,8 +7,8 @@ from embedding_hf_inst import EmbeddingHuggingFaceInstruct
 class EmbeddingFactory:
     def __init__(
         self,
-        provider,
-        model_name,
+        provider="",
+        model_name="",
     ):
         self.provider = provider
         if not self.provider:
