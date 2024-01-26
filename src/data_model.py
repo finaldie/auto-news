@@ -38,10 +38,10 @@ OBSIDIAN_INBOX_ITEM_ID = "obsidian_inbox_item_id_{}_{}_{}"
 # ttl: 4 weeks
 EMBEDDING_ITEM_ID = "embedding_item_id_{}_{}_{}"
 
-# key: prefix + source_name + id
+# key: prefix + provider + model_name + source_name + id
 # val: embedding data
 # ttl: 4 weeks
-MILVUS_EMBEDDING_ITEM_ID = "milvus_embedding_item_id_{}_{}"
+MILVUS_EMBEDDING_ITEM_ID = "milvus_embedding_item_id_{}_{}_{}_{}"
 
 # key: prefix + source_name + date + id
 # val: true/false

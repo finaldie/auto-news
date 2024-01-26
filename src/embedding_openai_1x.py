@@ -83,7 +83,10 @@ class EmbeddingOpenAI_1x(Embedding):
         client = db_client or DBClient()
 
         embedding = client.get_milvus_embedding_item_id(
-            source, page_id)
+            "openai",
+            self.model_name,
+            source,
+            page_id)
 
         if not embedding:
             # OpenAI embedding model accept 8k tokens, exceed it will
@@ -95,7 +98,11 @@ class EmbeddingOpenAI_1x(Embedding):
 
             # store embedding into redis (ttl = 1 month)
             client.set_milvus_embedding_item_id(
-                source, page_id, json.dumps(embedding),
+                "openai",
+                self.model_name,
+                source,
+                page_id,
+                json.dumps(embedding),
                 expired_time=key_ttl)
 
         else:
