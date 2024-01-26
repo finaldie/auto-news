@@ -4,7 +4,7 @@ from embedding_hf import EmbeddingHuggingFace
 from embedding_hf_inst import EmbeddingHuggingFaceInstruct
 
 
-class EmbeddingFactory:
+class EmbeddingAgent:
     def __init__(
         self,
         provider="",
