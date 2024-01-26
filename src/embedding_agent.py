@@ -18,7 +18,7 @@ class EmbeddingAgent:
         if not self.model_name:
             self.model_name = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 
-        print(f"[EmbeddingFactory] provider: {self.provider}, model_name: {self.model_name}")
+        print(f"[EmbeddingAgent] provider: {self.provider}, model_name: {self.model_name}")
 
         self.model = None
 

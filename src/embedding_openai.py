@@ -12,9 +12,9 @@ class EmbeddingOpenAI(Embedding):
         self.instance = None
 
         if openai.__version__ < "1.0.0":
-            self.instance = EmbeddingOpenAI_0x()
+            self.instance = EmbeddingOpenAI_0x(model_name=model_name)
         else:  # >= 1.0.0
-            self.instance = EmbeddingOpenAI_1x()
+            self.instance = EmbeddingOpenAI_1x(model_name=model_name)
 
         print(f"Initialized EmbeddingOpenAI Interface: openai version {openai.__version__}")
 
@@ -23,16 +23,17 @@ class EmbeddingOpenAI(Embedding):
 
     def getname(self, start_date, prefix="news"):
         return self.instance.getname(
-            start_date=start_date, prefix=prefix)
+            start_date=start_date,
+            prefix=prefix)
 
     def create(
         self,
         text: str,
-        model_name="text-embedding-ada-002",
         num_retries=3
     ):
         return self.instance.create(
-            text=text, model_name=model_name, num_retries=num_retries)
+            text=text,
+            num_retries=num_retries)
 
     def get_or_create(
         self,
@@ -43,5 +44,8 @@ class EmbeddingOpenAI(Embedding):
         key_ttl=86400 * 30
     ):
         return self.instance.get_or_create(
-            text=text, source=source, page_id=page_id,
-            db_client=db_client, key_ttl=key_ttl)
+            text=text,
+            source=source,
+            page_id=page_id,
+            db_client=db_client,
+            key_ttl=key_ttl)

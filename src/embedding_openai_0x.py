@@ -12,9 +12,9 @@ class EmbeddingOpenAI_0x(Embedding):
     """
     For The implementation for openai < 1.*
     """
-    def __init__(self, model_name="openai"):
+    def __init__(self, model_name="text-embedding-3-small"):
         super().__init__(model_name)
-        print(f"Initialized EmbeddingOpenAI 0x: {openai.__version__}")
+        print(f"Initialized EmbeddingOpenAI 0x: {openai.__version__}, model_name: {model_name}")
 
     def dim(self):
         return 1536
@@ -25,7 +25,6 @@ class EmbeddingOpenAI_0x(Embedding):
     def create(
         self,
         text: str,
-        model_name="text-embedding-ada-002",
         num_retries=3
     ):
         """
@@ -39,19 +38,23 @@ class EmbeddingOpenAI_0x(Embedding):
                 emb = openai.Embedding.create(
                     input=[text],
                     api_key=api_key,
-                    model=model_name)
+                    model=self.model_name)
 
             except openai.error.RateLimitError as e:
                 print(f"[ERROR] RateLimit error during embedding ({i}/{num_retries}): {e}")
 
                 if i == num_retries:
                     raise
+                else:
+                    time.sleep(1)
 
             except openai.error.APIError as e:
                 print(f"[ERROR] Failed during embedding ({i}/{num_retries}): {e}")
 
                 if i == num_retries:
                     raise
+                else:
+                    time.sleep(1)
 
         return emb["data"][0]["embedding"]
 
