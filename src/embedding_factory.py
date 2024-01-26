@@ -15,8 +15,8 @@ class EmbeddingFactory:
             self.provider = os.getenv("EMBEDDING_PROVIDER", "openai")
 
         self.model_name = model_name
-        if not self.mode_name:
-            self.mode_name = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+        if not self.model_name:
+            self.model_name = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 
         print(f"[EmbeddingFactory] provider: {self.provider}, model_name: {self.model_name}")
 
