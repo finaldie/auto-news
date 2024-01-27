@@ -16,7 +16,7 @@ class EmbeddingAgent:
 
         self.model_name = model_name
         if not self.model_name:
-            self.model_name = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+            self.model_name = os.getenv("EMBEDDING_MODEL", "text-embedding-ada-002")
 
         print(f"[EmbeddingAgent] provider: {self.provider}, model_name: {self.model_name}")
 

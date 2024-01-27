@@ -12,7 +12,7 @@ class EmbeddingOpenAI_0x(Embedding):
     """
     For The implementation for openai < 1.*
     """
-    def __init__(self, model_name="text-embedding-3-small"):
+    def __init__(self, model_name="text-embedding-ada-002"):
         super().__init__(model_name)
         print(f"Initialized EmbeddingOpenAI 0x: {openai.__version__}, model_name: {model_name}")
 

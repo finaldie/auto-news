@@ -13,7 +13,7 @@ class EmbeddingOpenAI_1x(Embedding):
     """
     For The implementation for openai < 1.*
     """
-    def __init__(self, model_name="openai"):
+    def __init__(self, model_name="text-embedding-ada-002"):
         super().__init__(model_name)
         self.client = OpenAI()
 
