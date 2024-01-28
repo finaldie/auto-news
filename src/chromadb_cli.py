@@ -27,10 +27,11 @@ class ChromaDB:
 
         if not self.emb_fn:
             openai_api_key = os.getenv("OPENAI_API_KEY", "")
+            model_name = os.getenv("EMBEDDING_MODEL", "text-embedding-ada-002")
 
             self.emb_fn = embedding_functions.OpenAIEmbeddingFunction(
                 api_key=openai_api_key,
-                model_name="text-embedding-ada-002"
+                model_name=model_name,
             )
 
         print(f"ChromaDB initialization done, db_path: {db_path}, collection_name: {collection_name}, emb_fn: {emb_fn}")

@@ -44,14 +44,21 @@ class EmbeddingHuggingFaceInstruct(Embedding):
         client = db_client or DBClient()
 
         embedding = client.get_embedding_item_id(
-            source, "hf_inst", page_id)
+            "hf_inst",
+            self.model_name,
+            source,
+            page_id)
 
         if not embedding:
             embedding = self.create(text)
 
             # store embedding into redis (ttl = 1 month)
             client.set_embedding_item_id(
-                source, "hf_inst", page_id, json.dumps(embedding),
+                "hf_inst",
+                self.model_name,
+                source,
+                page_id,
+                json.dumps(embedding),
                 expired_time=key_ttl)
 
         else:

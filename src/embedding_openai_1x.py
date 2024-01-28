@@ -13,7 +13,7 @@ class EmbeddingOpenAI_1x(Embedding):
     """
     For The implementation for openai < 1.*
     """
-    def __init__(self, model_name="openai"):
+    def __init__(self, model_name="text-embedding-ada-002"):
         super().__init__(model_name)
         self.client = OpenAI()
 
@@ -28,21 +28,20 @@ class EmbeddingOpenAI_1x(Embedding):
     def create(
         self,
         text: str,
-        model_name="text-embedding-ada-002",
         num_retries=3
     ):
         """
         It creates the embedding with 1536 dimentions by default
         """
-        retry_wait_time = 10  # seconds to wait
-        error_wait_time = 5   # seconds to wait
+        retry_wait_time = 3  # seconds to wait
+        error_wait_time = 2  # seconds to wait
         emb = None
 
         for i in range(1, num_retries + 1):
             try:
                 emb = self.client.embeddings.create(
                     input=[text],
-                    model=model_name)
+                    model=self.model_name)
 
             except openai.RateLimitError as e:
                 print(f"[ERROR] RateLimitError during embedding ({i}/{num_retries}): {e}")
@@ -84,7 +83,10 @@ class EmbeddingOpenAI_1x(Embedding):
         client = db_client or DBClient()
 
         embedding = client.get_milvus_embedding_item_id(
-            source, page_id)
+            "openai",
+            self.model_name,
+            source,
+            page_id)
 
         if not embedding:
             # OpenAI embedding model accept 8k tokens, exceed it will
@@ -96,7 +98,11 @@ class EmbeddingOpenAI_1x(Embedding):
 
             # store embedding into redis (ttl = 1 month)
             client.set_milvus_embedding_item_id(
-                source, page_id, json.dumps(embedding),
+                "openai",
+                self.model_name,
+                source,
+                page_id,
+                json.dumps(embedding),
                 expired_time=key_ttl)
 
         else:

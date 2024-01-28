@@ -103,20 +103,28 @@ class DBClient(DBClientBase):
         key = key_tpl.format(source, provider, item_id)
         self.driver.set(key, embed, **kwargs)
 
-    def get_milvus_embedding_item_id(self, source, item_id):
+    def get_milvus_embedding_item_id(
+        self,
+        provider,
+        model_name,
+        source,
+        item_id
+    ):
         key_tpl = data_model.MILVUS_EMBEDDING_ITEM_ID
-        key = key_tpl.format(source, item_id)
+        key = key_tpl.format(provider, model_name, source, item_id)
         return self.driver.get(key)
 
     def set_milvus_embedding_item_id(
         self,
+        provider,
+        model_name,
         source,
         item_id,
         embed: list,
         **kwargs
     ):
         key_tpl = data_model.MILVUS_EMBEDDING_ITEM_ID
-        key = key_tpl.format(source, item_id)
+        key = key_tpl.format(provider, model_name, source, item_id)
         self.driver.set(key, embed, **kwargs)
 
     def get_milvus_perf_data_item_id(self, source, dt: str, item_id):
