@@ -1,6 +1,8 @@
 import os
 import json
 import time
+
+import httpx
 import openai
 from openai import OpenAI
 
@@ -15,7 +17,10 @@ class EmbeddingOpenAI_1x(Embedding):
     """
     def __init__(self, model_name="text-embedding-ada-002"):
         super().__init__(model_name)
-        self.client = OpenAI()
+
+        client = httpx.Client(proxies={"http://": os.getenv("OPENAI_PROXY"),
+                                       "https://": os.getenv("OPENAI_PROXY")})
+        self.client = OpenAI(http_client=client)
 
         print(f"Initialized EmbeddingOpenAI 1x: {openai.__version__}")
 

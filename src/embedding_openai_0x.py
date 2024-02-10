@@ -1,6 +1,8 @@
 import os
 import json
 import time
+
+import httpx
 import openai
 
 from embedding import Embedding
@@ -35,7 +37,10 @@ class EmbeddingOpenAI_0x(Embedding):
 
         for i in range(1, num_retries + 1):
             try:
+                client = httpx.Client(proxies={"http://": os.getenv("OPENAI_PROXY"),
+                                               "https://": os.getenv("OPENAI_PROXY")})
                 emb = openai.Embedding.create(
+                    http_client=client,
                     input=[text],
                     api_key=api_key,
                     model=self.model_name)
