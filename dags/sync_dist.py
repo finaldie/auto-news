@@ -42,7 +42,7 @@ with DAG(
     'sync_dist',
     default_args=default_args,
     max_active_runs=1,
-    description='Sync content from ToRead. config: {"sources": "Twitter,Article,Youtube,RSS,Reddit", "targets": "Milvus", "dedup": true, "min-rating": 4}',
+    description='Sync content from ToRead. config: {"sources": "Twitter,Article,Youtube,RSS", "targets": "Milvus", "dedup": true, "min-rating": 4}',
     # schedule_interval=timedelta(minutes=60),
     # schedule_interval="1 * * * *",  # At minute 01 every hour
     # schedule_interval=None,
@@ -69,7 +69,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder=data/sync/{{ ds }} '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS,Reddit") }} '
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
     )
 
     t4 = BashOperator(
@@ -80,7 +80,7 @@ with DAG(
         '--run-id={{ run_id }} '
         '--job-id={{ ti.job_id }} '
         '--data-folder=data/sync '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS,Reddit") }} '
+        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
         '--targets={{ dag_run.conf.setdefault("targets", "Milvus") }} '
         '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
         '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
