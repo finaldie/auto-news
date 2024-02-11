@@ -64,8 +64,8 @@ with DAG(
         'collection_weekly',
         default_args=default_args,
         max_active_runs=1,
-        description='Collect weekly best content. config: {"sources": "{0}", '.format(content_sources)+
-                    '"targets": "notion", "dedup": true, "min-rating": 4, '
+        description='Collect weekly best content. config: {"sources": ' + f'"{content_sources}"' +
+                    ', "targets": "notion", "dedup": true, "min-rating": 4, '
                     '"force_to_run": true}',
         # schedule_interval=timedelta(minutes=60),
         schedule_interval="30 2 */1 * *",  # At 02:30 everyday
@@ -99,7 +99,7 @@ with DAG(
                      '--data-folder=data/collect '
                      '--collection-type=weekly '
                      '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
-                     '--sources={{ dag_run.conf.setdefault("sources", "{0}") }}'.format(content_sources)
+                     '--sources={{ dag_run.conf.setdefault("sources", ' + f'"{content_sources}"' + ') }}'
     )
 
     t4 = BashOperator(
@@ -113,7 +113,7 @@ with DAG(
                      '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
                      '--collection-type=weekly '
                      '--min-rating={{ dag_run.conf.setdefault("publishing-min-rating", 4.5) }} '
-                     '--sources={{ dag_run.conf.setdefault("sources", "{0}" }} '.format(content_sources)
+                     '--sources={{ dag_run.conf.setdefault("sources", ' + f'"{content_sources}"' + '}} '
     )
 
     t5 = BashOperator(

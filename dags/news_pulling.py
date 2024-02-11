@@ -79,7 +79,7 @@ with DAG(
                      '--data-folder="data/news" '
                      '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
                      '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
-                     '--sources={{ dag_run.conf.setdefault("sources", "{0}") }} '.format(content_sources),
+                     '--sources={{ dag_run.conf.setdefault("sources",' + f'"{content_sources}"' + ') }} '
     )
 
     t5 = BashOperator(
