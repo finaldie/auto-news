@@ -8,7 +8,7 @@ deploy-code:
 	mkdir -p $(AIRFLOW_PROJ_DIR)
 	if [ ! -d $(BOT_HOME) ]; then \
 		mkdir -p $(AIRFLOW_PROJ_DIR)/run; \
-		cd $(AIRFLOW_PROJ_DIR)/run && git clone https://github.com/zuenko/auto-news.git; \
+		cd $(AIRFLOW_PROJ_DIR)/run && git clone https://github.com/finaldie/auto-news.git; \
 		chmod -R 777 $(BOT_HOME)/.git; \
 	fi
 	echo "Deploying code done"
