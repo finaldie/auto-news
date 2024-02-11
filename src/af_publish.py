@@ -22,7 +22,7 @@ parser.add_argument("--data-folder", help="data folder to save",
                     default="data")
 parser.add_argument("--sources",
                     help="sources to pull, comma separated",
-                    default="Twitter,Article,Youtube,RSS,Reddit")
+                    default=os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS"))
 parser.add_argument("--targets",
                     help="targets to push, comma separated",
                     default="notion")

@@ -34,15 +34,14 @@ default_args = {
     # 'sla_miss_callback': yet_another_function,
     # 'trigger_rule': 'all_success'
 }
-content_sources = os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS")
-print("Content, sources:", content_sources)
+
 
 with DAG(
         'news_pulling',
         default_args=default_args,
         max_active_runs=1,
-        description='news pulling, config: {"sources": ' + f'"{content_sources}"' + ', "targets": "notion", '
-                                                                                    '"dedup": true}',
+        description='news pulling, config: {"sources":  "targets": "notion", '
+                    '"dedup": true}',
         schedule_interval="15 * * * *",  # At minute 15 every hour
         # schedule_interval=timedelta(minutes=60),
         # schedule_interval=None,
@@ -67,7 +66,6 @@ with DAG(
                      '--run-id={{ run_id }} '
                      '--job-id={{ ti.job_id }} '
                      '--data-folder="data/news" '
-                     '--sources={{ dag_run.conf.setdefault("sources", ' + f'"{content_sources}"' + ') }} ',
     )
 
     t4 = BashOperator(
@@ -80,7 +78,6 @@ with DAG(
                      '--data-folder="data/news" '
                      '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
                      '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
-                     '--sources={{ dag_run.conf.setdefault("sources",' + f'"{content_sources}"' + ') }} '
     )
 
     t5 = BashOperator(
