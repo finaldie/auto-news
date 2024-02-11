@@ -1,4 +1,3 @@
-
 help:
 	@echo "deploy|init|start|stop"
 
@@ -46,7 +45,7 @@ deploy-milvus:
 post-deploy:
 
 init-airflow:
-	docker compose up airflow-init
+	docker compose --env-file ../build/.env up airflow-init
 
 # Platform targets
 build:
@@ -62,7 +61,7 @@ deploy: post-deploy
 init: push_dags copy_files
 
 start-services:
-	docker-compose up -d
+	docker-compose --env-file ../build/.env up -d
 
 start: start-services
 	@echo ""
