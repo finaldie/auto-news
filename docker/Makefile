@@ -2,6 +2,7 @@
 help:
 	@echo "deploy|init|start|stop"
 
+# TODO: I don't like the way it is, should be optional.
 deploy-code:
 	echo "Deploying code ..."
 	mkdir -p $(AIRFLOW_PROJ_DIR)

@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta, datetime
 from textwrap import dedent
 
@@ -33,6 +34,7 @@ default_args = {
     # 'sla_miss_callback': yet_another_function,
     # 'trigger_rule': 'all_success'
 }
+content_sources = os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS")
 
 
 def should_run(**kwargs):
@@ -59,17 +61,18 @@ def should_run(**kwargs):
 
 
 with DAG(
-    'collection_weekly',
-    default_args=default_args,
-    max_active_runs=1,
-    description='Collect weekly best content. config: {"sources": "Twitter,Article,Youtube,RSS", "targets": "notion", "dedup": true, "min-rating": 4, "force_to_run": true}',
-    # schedule_interval=timedelta(minutes=60),
-    schedule_interval="30 2 */1 * *",  # At 02:30 everyday
-    # schedule_interval=None,
-    start_date=days_ago(1),
-    tags=['NewsBot'],
+        'collection_weekly',
+        default_args=default_args,
+        max_active_runs=1,
+        description='Collect weekly best content. config: {"sources": "{0}", '
+                    '"targets": "notion", "dedup": true, "min-rating": 4, '
+                    '"force_to_run": true}'.format(content_sources),
+        # schedule_interval=timedelta(minutes=60),
+        schedule_interval="30 2 */1 * *",  # At 02:30 everyday
+        # schedule_interval=None,
+        start_date=days_ago(1),
+        tags=['NewsBot'],
 ) as dag:
-
     br = BranchPythonOperator(
         task_id='condition',
         python_callable=should_run,
@@ -89,36 +92,36 @@ with DAG(
     t3 = BashOperator(
         task_id='pull',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_collect.py '
-        '--start {{ ds }} '
-        '--prefix=./run '
-        '--run-id={{ run_id }} '
-        '--job-id={{ ti.job_id }} '
-        '--data-folder=data/collect '
-        '--collection-type=weekly '
-        '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
+                     '--start {{ ds }} '
+                     '--prefix=./run '
+                     '--run-id={{ run_id }} '
+                     '--job-id={{ ti.job_id }} '
+                     '--data-folder=data/collect '
+                     '--collection-type=weekly '
+                     '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
+                     ' --sources={{ dag_run.conf.setdefault("sources", "{0}") }}'.format(content_sources)
     )
 
     t4 = BashOperator(
         task_id='save',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_publish.py '
-        '--start {{ ds }} '
-        '--prefix=./run '
-        '--run-id={{ run_id }} '
-        '--job-id={{ ti.job_id }} '
-        '--data-folder=data/collect '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS") }} '
-        '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
-        '--collection-type=weekly '
-        '--min-rating={{ dag_run.conf.setdefault("publishing-min-rating", 4.5) }} '
+                     '--start {{ ds }} '
+                     '--prefix=./run '
+                     '--run-id={{ run_id }} '
+                     '--job-id={{ ti.job_id }} '
+                     '--data-folder=data/collect '
+                     '--sources={{ dag_run.conf.setdefault("sources", "{0}" }} '
+                     '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
+                     '--collection-type=weekly '
+                     '--min-rating={{ dag_run.conf.setdefault("publishing-min-rating", 4.5) }} '.format(content_sources)
     )
 
     t5 = BashOperator(
         task_id='finish',
         depends_on_past=False,
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_end.py '
-        '--start {{ ds }} '
-        '--prefix=./run ',
+                     '--start {{ ds }} '
+                     '--prefix=./run ',
     )
 
     br >> t1 >> t2 >> t3 >> t4 >> t5
