@@ -1,4 +1,3 @@
-
 help:
 	@echo "deploy|init|start|stop"
 
@@ -8,7 +7,7 @@ deploy-code:
 	mkdir -p $(AIRFLOW_PROJ_DIR)
 	if [ ! -d $(BOT_HOME) ]; then \
 		mkdir -p $(AIRFLOW_PROJ_DIR)/run; \
-		cd $(AIRFLOW_PROJ_DIR)/run && git clone https://github.com/finaldie/auto-news.git; \
+		cd $(AIRFLOW_PROJ_DIR)/run && $(GITHUB_LINK); \
 		chmod -R 777 $(BOT_HOME)/.git; \
 	fi
 	echo "Deploying code done"
@@ -46,7 +45,7 @@ deploy-milvus:
 post-deploy:
 
 init-airflow:
-	docker compose up airflow-init
+	docker compose --env-file ../build/.env up airflow-init
 
 # Platform targets
 build:
@@ -62,7 +61,7 @@ deploy: post-deploy
 init: push_dags copy_files
 
 start-services:
-	docker-compose up -d
+	docker-compose --env-file ../build/.env up -d
 
 start: start-services
 	@echo ""

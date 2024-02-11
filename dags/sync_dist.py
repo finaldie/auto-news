@@ -34,7 +34,6 @@ default_args = {
     # 'sla_miss_callback': yet_another_function,
     # 'trigger_rule': 'all_success'
 }
-content_sources = os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS")
 
 # Important Notes: This DAG must be executed before others, since it
 # will create the new embedding table first, then other DAGs can be
@@ -43,10 +42,9 @@ with DAG(
         'sync_dist',
         default_args=default_args,
         max_active_runs=1,
-        description='Sync content from ToRead. config: {"sources": "{0}", '.format(content_sources) + '"targets": '
-                                                                                                      '"Milvus", '
-                                                                                                      '"dedup": true, '
-                                                                                                      '"min-rating": 4}',
+        description='Sync content from ToRead. config: {"sources": "targets": "Milvus", '
+                    '"dedup": true, '
+                    '"min-rating": 4}',
         # schedule_interval=timedelta(minutes=60),
         # schedule_interval="1 * * * *",  # At minute 01 every hour
         # schedule_interval=None,
@@ -72,7 +70,6 @@ with DAG(
                      '--run-id={{ run_id }} '
                      '--job-id={{ ti.job_id }} '
                      '--data-folder=data/sync/{{ ds }} '
-                     '--sources={{ dag_run.conf.setdefault("sources", "{0}") }} '.format(content_sources)
     )
 
     t4 = BashOperator(
@@ -86,7 +83,6 @@ with DAG(
                      '--targets={{ dag_run.conf.setdefault("targets", "Milvus") }} '
                      '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
                      '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
-                     '--sources={{ dag_run.conf.setdefault("sources", "{0}") }} '.format(content_sources)
     )
 
     t5 = BashOperator(
