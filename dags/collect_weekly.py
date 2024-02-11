@@ -35,6 +35,7 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 content_sources = os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS")
+print("Content, sources:", content_sources)
 
 
 def should_run(**kwargs):
@@ -113,7 +114,7 @@ with DAG(
                      '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
                      '--collection-type=weekly '
                      '--min-rating={{ dag_run.conf.setdefault("publishing-min-rating", 4.5) }} '
-                     '--sources={{ dag_run.conf.setdefault("sources", ' + f'"{content_sources}"' + '}} '
+                     '--sources={{ dag_run.conf.setdefault("sources", ' + f'"{content_sources}") ' + '}} '
     )
 
     t5 = BashOperator(

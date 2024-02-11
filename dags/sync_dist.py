@@ -35,6 +35,7 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 content_sources = os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS")
+print("Content, sources:", content_sources)
 
 # Important Notes: This DAG must be executed before others, since it
 # will create the new embedding table first, then other DAGs can be

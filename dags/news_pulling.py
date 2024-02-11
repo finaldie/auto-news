@@ -35,6 +35,7 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 content_sources = os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS")
+print("Content, sources:", content_sources)
 
 with DAG(
         'news_pulling',
