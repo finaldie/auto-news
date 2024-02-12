@@ -1,12 +1,10 @@
-from datetime import timedelta, datetime
-from textwrap import dedent
+from datetime import timedelta
 
 # The DAG object; we'll need this to instantiate a DAG
 from airflow import DAG
 
 # Operators; we need this to operate!
 from airflow.operators.bash import BashOperator
-from airflow.operators.python import BranchPythonOperator
 from airflow.utils.dates import days_ago
 
 # These args will get passed on to each operator
