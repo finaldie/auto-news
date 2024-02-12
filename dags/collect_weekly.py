@@ -1,6 +1,4 @@
-import os
-from datetime import timedelta, datetime
-from textwrap import dedent
+from datetime import datetime, timedelta
 
 # The DAG object; we'll need this to instantiate a DAG
 from airflow import DAG
