@@ -1,6 +1,4 @@
-
-from datetime import timedelta
-from textwrap import dedent
+from datetime import datetime, timedelta
 
 # The DAG object; we'll need this to instantiate a DAG
 from airflow import DAG
@@ -37,17 +35,17 @@ default_args = {
 
 
 with DAG(
-    'news_pulling',
-    default_args=default_args,
-    max_active_runs=1,
-    description='news pulling, config: {"sources": "Twitter,Article,Youtube,RSS,Reddit", "targets": "notion", "dedup": true}',
-    schedule_interval="15 * * * *",  # At minute 15 every hour
-    # schedule_interval=timedelta(minutes=60),
-    # schedule_interval=None,
-    start_date=days_ago(0),
-    tags=['NewsBot'],
+        'news_pulling',
+        default_args=default_args,
+        max_active_runs=1,
+        description='news pulling, config: {"sources":  "targets": "notion", '
+                    '"dedup": true}',
+        schedule_interval="15 * * * *",  # At minute 15 every hour
+        # schedule_interval=timedelta(minutes=60),
+        # schedule_interval=None,
+        start_date=days_ago(0),
+        tags=['NewsBot'],
 ) as dag:
-
     t1 = BashOperator(
         task_id='start',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_start.py --start {{ ds }} --prefix=./run',
@@ -61,33 +59,31 @@ with DAG(
     t3 = BashOperator(
         task_id='pull',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_pull.py '
-        '--start {{ ds }} '
-        '--prefix=./run '
-        '--run-id={{ run_id }} '
-        '--job-id={{ ti.job_id }} '
-        '--data-folder="data/news" '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS,Reddit") }} ',
+                     '--start {{ ds }} '
+                     '--prefix=./run '
+                     '--run-id={{ run_id }} '
+                     '--job-id={{ ti.job_id }} '
+                     '--data-folder="data/news" '
     )
 
     t4 = BashOperator(
         task_id='save',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_save.py '
-        '--start {{ ds }} '
-        '--prefix=./run '
-        '--run-id={{ run_id }} '
-        '--job-id={{ ti.job_id }} '
-        '--data-folder="data/news" '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS,Reddit") }} '
-        '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
-        '--dedup={{ dag_run.conf.setdefault("dedup", True) }} ',
+                     '--start {{ ds }} '
+                     '--prefix=./run '
+                     '--run-id={{ run_id }} '
+                     '--job-id={{ ti.job_id }} '
+                     '--data-folder="data/news" '
+                     '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
+                     '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
     )
 
     t5 = BashOperator(
         task_id='finish',
         depends_on_past=False,
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_end.py '
-        '--start {{ ds }} '
-        '--prefix=./run ',
+                     '--start {{ ds }} '
+                     '--prefix=./run ',
     )
 
     t1 >> t2 >> t3 >> t4 >> t5

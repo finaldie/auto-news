@@ -1,12 +1,10 @@
-from datetime import timedelta, datetime
-from textwrap import dedent
+from datetime import datetime, timedelta
 
 # The DAG object; we'll need this to instantiate a DAG
 from airflow import DAG
 
 # Operators; we need this to operate!
 from airflow.operators.bash import BashOperator
-from airflow.operators.python import BranchPythonOperator
 from airflow.utils.dates import days_ago
 
 # These args will get passed on to each operator
@@ -34,23 +32,23 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 
-
 # Important Notes: This DAG must be executed before others, since it
 # will create the new embedding table first, then other DAGs can be
 # consumed later
 with DAG(
-    'sync_dist',
-    default_args=default_args,
-    max_active_runs=1,
-    description='Sync content from ToRead. config: {"sources": "Twitter,Article,Youtube,RSS,Reddit", "targets": "Milvus", "dedup": true, "min-rating": 4}',
-    # schedule_interval=timedelta(minutes=60),
-    # schedule_interval="1 * * * *",  # At minute 01 every hour
-    # schedule_interval=None,
-    schedule_interval='@hourly',
-    start_date=days_ago(0, hour=1),
-    tags=['NewsBot'],
+        'sync_dist',
+        default_args=default_args,
+        max_active_runs=1,
+        description='Sync content from ToRead. config: {"sources": "targets": "Milvus", '
+                    '"dedup": true, '
+                    '"min-rating": 4}',
+        # schedule_interval=timedelta(minutes=60),
+        # schedule_interval="1 * * * *",  # At minute 01 every hour
+        # schedule_interval=None,
+        schedule_interval='@hourly',
+        start_date=days_ago(0, hour=1),
+        tags=['NewsBot'],
 ) as dag:
-
     t1 = BashOperator(
         task_id='start',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_start.py --start {{ ds }} --prefix=./run',
@@ -64,44 +62,42 @@ with DAG(
     t3 = BashOperator(
         task_id='pull',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_sync.py '
-        '--start {{ ds }} '
-        '--prefix=./run '
-        '--run-id={{ run_id }} '
-        '--job-id={{ ti.job_id }} '
-        '--data-folder=data/sync/{{ ds }} '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS,Reddit") }} '
+                     '--start {{ ds }} '
+                     '--prefix=./run '
+                     '--run-id={{ run_id }} '
+                     '--job-id={{ ti.job_id }} '
+                     '--data-folder=data/sync/{{ ds }} '
     )
 
     t4 = BashOperator(
         task_id='save',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_dist.py '
-        '--start {{ ds }} '
-        '--prefix=./run '
-        '--run-id={{ run_id }} '
-        '--job-id={{ ti.job_id }} '
-        '--data-folder=data/sync '
-        '--sources={{ dag_run.conf.setdefault("sources", "Twitter,Article,Youtube,RSS,Reddit") }} '
-        '--targets={{ dag_run.conf.setdefault("targets", "Milvus") }} '
-        '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
-        '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
+                     '--start {{ ds }} '
+                     '--prefix=./run '
+                     '--run-id={{ run_id }} '
+                     '--job-id={{ ti.job_id }} '
+                     '--data-folder=data/sync '
+                     '--targets={{ dag_run.conf.setdefault("targets", "Milvus") }} '
+                     '--min-rating={{ dag_run.conf.setdefault("min-rating", 4) }} '
+                     '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
     )
 
     t5 = BashOperator(
         task_id='clean',
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_clean.py '
-        '--start {{ ds }} '
-        '--prefix=./run '
-        '--run-id={{ run_id }} '
-        '--job-id={{ ti.job_id }} '
-        '--milvus-retention-days={{ dag_run.conf.setdefault("--milvus-retention-days", 3) }} '
+                     '--start {{ ds }} '
+                     '--prefix=./run '
+                     '--run-id={{ run_id }} '
+                     '--job-id={{ ti.job_id }} '
+                     '--milvus-retention-days={{ dag_run.conf.setdefault("--milvus-retention-days", 3) }} '
     )
 
     t6 = BashOperator(
         task_id='finish',
         depends_on_past=False,
         bash_command='cd ~/airflow/run/auto-news/src && python3 af_end.py '
-        '--start {{ ds }} '
-        '--prefix=./run ',
+                     '--start {{ ds }} '
+                     '--prefix=./run ',
     )
 
     t1 >> t2 >> t3 >> t4 >> t5 >> t6

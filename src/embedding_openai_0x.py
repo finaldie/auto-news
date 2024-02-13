@@ -1,6 +1,8 @@
 import os
 import json
 import time
+
+import httpx
 import openai
 
 from embedding import Embedding
@@ -35,10 +37,20 @@ class EmbeddingOpenAI_0x(Embedding):
 
         for i in range(1, num_retries + 1):
             try:
-                emb = openai.Embedding.create(
-                    input=[text],
-                    api_key=api_key,
-                    model=self.model_name)
+                if os.getenv("OPENAI_PROXY") is not None:
+                    client = httpx.Client(proxies={"http://": os.getenv("OPENAI_PROXY"),
+                                                   "https://": os.getenv("OPENAI_PROXY")})
+
+                    emb = openai.Embedding.create(
+                        http_client=client,
+                        input=[text],
+                        api_key=api_key,
+                        model=self.model_name)
+                else:
+                    emb = openai.Embedding.create(
+                        input=[text],
+                        api_key=api_key,
+                        model=self.model_name)
 
             except openai.error.RateLimitError as e:
                 print(f"[ERROR] RateLimit error during embedding ({i}/{num_retries}): {e}")

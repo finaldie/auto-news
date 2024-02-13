@@ -1,5 +1,6 @@
 import os
 
+import httpx
 from langchain import LLMChain
 from langchain.text_splitter import (
     RecursiveCharacterTextSplitter
@@ -192,13 +193,23 @@ class LLMAgentBase:
         # TODO: support non-openAI llm
         if provider == "openai":
             model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
-
-            llm = ChatOpenAI(
-                # model_name="text-davinci-003"
-                model_name=model_name,
-                # temperature dictates how whacky the output should be
-                # for fixed response format task, set temperature = 0
-                temperature=temperature)
+            if os.getenv('OPENAI_PROXY') is not None:
+                client = httpx.Client(proxies={"http://": os.getenv("OPENAI_PROXY"),
+                                               "https://": os.getenv("OPENAI_PROXY")})
+                llm = ChatOpenAI(
+                    # model_name="text-davinci-003"
+                    model_name=model_name,
+                    http_client=client,
+                    # temperature dictates how whacky the output should be
+                    # for fixed response format task, set temperature = 0
+                    temperature=temperature)
+            else:
+                llm = ChatOpenAI(
+                    # model_name="text-davinci-003"
+                    model_name=model_name,
+                    # temperature dictates how whacky the output should be
+                    # for fixed response format task, set temperature = 0
+                    temperature=temperature)
 
         elif provider == "google":
             model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")

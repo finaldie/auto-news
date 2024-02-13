@@ -53,4 +53,5 @@ docker
 duckduckgo_search
 
 # Remove it once httpx fix the dependency issue
+httpx[socks]
 httpcore>=1.*

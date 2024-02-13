@@ -23,7 +23,7 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default="Twitter,Article,Youtube,RSS")
+                    default=os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS"))
 
 
 def pull_twitter(args, op, source):

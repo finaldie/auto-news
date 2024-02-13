@@ -48,7 +48,12 @@ The user input text: {content}
 
 LLM_PROMPT_SUMMARY_COMBINE_PROMPT = """
 Write a concise summary of the following text delimited by triple backquotes.
-Return your response in numbered list which covers the key points of the text and ensure that a 5 year old would understand.
+Summarize the main points and their comprehensive 
+explanations from below text, presenting them under appropriate headings. 
+Use various Emoji to symbolize different sections, and format the content as a cohesive paragraph under each heading. 
+Ensure the summary is clear, detailed, and informative, reflecting the executive summary style found in news articles. 
+Avoid using phrases that directly reference 'the script provides' to maintain a direct and objective tone.
+
 
 ```{text}```
 NUMBERED LIST SUMMARY:
@@ -58,7 +63,11 @@ NUMBERED LIST SUMMARY:
 # With translation (Notes: use with suffix together)
 LLM_PROMPT_SUMMARY_COMBINE_PROMPT2 = """
 Write a concise summary of the following text delimited by triple backquotes.
-Return your response in numbered list which covers the key points of the text and ensure that a 5 year old would understand.
+Summarize the main points and their comprehensive 
+explanations from below text, presenting them under appropriate headings. 
+Use various Emoji to symbolize different sections, and format the content as a cohesive paragraph under each heading. 
+Ensure the summary is clear, detailed, and informative, reflecting the executive summary style found in news articles. 
+Avoid using phrases that directly reference 'the script provides' to maintain a direct and objective tone.
 
 ```{text}```
 """

@@ -23,7 +23,7 @@ parser.add_argument("--collection-type", help="weekly, monthly, yearly",
 parser.add_argument("--min-rating", help="Minimum rating to pull",
                     default=4)
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default="Twitter,Article,Youtube,RSS,Reddit")
+                    default=os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS"))
 
 
 def pull(args, op, sources):

@@ -138,6 +138,8 @@ services:
     command: webserver
     ports:
       - "8080:8080"
+    environment:
+      <<: *airflow-common-env
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -185,6 +187,7 @@ services:
           echo "[pip] Installation finished"
           echo "[pip] langchain version (after): `pip list | grep langchain`"
         fi
+        pip3 install httpx[socks]
         echo "=================================================="
         echo "Start airflow worker ...  "
         echo "=================================================="
