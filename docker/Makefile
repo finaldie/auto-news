@@ -7,7 +7,7 @@ deploy-code:
 	mkdir -p $(AIRFLOW_PROJ_DIR)
 	if [ ! -d $(BOT_HOME) ]; then \
 		mkdir -p $(AIRFLOW_PROJ_DIR)/run; \
-		cd $(AIRFLOW_PROJ_DIR)/run && $(GITHUB_LINK); \
+		cd $(AIRFLOW_PROJ_DIR)/run && git clone $(GITHUB_LINK); \
 		chmod -R 777 $(BOT_HOME)/.git; \
 	fi
 	echo "Deploying code done"
