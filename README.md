@@ -9,13 +9,16 @@ See this [Blog post](https://finaldie.com/blog/auto-news-an-automated-news-aggre
 https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105aa8ee0ea9
 
 ## Features
-- Pull from Feed sources (including RSS, Reddit, Tweets, etc) and summarize them
+- Aggregate feed sources (including RSS, Reddit, Tweets, etc) with summarization
 - Summarize YouTube videos (generate transcript if needed)
+- Summarize Web Articles (generate transcript if needed)
 - Filter content based on personal interests and remove 80%+ noises
-- Generate `TODO` list from Takeaways/Journal-notes
-- Weekly top-k aggregations
-- Journal notes summarization and insights generating
 - A unified/central reading experience (e.g., RSS reader-like style, Notion based)
+- [LLM] Generate `TODO` list from Takeaways/Journal-notes
+- [LLM] Organize Journal notes with summarization and insights
+- [LLM] **Experimental** Deepdive topic via web search agent and [autogen](https://github.com/microsoft/autogen)
+- Multi-LLM backend: OpenAI ChatGPT, Google Gemini
+- Weekly top-k aggregations
 
 
 ![image](https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639)

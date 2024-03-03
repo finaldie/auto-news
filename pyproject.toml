@@ -1,0 +1,76 @@
+[project]
+name = "auto-news"
+version = "0.1.0"
+description = "AutoNews backend"
+authors = [
+    { name = "Yuzhang Hu", email = "hyzwowtools@gmail.com" }
+]
+dependencies = [
+    "SpeechRecognition",
+    "arxiv",
+    "bs4",
+    "chromadb>=0.4",
+    "docker",
+    "duckduckgo_search",
+    "fake_useragent",
+    "feedparser",
+    "httpcore>=1.0",
+    "httpx",
+    "langchain==0.1.4",
+    "langchain-community==0.0.14",
+    "langchain-google-genai",
+    "llama-index>=0.9",
+    "lz4",
+    "minio",
+    "miniopy-async",
+    "mysql-connector-python>=8.2.0",
+    "notion-client",
+    "openai",
+    "openai-whisper",
+    "pillow",
+    "pinecone-client",
+    "pyautogen==0.2.2",
+    "pymilvus===2.2.8",
+    "pymupdf",
+    "python-dotenv",
+    "python-snappy",
+    "pyttsx3",
+    "pytube",
+    "pytz",
+    "redis",
+    "requests",
+    "retry",
+    "scales",
+    "scylla-driver",
+    "soundfile",
+    "tiktoken",
+    "transformers",
+    "tweepy",
+    "validators",
+    "youtube-transcript-api",
+    "yt-dlp",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[project.scripts]
+# hello = "airflow:hello"
+
+[project.urls]
+Homepage = "https://github.com/finaldie/auto-news"
+Documentation = "https://github.com/finaldie/auto-news/wiki"
+Repository = "https://github.com/finaldie/auto-news"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["./"]
