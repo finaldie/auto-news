@@ -23,6 +23,9 @@ https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105
 
 ![image](https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639)
 
+## Documentation
+https://github.com/finaldie/auto-news/wiki
+
 ## Architecture
 * UI: Notion-based, cross-platform (Web browser, iOS/Android app)
 * Backend: Runs on Linxu/MacOS
