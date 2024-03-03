@@ -2,7 +2,8 @@ python-dotenv
 pytz
 requests
 
-langchain
+langchain==0.1.4
+langchain-community==0.0.14
 langchain-google-genai
 transformers
 pillow
