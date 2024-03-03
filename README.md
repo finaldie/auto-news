@@ -16,7 +16,7 @@ https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105
 - A unified/central reading experience (e.g., RSS reader-like style, Notion based)
 - [LLM] Generate `TODO` list from Takeaways/Journal-notes
 - [LLM] Organize Journal notes with summarization and insights
-- [LLM] **Experimental** Deepdive topic via web search agent and [autogen](https://github.com/microsoft/autogen)
+- [LLM] **Experimental** [Deepdive](https://github.com/finaldie/auto-news/wiki/Deepdive-(Experimental)) topic via web search agent and [autogen](https://github.com/microsoft/autogen)
 - Multi-LLM backend: OpenAI ChatGPT, Google Gemini
 - Weekly top-k aggregations
 
