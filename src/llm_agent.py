@@ -8,9 +8,9 @@ from langchain.text_splitter import (
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.summarize import load_summarize_chain
-from langchain.document_loaders import YoutubeLoader
-from langchain.document_loaders import WebBaseLoader
-from langchain.document_loaders import ArxivLoader
+from langchain_community.document_loaders import YoutubeLoader
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.document_loaders import ArxivLoader
 from langchain.utilities.arxiv import ArxivAPIWrapper
 from langchain_google_genai import ChatGoogleGenerativeAI
 import google.generativeai as genai
