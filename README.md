@@ -1,6 +1,8 @@
 # Auto-News: An Automatic News Aggregator with LLM
 A personal news aggregator to pull information from multi-sources + LLM (ChatGPT) to help us read efficiently with less noise, the sources including Tweets, RSS, YouTube, Web Articles, Reddit, and random Journal notes.
 
+<img src="https://github.com/finaldie/auto-news/assets/1088543/ca046ce6-17e5-4fcf-b5a3-6444ad69af3c" width="90%"/>
+
 ## Why need it?
 In the world of this information explosion, we live with noise every day, it becomes even worse after the generative AI was born. Time is a precious resource for each of us, How to use our time more efficiently? It becomes more challenging than ever. Think about how much time we spent on pulling/searching/filtering content from different sources, how many times we put the article/paper or long video as a side tab, but never got a chance to look at, and how much effort to organize the information we have read. We need a better way to get rid of the noises, focus on reading the information efficiently based on our interests, and stay on track with the goals we defined.
 
@@ -9,16 +11,22 @@ See this [Blog post](https://finaldie.com/blog/auto-news-an-automated-news-aggre
 https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105aa8ee0ea9
 
 ## Features
-- Pull from Feed sources (including RSS, Reddit, Tweets, etc) and summarize them
+- Aggregate feed sources (including RSS, Reddit, Tweets, etc) with summarization
 - Summarize YouTube videos (generate transcript if needed)
+- Summarize Web Articles (generate transcript if needed)
 - Filter content based on personal interests and remove 80%+ noises
-- Generate `TODO` list from Takeaways/Journal-notes
-- Weekly top-k aggregations
-- Journal notes summarization and insights generating
 - A unified/central reading experience (e.g., RSS reader-like style, Notion based)
+- [LLM] Generate `TODO` list from Takeaways/Journal-notes
+- [LLM] Organize Journal notes with summarization and insights
+- [LLM] **Experimental** [Deepdive](https://github.com/finaldie/auto-news/wiki/Deepdive-(Experimental)) topic via web search agent and [autogen](https://github.com/microsoft/autogen)
+- Multi-LLM backend: OpenAI ChatGPT, Google Gemini
+- Weekly top-k aggregations
 
 
 ![image](https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639)
+
+## Documentation
+https://github.com/finaldie/auto-news/wiki
 
 ## Architecture
 * UI: Notion-based, cross-platform (Web browser, iOS/Android app)

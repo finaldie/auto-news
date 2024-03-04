@@ -70,7 +70,7 @@ class OperatorDeepDive(OperatorBase):
 
             if not page_action_meta:
                 dedup_pages[page_id] = page
-                print(f"Valid page to trigger action: {page}, metadata: {page_action_meta}")
+                print(f"Valid page to trigger action: page_id {page_id}, page name: {page.get('name')}, metadata: {page_action_meta}")
 
             else:
                 print(f"[WARN] same last_edited_time {last_edited_time}, skip this page: {page}")

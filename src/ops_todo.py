@@ -73,9 +73,9 @@ class OperatorTODO(OperatorBase):
 
             if not page_todo_meta or page_todo_meta.get("last_edited_time") != last_edited_time:
                 dedup_pages[page_id] = page
-                print(f"Valid page to generate TODO: {page}, metadata: {page_todo_meta}")
+                print(f"Valid page to generate TODO: page_id {page_id}, page name: {page.get('name')}, metadata: {page_todo_meta}")
             else:
-                print(f"[WARN] same last_edited_time {last_edited_time}, skip this page: {page}")
+                print(f"[WARN] same last_edited_time {last_edited_time}, skip this page id: {page_id}")
 
         return dedup_pages
 

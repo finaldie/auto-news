@@ -350,7 +350,7 @@ class OperatorBase:
                     database_id,
                     source,
                     last_edited_time=last_edited_time,
-                    extraction_interval=0.1,
+                    extraction_interval=0.02,
                     require_user_rating=False)
 
                 print(f"Pulled {len(pages)} pages for source: {source}")
