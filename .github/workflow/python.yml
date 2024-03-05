@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: '3.8'
 
@@ -24,3 +24,8 @@ jobs:
         pip install -r docker/requirements.txt
 
     # Add additional steps here for your testing or validation process
+    - name: Build docker image
+      run: |
+        mkdir -p build
+        cp .env.template build/.env
+      docker build . --file build/Dockerfile --tag autonews-github-action:$(date +%s)
