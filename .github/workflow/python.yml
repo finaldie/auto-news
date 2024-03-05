@@ -2,8 +2,7 @@ name: Python CI (Deps)
 
 on:
   push:
-    branches:
-      - '*'
+    branches: [ "main" ]
   pull_request:
     branches:
       - '*'
