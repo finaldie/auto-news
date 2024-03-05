@@ -1,4 +1,7 @@
 # Auto-News: An Automatic News Aggregator with LLM
+
+[![GitHub Build](https://github.com/finaldie/auto-news/actions/workflows/python/badge.svg)](https://github.com/finaldie/auto-news/actions)
+
 A personal news aggregator to pull information from multi-sources + LLM (ChatGPT) to help us read efficiently with less noise, the sources including Tweets, RSS, YouTube, Web Articles, Reddit, and random Journal notes.
 
 <img src="https://github.com/finaldie/auto-news/assets/1088543/ca046ce6-17e5-4fcf-b5a3-6444ad69af3c" width="90%"/>

@@ -30,7 +30,7 @@ dependencies = [
     "pillow",
     "pinecone-client",
     "pyautogen==0.2.2",
-    "pymilvus===2.2.8",
+    "pymilvus>=2.2.*",
     "pymupdf",
     "python-dotenv",
     "python-snappy",
@@ -51,7 +51,7 @@ dependencies = [
     "yt-dlp",
 ]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.9"
 
 [project.scripts]
 # hello = "airflow:hello"
