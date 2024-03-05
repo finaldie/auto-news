@@ -30,7 +30,7 @@ dependencies = [
     "pillow",
     "pinecone-client",
     "pyautogen==0.2.2",
-    "pymilvus===2.2.8",
+    "pymilvus>=2.2.*",
     "pymupdf",
     "python-dotenv",
     "python-snappy",
