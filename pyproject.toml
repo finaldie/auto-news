@@ -51,7 +51,7 @@ dependencies = [
     "yt-dlp",
 ]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.9"
 
 [project.scripts]
 # hello = "airflow:hello"
