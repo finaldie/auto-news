@@ -1,6 +1,9 @@
-name: Python CI
+name: Python CI (Deps)
 
 on:
+  push:
+    branches:
+      - '*'
   pull_request:
     branches:
       - '*'
@@ -24,8 +27,8 @@ jobs:
         pip install -r docker/requirements.txt
 
     # Add additional steps here for your testing or validation process
-    - name: Build docker image
-      run: |
-        mkdir -p build
-        cp .env.template build/.env
-      docker build . --file build/Dockerfile --tag autonews-github-action:$(date +%s)
+    # - name: Build docker image
+    #   run: |
+    #     mkdir -p build
+    #     cp .env.template build/.env
+    #     docker build . --file build/Dockerfile --tag autonews-github-action:$(date +%s)
