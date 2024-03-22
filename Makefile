@@ -19,6 +19,7 @@ help:
 	@echo "\_ make clean"
 	@echo ""
 	@echo "=== k8s deployment ==="
+	@echo "\_ make helm-repo-update"
 	@echo "\_ make k8s-env-create"
 	@echo "\_ make k8s-namespace-create"
 	@echo "\_ make k8s-secret-create"
@@ -125,12 +126,19 @@ image_repo ?= finaldie/auto-news
 TIMEOUT ?= 10m0s
 
 # steps to deploy to k8s:
+# make helm-repo-update
 # make k8s-env-create
 # make k8s-namespace-create
 # make k8s-secret-create
 # [optional] make k8s-docker-build repo=xxx tag=1.0.0
 # [optional] make k8s-docker-push repo=xxx tag=1.0.0
 # make k8s-helm-install
+
+helm-repo-update:
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+	helm repo add zilliztech https://zilliztech.github.io/milvus-helm
+	helm repo add apache-airflow https://airflow.apache.org
+	helm repo update
 
 k8s-namespace-create:
 	-kubectl create namespace ${namespace}
@@ -179,6 +187,7 @@ k8s-docker-push:
 	cd docker && make push-k8s repo=${image_repo} tag=${tag}
 
 k8s-helm-install:
+	cd ./helm && helm dependency build
 	helm upgrade \
 		--install \
 		--debug \
