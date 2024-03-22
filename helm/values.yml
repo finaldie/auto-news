@@ -28,13 +28,13 @@ airflow:
     # pod
     replicas: 1
 
-    resources: {}
+    resources:
     #   limits:
     #     cpu: 4
     #     memory: 4Gi
-    #   requests:
-    #     cpu: 100m
-    #     memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
 
     persistence:
       size: 10Gi
@@ -90,18 +90,87 @@ airflow:
         exec \
         airflow {{ semverCompare ">=2.0.0" .Values.airflowVersion | ternary "celery worker" "worker" }}
 
+    env:
+      - name: NOTION_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: NOTION_TOKEN
+
+      - name: OPENAI_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: OPENAI_API_KEY
+
+      - name: GOOGLE_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: GOOGLE_API_KEY
+
+      - name: REDDIT_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: REDDIT_CLIENT_ID
+
+      - name: REDDIT_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: REDDIT_CLIENT_SECRET
+
+      - name: AUTOGEN_GPT4_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: AUTOGEN_GPT4_API_KEY
+
+      - name: AUTOGEN_GPT3_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: AUTOGEN_GPT3_API_KEY
+
+      # Twitter Paid Account Only
+      - name: TWITTER_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: TWITTER_API_KEY
+
+      - name: TWITTER_API_KEY_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: TWITTER_API_KEY_SECRET
+
+      - name: TWITTER_ACCESS_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: TWITTER_ACCESS_TOKEN
+
+      - name: TWITTER_ACCESS_TOKEN_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: airflow-secret
+            key: TWITTER_ACCESS_TOKEN_SECRET
+
+
   triggerer:
     replicas: 2
     persistence:
       size: 5Gi
 
-    resources: {}
+    resources:
     #   limits:
     #     cpu: 500m
     #     memory: 512Mi
-    #   requests:
-    #     cpu: 100m
-    #     memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
 
   scheduler:
     replicas: 2
@@ -123,13 +192,13 @@ airflow:
   webserver:
     replicas: 1
 
-    resources: {}
+    resources:
     #  limits:
     #    cpu: 500m
     #    memory: 1Gi
-    #  requests:
-    #    cpu: 100m
-    #    memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
 
     # If we limited resources, the webserver may not boot up within 60s
     # then it will be killed by k8s, increase the failureThreshold x2,
@@ -143,15 +212,312 @@ airflow:
         value: "true"
 
 
+#######################################################################
+# Redis
+#######################################################################
 redis:
   password: bot
 
-  resources: {}
+  resources:
   #   limits:
   #     cpu: 1
   #     memory: 1Gi
-  #   requests:
-  #     cpu: 200m
-  #     memory: 32Mi
+    requests:
+      cpu: 200m
+      memory: 32Mi
 
   affinity: {}
+
+
+#######################################################################
+# Milvus
+#######################################################################
+# upstream values from https://github.com/zilliztech/milvus-helm/blob/master/charts/milvus/values.yaml
+
+milvus:
+  ## Enable or disable Milvus Cluster mode
+  cluster:
+    enabled: true
+
+  image:
+    all:
+      tag: v2.3.8
+
+  metrics:
+    enabled: true
+
+    # enable/disable prometheus service monitor
+    serviceMonitor:
+      enabled: false
+
+  # global affinity: apply to all components
+  affinity: {}
+
+  ######################################################################
+  # Milvus components, can be scale out independently
+  ######################################################################
+  # rootCoordinator:
+  #   enabled: true
+  #   # You can set the number of replicas greater than 1, only if enable active standby
+  #   replicas: 1  # Run Root Coordinator mode with replication disabled
+  #
+  # queryCoordinator:
+  #   enabled: true
+  #   # You can set the number of replicas greater than 1, only if enable active standby
+  #   replicas: 1  # Run Query Coordinator mode with replication disabled
+  #
+  # queryNode:
+  #   enabled: true
+  #   # You can set the number of replicas to -1 to remove the replicas field in case you want to use HPA
+  #   replicas: 1
+  #
+  # indexCoordinator:
+  #   enabled: true
+  #   # You can set the number of replicas greater than 1, only if enable active standby
+  #   replicas: 1   # Run Index Coordinator mode with replication disabled
+  #
+  # dataCoordinator:
+  #   enabled: true
+  #   # You can set the number of replicas greater than 1, only if enable active standby
+  #   replicas: 1  # Run Data Coordinator mode with replication disabled
+  #
+  # dataNode:
+  #   enabled: true
+  #   # You can set the number of replicas to -1 to remove the replicas field in case you want to use HPA
+  #   replicas: 1
+  #
+  # ## mixCoordinator contains all coord
+  # ## If you want to use mixcoord, enable this and disable all of other coords
+  # mixCoordinator:
+  #   enabled: false
+  #   # You can set the number of replicas greater than 1, only if enable active standby
+  #   replicas: 1 # Run Mixture Coordinator mode with replication disabled
+
+
+  ######################################################################
+  # Milvus Dependencies
+  ######################################################################
+  ## Milvus UI
+  attu:
+    enabled: true
+    service:
+      port: 3001
+
+  ## Milvus backup
+  minio:
+    enabled: true
+    # Default replicas = 4
+    replicas: 4
+    resources:
+      requests:
+        cpu: 100m
+        # Default is 2Gi, reduce to 256Mi
+        memory: 256Mi
+
+    persistence:
+      enabled: true
+      # Default is 500Gi, reduce to 10Gi
+      size: 10Gi
+
+    affinity: {}
+
+  etcd:
+    enabled: true
+    # Keep in mind, consensus service count must be odd
+    replicaCount: 3
+
+    persistence:
+      enabled: true
+      # Default is 10Gi, reduce to 8Gi
+      size: 8Gi
+
+    affinity: {}
+
+  pulsar:
+    enabled: true
+
+    zookeeper:
+      # Keep in mind, consensus service count must be odd
+      replicaCount: 3
+
+      resources:
+        requests:
+          # Default is 1Gi, reduce to 256Mi
+          memory: 256Mi
+          # Default is 0.3cpu, reduce to 0.1
+          cpu: 0.1
+
+      volumes:
+        # use a persistent volume or emptyDir
+        persistence: true
+        data:
+          name: data
+          # Default is 20Gi, reduce to 5Gi
+          size: 5Gi
+
+    bookkeeper:
+      replicaCount: 3
+      volumes:
+        journal:
+          name: journal
+          # Default is 100Gi, reduce to 2Gi
+          size: 4Gi
+        ledgers:
+          name: ledgers
+          # Default is 200Gi, reduce to 4Gi
+          size: 4Gi
+      resources:
+        requests:
+          # Default is 2Gi, reduce to 256Mi
+          memory: 256Mi
+          # Default is 1cpu, reduce to 0.2
+          cpu: 0.2
+
+    broker:
+      replicaCount: 1
+      resources:
+        requests:
+          # Default is 4Gi, reduce to 256Mi
+          memory: 256Mi
+          # Default is 1.5cpu, reduce to 0.2
+          cpu: 0.2
+
+    autorecovery:
+      resources:
+        requests:
+          # Default is 512Mi, reduce to 256Mi
+          memory: 256Mi
+          # Default is 1cpu, reduce to 0.2
+          cpu: 0.2
+
+    proxy:
+      replicaCount: 1
+      resources:
+        requests:
+          # Default is 2048Mi, reduce to 256Mi
+          memory: 256Mi
+          # Default is 1cpu, reduce to 0.2
+          cpu: 0.2
+
+#######################################################################
+# MySQL
+#######################################################################
+mysql:
+  # standalone | replication
+  architecture: standalone
+  auth:
+    createDatabase: true
+    customPasswordFiles: {}
+    database: bot
+    defaultAuthenticationPlugin: ''
+    existingSecret: ''
+    password: 'bot'
+    replicationPassword: 'bot'
+    replicationUser: bot
+    rootPassword: 'bot'
+    usePasswordFiles: false
+    username: 'bot'
+
+  global:
+    imagePullSecrets: []
+    imageRegistry: ''
+    storageClass: ''
+
+  image:
+    debug: false
+    digest: ''
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+    registry: docker.io
+    repository: bitnami/mysql
+    # tag: 8.3-debian-11
+
+  metrics:
+    enabled: true
+
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 120
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    prometheusRule:
+      additionalLabels: {}
+      enabled: false
+      namespace: ''
+      rules: []
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits: {}
+      requests: {}
+    service:
+      annotations:
+        prometheus.io/port: '{{ .Values.mysql.metrics.service.port }}'
+        prometheus.io/scrape: 'true'
+      clusterIP: ''
+      port: 9104
+      type: ClusterIP
+
+    # enable/disable prometheus service monitor target
+    serviceMonitor:
+      enabled: false
+
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      annotations: {}
+      enabled: true
+      existingClaim: ''
+      selector: {}
+      size: 4Gi
+      storageClass: ''
+      subPath: ''
+    persistentVolumeClaimRetentionPolicy:
+      enabled: false
+      whenDeleted: Retain
+      whenScaled: Retain
+    resources:
+      limits: {}
+      requests: {}
+
+    service:
+      annotations: {}
+      clusterIP: ''
+      externalTrafficPolicy: Cluster
+      extraPorts: []
+      headless:
+        annotations: {}
+      loadBalancerIP: ''
+      loadBalancerSourceRanges: []
+      nodePorts:
+        mysql: ''
+      ports:
+        mysql: 3306
+      sessionAffinity: None
+      sessionAffinityConfig: {}
+      type: ClusterIP
+
+  # enabled when architecture = replication
+  secondary:
+    affinity: {}
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      annotations: {}
+      enabled: true
+      existingClaim: ''
+      selector: {}
+      size: 4Gi
+      storageClass: ''
+      subPath: ''
+    replicaCount: 2
+    resources:
+      limits: {}
+      requests: {}
