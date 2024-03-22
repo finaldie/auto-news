@@ -20,9 +20,10 @@ help:
 	@echo ""
 	@echo "=== k8s deployment ==="
 	@echo "\_ make k8s-env-create"
+	@echo "\_ make k8s-namespace-create"
 	@echo "\_ make k8s-secret-create"
-	@echo "\_ make k8s-docker-build tag=x.y.z"
-	@echo "\_ make k8s-docker-push tag=x.y.z"
+	@echo "\_ make k8s-docker-build repo=xxx tag=x.y.z"
+	@echo "\_ make k8s-docker-push repo=xxx tag=x.y.z"
 	@echo "\_ make k8s-helm-install"
 
 
@@ -120,13 +121,19 @@ upgrade:
 -include build/.env
 
 namespace ?= auto-news
+image_repo ?= finaldie/auto-news
 TIMEOUT ?= 10m0s
 
 # steps to deploy to k8s:
 # make k8s-env-create
+# make k8s-namespace-create
 # make k8s-secret-create
-# [optional] make k8s-docker-build tag=1.0.0
+# [optional] make k8s-docker-build repo=xxx tag=1.0.0
+# [optional] make k8s-docker-push repo=xxx tag=1.0.0
 # make k8s-helm-install
+
+k8s-namespace-create:
+	-kubectl create namespace ${namespace}
 
 k8s-env-create:
 	@echo "***Create env file for k8s**"
@@ -141,7 +148,7 @@ k8s-env-create:
 	cat $(build_dir)/.env.k8s
 
 k8s-secret-create:
-	@echo "**Create airflow secret**"
+	@echo "**Create airflow secret (namespace: ${namespace})**"
 	kubectl create secret generic airflow-secrets \
 	-n ${namespace} \
   --from-literal=NOTION_TOKEN=$(NOTION_TOKEN) \
@@ -157,19 +164,19 @@ k8s-secret-create:
   --from-literal=TWITTER_ACCESS_TOKEN_SECRET=$(TWITTER_ACCESS_TOKEN_SECRET)
 
 k8s-secret-delete:
-	@echo "**Delete airflow secret**"
+	@echo "**Deleting airflow secret (namespace: ${namespace}) ...**"
 	-kubectl delete secret \
 		--ignore-not-found=true \
 		-n ${namespace} \
 		airflow-secrets
 
-# k8s-docker-build tag=1.0.0
+# k8s-docker-build repo=xxx tag=1.0.0
 k8s-docker-build:
-	cd docker && make build-k8s tag=${tag}
+	cd docker && make build-k8s repo=${image_repo} tag=${tag} topdir=$(topdir)
 
-# k8s-docker-push tag=1.0.0
+# k8s-docker-push repo=xxx tag=1.0.0
 k8s-docker-push:
-	cd docker && make push-k8s tag=${tag}
+	cd docker && make push-k8s repo=${image_repo} tag=${tag}
 
 k8s-helm-install:
 	helm upgrade \
