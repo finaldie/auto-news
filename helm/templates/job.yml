@@ -15,7 +15,7 @@ spec:
       - name: airflow-init-user
         # imagePullPolicy: IfNotPresent
 
-        image: {{ .Values.airflow.images.airflow.repository }}:{{ .Values.airflow.images.airflow.tag }}
+        image: "{{ .Values.airflow.images.airflow.repository }}:{{ .Values.airflow.images.airflow.tag }}"
 
         # Add any command arguments or environment variables needed
         # Notes: airflow dags command requires an airflow connected
