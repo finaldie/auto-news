@@ -1,0 +1,157 @@
+# Guide: https://airflow.apache.org/docs/helm-chart/stable/production-guide.html
+# Upstream values: https://github.com/apache/airflow/blob/main/chart/values.yaml
+
+airflow:
+  images:
+    airflow:
+      repository: finaldie/auto-news
+      tag: 1.0.0
+
+    useDefaultImageForMigration: true
+
+  ## secret if use private repository which requires authorization
+  # registry:
+  #   secretName: regcred
+
+  # https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserver-secret-key
+  # Generated from command: python3 -c 'import secrets; print(secrets.token_hex(16))'
+  # Change it if necessary
+  webserverSecretKey: bea88c6c0147627c653c54147ea80ab8
+
+  # airflow global affinity
+  affinity: {}
+
+  workers:
+    # Notes: by increasing the replicas, need either the storage provider
+    # supports ReadWriteMany accessMode OR we have to use the k8s executor
+    # and apply affinity rules between tasks to align them in the same
+    # pod
+    replicas: 1
+
+    resources: {}
+    #   limits:
+    #     cpu: 4
+    #     memory: 4Gi
+    #   requests:
+    #     cpu: 100m
+    #     memory: 256Mi
+
+    persistence:
+      size: 10Gi
+
+    # Increase failureThreshold as we will install the packages
+    # from requirements-local.txt, it may take at least 5 minutes
+    # Notes: default check interval 60s
+    livenessProbe:
+      # Default is 5
+      failureThreshold: 15
+
+    # Request for data volume
+    volumeClaimTemplates:
+      - metadata:
+          name: airflow-worker-data-pvc
+        spec:
+          # storageClassName: ""
+          accessModes:
+            - "ReadWriteOnce"
+          resources:
+            requests:
+              storage: "20Gi"
+
+    # Mount data volume
+    extraVolumeMounts:
+      - name: airflow-worker-data-pvc
+        mountPath: "/opt/airflow/data"
+
+    args:
+      - "bash"
+      - "-c"
+      - |-
+        echo "User: `id`"
+        echo "PWD: `pwd`"
+        echo "=================================================="
+        echo "Working dir files (tree)"
+        echo "=================================================="
+        tree
+        echo "=================================================="
+        echo "Upgrade pip packages from requirements-local.txt  "
+        echo "=================================================="
+        pip install --upgrade pip
+        if [ -f ~/airflow/run/requirements-local.txt ]; then
+          echo "[pip] Found requirements-local.txt, installing ..."
+          echo "[pip] langchain version (before): `pip list | grep langchain`"
+          pip install --upgrade -r ~/airflow/run/requirements-local.txt
+          echo "[pip] Installation finished"
+          echo "[pip] langchain version (after): `pip list | grep langchain`"
+        fi
+        echo "=================================================="
+        echo "Starting airflow worker ...  "
+        echo "=================================================="
+        exec \
+        airflow {{ semverCompare ">=2.0.0" .Values.airflowVersion | ternary "celery worker" "worker" }}
+
+  triggerer:
+    replicas: 2
+    persistence:
+      size: 5Gi
+
+    resources: {}
+    #   limits:
+    #     cpu: 500m
+    #     memory: 512Mi
+    #   requests:
+    #     cpu: 100m
+    #     memory: 128Mi
+
+  scheduler:
+    replicas: 2
+    resources:
+      # limits:
+      #   cpu: 1
+      #   memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+    env:
+      - name: "AIRFLOW__SCHEDULER__TASK_QUEUED_TIMEOUT"
+        value: "60"
+      - name: "AIRFLOW__SCHEDULER__TASK_QUEUED_TIMEOUT_CHECK_INTERVAL"
+        value: "15"
+
+  # Default username/pass: admin/admin
+  webserver:
+    replicas: 1
+
+    resources: {}
+    #  limits:
+    #    cpu: 500m
+    #    memory: 1Gi
+    #  requests:
+    #    cpu: 100m
+    #    memory: 128Mi
+
+    # If we limited resources, the webserver may not boot up within 60s
+    # then it will be killed by k8s, increase the failureThreshold x2,
+    # to wait longer time
+    startupProbe:
+      # Default is 6
+      failureThreshold: 12
+
+    env:
+      - name: AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS
+        value: "true"
+
+
+redis:
+  password: bot
+
+  resources: {}
+  #   limits:
+  #     cpu: 1
+  #     memory: 1Gi
+  #   requests:
+  #     cpu: 200m
+  #     memory: 32Mi
+
+  affinity: {}

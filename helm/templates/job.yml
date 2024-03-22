@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-init-user
+spec:
+  ## Uncomment the line below if enable auto cleanup the job pod
+  # ttlSecondsAfterFinished: 300
+
+  # Retry at most 2 times
+  backoffLimit: 2
+
+  template:
+    spec:
+      containers:
+      - name: airflow-init-user
+        # imagePullPolicy: IfNotPresent
+
+        image: {{ .Values.airflow.images.airflow.repository }}:{{ .Values.airflow.images.airflow.tag }}
+
+        # Add any command arguments or environment variables needed
+        # Notes: airflow dags command requires an airflow connected
+        # environment, move those to makefile targets will be eaiser
+        command: ["/bin/bash"]
+        args:
+        - -c
+        - |
+          echo "User: `id`"
+          echo "PWD: `pwd`"
+          echo "----"
+          echo "Apply patches ..."
+          python3 ~/airflow/run/be-jobs/patches.py
+          echo "Apply patches finished"
+          echo "----"
+          echo "Job finished"
+
+      # Ensures the job runs only once
+      restartPolicy: Never

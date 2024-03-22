@@ -24,8 +24,8 @@ dependencies:
 - name: airflow
   version: '1.13.0'
   repository: https://airflow.apache.org
-  condition: airflow.enabled
-  
+  # condition: airflow.enabled
+
 - name: mysql
   version: '10.1.0'
   repository: https://charts.bitnami.com/bitnami
