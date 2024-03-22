@@ -149,7 +149,7 @@ k8s-env-create:
 
 k8s-secret-create:
 	@echo "**Create airflow secret (namespace: ${namespace})**"
-	kubectl create secret generic airflow-secrets \
+	-kubectl create secret generic airflow-secrets \
 	-n ${namespace} \
   --from-literal=NOTION_TOKEN=$(NOTION_TOKEN) \
   --from-literal=OPENAI_API_KEY=$(OPENAI_API_KEY) \
