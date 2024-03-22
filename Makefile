@@ -180,14 +180,14 @@ k8s-docker-push:
 
 k8s-helm-install:
 	helm upgrade \
-     --install \
-		 --debug \
-     --namespace=${namespace} \
-     --create-namespace \
-     --timeout=${TIMEOUT} \
-     --wait-for-jobs=true \
-     auto-news \
-     ./helm
+		--install \
+		--debug \
+		--namespace=${namespace} \
+		--create-namespace \
+		--timeout=${TIMEOUT} \
+		--wait-for-jobs=true \
+		auto-news \
+		./helm
 
 k8s-helm-uninstall:
 	helm uninstall \
