@@ -1,0 +1,15 @@
+dependencies:
+- name: milvus
+  repository: https://zilliztech.github.io/milvus-helm
+  version: 4.1.26
+- name: airflow
+  repository: https://airflow.apache.org
+  version: 1.13.0
+- name: mysql
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.1.0
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 19.0.1
+digest: sha256:9586d7d3e6eab18e2f47c6244966cafb8e398950e95fc9ebe2b679f9ea0f726f
+generated: "2024-03-22T11:00:14.198722336Z"

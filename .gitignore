@@ -166,3 +166,6 @@ requirements-local.txt
 
 # Migration folders
 .openai_migration
+
+# helm
+helm/charts
