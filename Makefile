@@ -155,14 +155,17 @@ k8s-namespace-create:
 k8s-env-create:
 	@echo "***Create env file for k8s**"
 	mkdir -p $(build_dir)
-	if [ ! -f $(build_dir)/.env ]; then \
-		cp .env.template $(build_dir)/.env; \
-		echo "HOSTNAME=`hostname`" >> $(build_dir)/.env; \
+	if [ ! -f $(build_dir)/.env.k8s ]; then \
+		cp .env.template.k8s $(build_dir)/.env.k8s; \
+		echo "HOSTNAME=`hostname`" >> $(build_dir)/.env.k8s; \
 	fi
-	cat $(build_dir)/.env | grep -vE "NOTION_TOKEN|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s
-	@echo "**env file generated complete (secrets removed):**"
+	if [ ! -f $(build_dir)/.env.k8s.docker ]; then \
+		cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s.docker; \
+		@echo "**env file generating completed (secrets removed):**"; \
+	fi
 	@echo ""
-	cat $(build_dir)/.env.k8s
+	cat $(build_dir)/.env.k8s.docker
+	@echo "===="
 
 k8s-secret-create:
 	@echo "**Create airflow secret (namespace: ${namespace})**"

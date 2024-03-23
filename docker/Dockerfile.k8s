@@ -61,4 +61,4 @@ COPY dags/ /opt/airflow/dags/
 
 # Install user code
 COPY ./src /opt/airflow/run/auto-news/src
-COPY ./build/.env.k8s /opt/airflow/run/auto-news/src/.env
+COPY ./build/.env.k8s.docker /opt/airflow/run/auto-news/src/.env
