@@ -48,6 +48,10 @@ spec:
 
         image: "{{ .Values.airflow.images.airflow.repository }}:{{ .Values.airflow.images.airflow.tag }}"
 
+        envFrom:
+        - secretRef:
+            name: airflow-secrets
+
         # Add any command arguments or environment variables needed
         # Notes: airflow dags command requires an airflow connected
         # environment, move those to makefile targets will be eaiser
