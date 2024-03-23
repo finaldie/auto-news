@@ -32,8 +32,8 @@ help:
 	@echo ""
 	@echo "=== k8s port-fowarding ==="
 	@echo "Airflow: 'kubectl port-forward service/auto-news-webserver 8080:8080 --namespace ${namespace} --address=0.0.0.0'"
-	@echo "Milvus : 'kubectl port-forward service/auto-news-milvus-attu -n ${namespace} 3001:3001 --address=0.0.0.0'"
-	@echo "Adminer: 'kubectl port-forward service/auto-news-adminer -n ${namespace} 3406:8080 --address=0.0.0.0'"
+	@echo "Milvus : 'kubectl port-forward service/auto-news-milvus-attu -n ${namespace} 9100:3001 --address=0.0.0.0'"
+	@echo "Adminer: 'kubectl port-forward service/auto-news-adminer -n ${namespace} 8070:8080 --address=0.0.0.0'"
 
 
 topdir := $(shell pwd)

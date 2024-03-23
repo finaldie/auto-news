@@ -34,6 +34,7 @@ https://github.com/finaldie/auto-news/wiki
 ## Architecture
 * UI: Notion-based, cross-platform (Web browser, iOS/Android app)
 * Backend: Runs on Linxu/MacOS
+  * For deployment: Support both [docker-compose](https://docs.docker.com/compose/) and [kubernetes](https://kubernetes.io/)
 
 ![image](https://github.com/finaldie/auto-news/assets/1088543/d1923ea8-6e4f-46b8-a654-45e21372438e)
 
@@ -42,11 +43,11 @@ https://github.com/finaldie/auto-news/wiki
 | Component | Minimum Requirements | Recommended  |
 | --------- | -----------          | ----         |
 | OS        | Linux, MacOS         | Linux, MacOS |
-| CPU       | 2 cores              | 4 cores      |
-| Memory    | 6GB                  | 12GB         |
-| Disk      | 20GB                 | 50GB         |
+| CPU       | 2 cores              | 8 cores      |
+| Memory    | 6GB                  | 16GB         |
+| Disk      | 20GB                 | 100GB        |
 
-# Quick Start Guide
+# Quick Start Guide (Docker-compose)
 ## Preparison
 * [Required] [Docker](https://www.docker.com/)
 * [Required] [Notion Token](https://www.notion.so/my-integrations)
@@ -107,6 +108,10 @@ Readings
 Go to Notion `ToRead` database page, all the data will flow into this database later on, create the database views for different sources to help us organize flows easier. E.g. Tweets, Articles, YouTube, RSS, etc
 
 Now, enjoy and have fun.
+
+# Kubernetes Deployment
+
+See the installation guide from: [Installation using Helm](https://github.com/finaldie/auto-news/wiki/Installation-using-Helm)
 
 # Operations
 ## [Monitoring] Control Panel
