@@ -57,7 +57,7 @@ build-nocache:
 # build-k8s repo=xxx tag=1.0.0
 build-k8s:
 	@echo "Building docker image for k8s environment, topdir: [$(topdir)]"
-	docker build --pull --rm --no-cache -t ${repo}:${tag} -f Dockerfile.k8s $(topdir)
+	docker build --pull --rm -t ${repo}:${tag} -f Dockerfile.k8s $(topdir)
 
 # push-k8s repo=xxx tag=1.0.0
 push-k8s:

@@ -150,7 +150,7 @@ k8s-env-create:
 		cp .env.template $(build_dir)/.env; \
 		echo "HOSTNAME=`hostname`" >> $(build_dir)/.env; \
 	fi
-	cat $(build_dir)/.env | grep -vE "NOTION_TOKEN|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET" >> $(build_dir)/.env.k8s
+	cat $(build_dir)/.env | grep -vE "NOTION_TOKEN|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s
 	@echo "**env file generated complete (secrets removed):**"
 	@echo ""
 	cat $(build_dir)/.env.k8s
@@ -164,6 +164,8 @@ k8s-secret-create:
   --from-literal=GOOGLE_API_KEY=$(GOOGLE_API_KEY) \
   --from-literal=REDDIT_CLIENT_ID=$(REDDIT_CLIENT_ID) \
   --from-literal=REDDIT_CLIENT_SECRET=$(REDDIT_CLIENT_SECRET) \
+  --from-literal=MYSQL_USER=$(MYSQL_USER) \
+  --from-literal=MYSQL_PASSWORD=$(MYSQL_PASSWORD) \
   --from-literal=AUTOGEN_GPT4_API_KEY=$(AUTOGEN_GPT4_API_KEY) \
   --from-literal=AUTOGEN_GPT3_API_KEY=$(AUTOGEN_GPT3_API_KEY) \
   --from-literal=TWITTER_API_KEY=$(TWITTER_API_KEY) \

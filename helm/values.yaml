@@ -5,11 +5,13 @@ airflow:
   images:
     airflow:
       repository: finaldie/auto-news
-      tag: 1.0.0
+      tag: 0.9.1
 
     useDefaultImageForMigration: true
 
   ## secret if use private repository which requires authorization
+  #  - secret name: regcred
+  #  - secret type: docker
   # registry:
   #   secretName: regcred
 
@@ -20,6 +22,78 @@ airflow:
 
   # airflow global affinity
   affinity: {}
+
+  extraEnvFrom: |
+    - secretRef:
+        name: airflow-secrets
+
+    # env:
+    #   - name: NOTION_TOKEN
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: NOTION_TOKEN
+
+    #   - name: OPENAI_API_KEY
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: OPENAI_API_KEY
+
+    #   - name: GOOGLE_API_KEY
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: GOOGLE_API_KEY
+
+    #   - name: REDDIT_CLIENT_ID
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: REDDIT_CLIENT_ID
+
+    #   - name: REDDIT_CLIENT_SECRET
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: REDDIT_CLIENT_SECRET
+
+    #   - name: AUTOGEN_GPT4_API_KEY
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: AUTOGEN_GPT4_API_KEY
+
+    #   - name: AUTOGEN_GPT3_API_KEY
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: AUTOGEN_GPT3_API_KEY
+
+    #   # Twitter Paid Account Only
+    #   - name: TWITTER_API_KEY
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: TWITTER_API_KEY
+
+    #   - name: TWITTER_API_KEY_SECRET
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: TWITTER_API_KEY_SECRET
+
+    #   - name: TWITTER_ACCESS_TOKEN
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: TWITTER_ACCESS_TOKEN
+
+    #   - name: TWITTER_ACCESS_TOKEN_SECRET
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: airflow-secrets
+    #         key: TWITTER_ACCESS_TOKEN_SECRET
 
   workers:
     # Notes: by increasing the replicas, need either the storage provider
@@ -90,74 +164,6 @@ airflow:
         exec \
         airflow {{ semverCompare ">=2.0.0" .Values.airflowVersion | ternary "celery worker" "worker" }}
 
-    env:
-      - name: NOTION_TOKEN
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: NOTION_TOKEN
-
-      - name: OPENAI_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: OPENAI_API_KEY
-
-      - name: GOOGLE_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: GOOGLE_API_KEY
-
-      - name: REDDIT_CLIENT_ID
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: REDDIT_CLIENT_ID
-
-      - name: REDDIT_CLIENT_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: REDDIT_CLIENT_SECRET
-
-      - name: AUTOGEN_GPT4_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: AUTOGEN_GPT4_API_KEY
-
-      - name: AUTOGEN_GPT3_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: AUTOGEN_GPT3_API_KEY
-
-      # Twitter Paid Account Only
-      - name: TWITTER_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: TWITTER_API_KEY
-
-      - name: TWITTER_API_KEY_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: TWITTER_API_KEY_SECRET
-
-      - name: TWITTER_ACCESS_TOKEN
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: TWITTER_ACCESS_TOKEN
-
-      - name: TWITTER_ACCESS_TOKEN_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: airflow-secrets
-            key: TWITTER_ACCESS_TOKEN_SECRET
-
 
   triggerer:
     replicas: 2
@@ -216,6 +222,7 @@ airflow:
 # Redis
 #######################################################################
 redis:
+  enabled: true
   password: bot
 
   resources:
@@ -235,9 +242,11 @@ redis:
 # upstream values from https://github.com/zilliztech/milvus-helm/blob/master/charts/milvus/values.yaml
 
 milvus:
+  enabled: true
+
   ## Enable or disable Milvus Cluster mode
   cluster:
-    enabled: true
+    enabled: false
 
   image:
     all:
@@ -334,7 +343,8 @@ milvus:
     affinity: {}
 
   pulsar:
-    enabled: true
+    # Enable it for cluster mode
+    enabled: false
 
     zookeeper:
       # Keep in mind, consensus service count must be odd
@@ -403,6 +413,8 @@ milvus:
 # MySQL
 #######################################################################
 mysql:
+  enabled: true
+
   # standalone | replication
   architecture: standalone
   auth:
