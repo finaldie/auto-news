@@ -55,6 +55,9 @@ spec:
         args:
         - -c
         - |
+          echo "** Environment Variables **"
+          env | grep -E "MYSQL_|NOTION|OPENAI|GOOGLE"
+          echo "===="
           echo "User: `id`"
           echo "PWD: `pwd`"
           echo "----"
