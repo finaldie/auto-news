@@ -10,10 +10,28 @@ spec:
   backoffLimit: 2
 
   template:
+    metadata:
+      labels:
+        app.role: apps
+
     spec:
+      affinity:
+        {{- if .Values.airflow.affinity }}
+          {{- toYaml .Values.airflow.affinity | nindent 8 }}
+        {{- else }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.role: apps
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+        {{- end }}
+
       containers:
       - name: airflow-init-user
-        # imagePullPolicy: IfNotPresent
+        imagePullPolicy: IfNotPresent
 
         image: "{{ .Values.airflow.images.airflow.repository }}:{{ .Values.airflow.images.airflow.tag }}"
 
@@ -35,3 +53,8 @@ spec:
 
       # Ensures the job runs only once
       restartPolicy: Never
+
+      {{ if .Values.airflow.registry.secretName  }}
+      imagePullSecrets:
+        - name: {{ .Values.airflow.registry.secretName }}
+      {{ end }}
