@@ -163,7 +163,7 @@ k8s-env-create:
 	fi
 	if [ ! -f $(build_dir)/.env.k8s.docker ]; then \
 		cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s.docker; \
-		@echo "**env file generating completed (secrets removed):**"; \
+		echo "**env file generating completed (secrets removed):**"; \
 	fi
 	@echo ""
 	cat $(build_dir)/.env.k8s.docker
