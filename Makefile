@@ -1,3 +1,5 @@
+namespace ?= auto-news
+
 help:
 	@echo "Usage:"
 	@echo "=== Local deployment ==="
@@ -27,6 +29,11 @@ help:
 	@echo "\_ make k8s-docker-push repo=xxx tag=x.y.z"
 	@echo "\_ make k8s-helm-install"
 	@echo "\_ make k8s-airflow-dags-enable"
+	@echo ""
+	@echo "=== k8s port-fowarding ==="
+	@echo "Airflow: kubectl port-forward service/airflow-webserver 8080:8080 --namespace ${namespace} --address=0.0.0.0'"
+	@echo "Milvus : kubectl port-forward service/milvus-attu -n ${namespace} 3001:3001 --address=0.0.0.0'"
+	@echo "Adminer: kubectl port-forward service/adminer -n ${namespace} 3406:8080 --address=0.0.0.0'"
 
 
 topdir := $(shell pwd)
@@ -122,7 +129,6 @@ upgrade:
 #######################################################################
 -include build/.env
 
-namespace ?= auto-news
 image_repo ?= finaldie/auto-news
 TIMEOUT ?= 10m0s
 
