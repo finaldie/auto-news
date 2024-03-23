@@ -533,3 +533,17 @@ mysql:
     resources:
       limits: {}
       requests: {}
+
+
+#######################################################################
+# Adminer
+#
+# Default values: https://artifacthub.io/packages/helm/cetic/adminer?modal=values
+#######################################################################
+adminer:
+  enabled: true
+  affinity: {}
+  resources: {}
+  service:
+  type: ClusterIP
+  port: 8080

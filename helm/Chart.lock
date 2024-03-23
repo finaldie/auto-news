@@ -8,8 +8,11 @@ dependencies:
 - name: mysql
   repository: https://charts.bitnami.com/bitnami
   version: 10.1.0
+- name: adminer
+  repository: https://cetic.github.io/helm-charts
+  version: 0.2.1
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 19.0.1
-digest: sha256:b3623e9f65c65fe4c4fd770eeb37313e6ba9d949236a382ce52e6b730c08aa97
-generated: "2024-03-22T23:27:34.746126283Z"
+digest: sha256:fb2dc9bf2e106934bf55c91cf4cf52b4b0fa2ba7ddb5cbdf88ad4328d40942fc
+generated: "2024-03-23T19:43:23.85040107Z"

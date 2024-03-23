@@ -31,6 +31,11 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   condition: mysql.enabled
 
+- name: adminer
+  version: '0.2.1'
+  repository: https://cetic.github.io/helm-charts
+  condition: adminer.enabled
+
 - name: redis
   version: '19.0.1'
   repository: https://charts.bitnami.com/bitnami
