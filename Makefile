@@ -219,20 +219,20 @@ k8s-helm-uninstall:
 
 k8s-airflow-dags-enable:
 	@echo "Airflow DAGs unpausing..."
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause news_pulling
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause sync_dist
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause collection_weekly
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause journal_daily
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause action
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause news_pulling
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause sync_dist
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause collection_weekly
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause journal_daily
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause action
 	@echo "Airflow DAGs unpausing finished"
 
 airflow-dags-disable:
 	@echo "Airflow DAGs pausing..."
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause news_pulling
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause sync_dist
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause collection_weekly
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause journal_daily
-	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause action
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause news_pulling
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause sync_dist
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause collection_weekly
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause journal_daily
+	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause action
 	@echo "Airflow DAGs pausing finished"
 
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags
