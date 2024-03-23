@@ -61,6 +61,9 @@ prepare-env:
 		cp .env.template $(build_dir)/.env; \
 		echo "HOSTNAME=`hostname`" >> $(build_dir)/.env; \
 	fi
+	if [ ! -f $(build_dir)/.env.k8s ]; then \
+		cp .env.template.k8s $(build_dir)/.env.k8s; \
+	fi
 	chmod -R 777 $(build_dir)
 
 
@@ -157,7 +160,6 @@ k8s-env-create:
 	mkdir -p $(build_dir)
 	if [ ! -f $(build_dir)/.env.k8s ]; then \
 		cp .env.template.k8s $(build_dir)/.env.k8s; \
-		echo "HOSTNAME=`hostname`" >> $(build_dir)/.env.k8s; \
 	fi
 	if [ ! -f $(build_dir)/.env.k8s.docker ]; then \
 		cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s.docker; \
