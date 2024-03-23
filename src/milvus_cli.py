@@ -1,3 +1,5 @@
+import os
+
 from pymilvus import (
     connections,
     FieldSchema,
@@ -13,16 +15,22 @@ class MilvusClient:
     def __init__(
         self,
         alias="default",
-        host="milvus-standalone",
-        port='19530',
+        host="",
+        port="",
         emb_agent=None,
     ):
         self.alias = alias  # The server alias we connect to
+        self.host = host or os.getenv("MILVUS_HOST", "milvus-standalone")
+
+        # In k8s, the port format tcp://IP:19530, extract it again
+        self.port = port or os.getenv("MILVUS_PORT", "19530").split(":")[-1]
+
+        print(f"[MilvusClient] server.alias: {self.alias}, host: {self.host}, port: {self.port}")
 
         self.conn = connections.connect(
-            alias=alias,
-            host=host,
-            port=port
+            alias=self.alias,
+            host=self.host,
+            port=self.port
         )
 
         self.emb_agent = emb_agent
