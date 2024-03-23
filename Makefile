@@ -26,6 +26,7 @@ help:
 	@echo "\_ make k8s-docker-build repo=xxx tag=x.y.z"
 	@echo "\_ make k8s-docker-push repo=xxx tag=x.y.z"
 	@echo "\_ make k8s-helm-install"
+	@echo "\_ make k8s-airflow-dags-enable"
 
 
 topdir := $(shell pwd)
@@ -133,6 +134,7 @@ TIMEOUT ?= 10m0s
 # [optional] make k8s-docker-build repo=xxx tag=1.0.0
 # [optional] make k8s-docker-push repo=xxx tag=1.0.0
 # make k8s-helm-install
+# make k8s-airflow-dags-enable
 
 helm-repo-update:
 	helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -207,6 +209,24 @@ k8s-helm-uninstall:
 		--wait=true \
 		--debug \
 		auto-news
+
+k8s-airflow-dags-enable:
+	@echo "Airflow DAGs unpausing..."
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause news_pulling
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause sync_dist
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause collection_weekly
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause journal_daily
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags unpause action
+	@echo "Airflow DAGs unpausing finished"
+
+airflow-dags-disable:
+	@echo "Airflow DAGs pausing..."
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause news_pulling
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause sync_dist
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause collection_weekly
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause journal_daily
+	kubectl exec -n ${namespace} airflow-worker-0 -- airflow dags pause action
+	@echo "Airflow DAGs pausing finished"
 
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags
 .PHONY: test upgrade enable_dags info ps help prepare-env docker-network
