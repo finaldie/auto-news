@@ -5,11 +5,19 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: airflow-init-user
+
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
-  # auto cleanup the job pod after n seconds
+  # Auto cleanup the job pod after n seconds
   # k8s Job is immutable, for upgrading/patching, we either delete the existing
   # job pod or wait after the ttl and the job pod will be auto removed
-  ttlSecondsAfterFinished: 300
+  #
+  # For ArgoCD:
+  # use argocd.argoproj.io/hook and argocd.argoproj.io/hook-delete-policy
+  # annotations to run the at specific stage and do the cleanup correctly
+  ## ttlSecondsAfterFinished: 300
 
   # Retry at most 2 times
   backoffLimit: 2
