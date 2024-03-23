@@ -28,7 +28,7 @@ spec:
           echo "PWD: `pwd`"
           echo "----"
           echo "Apply patches ..."
-          python3 ~/airflow/run/be-jobs/patches.py
+          python3 ~/airflow/run/auto-news/src/patches.py
           echo "Apply patches finished"
           echo "----"
           echo "Job finished"
