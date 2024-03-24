@@ -1,9 +1,9 @@
 # Auto-News: An Automatic News Aggregator with LLM
 
 [![GitHub Build](https://github.com/finaldie/auto-news/actions/workflows/python.yml/badge.svg)](https://github.com/finaldie/auto-news/actions)
-![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
-![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=for-the-badge&logo=notion&logoColor=white)
-![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=Flat&logo=kubernetes&logoColor=white)
+![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=Flat&logo=notion&logoColor=white)
+![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=Flat&logo=openai&logoColor=white)
 
 A personal news aggregator to pull information from multi-sources + LLM (ChatGPT) to help us read efficiently with less noise, the sources including Tweets, RSS, YouTube, Web Articles, Reddit, and random Journal notes.
 
