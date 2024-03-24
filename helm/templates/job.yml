@@ -1,0 +1,80 @@
+###############################################################################
+# Airflow init user job template
+###############################################################################
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-init-user
+
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  # Auto cleanup the job pod after n seconds
+  # k8s Job is immutable, for upgrading/patching, we either delete the existing
+  # job pod or wait after the ttl and the job pod will be auto removed
+  #
+  # For ArgoCD:
+  # use argocd.argoproj.io/hook and argocd.argoproj.io/hook-delete-policy
+  # annotations to run the at specific stage and do the cleanup correctly
+  ## ttlSecondsAfterFinished: 300
+
+  # Retry at most 2 times
+  backoffLimit: 2
+
+  template:
+    metadata:
+      labels:
+        app.role: apps
+
+    spec:
+      affinity:
+        {{- if .Values.airflow.affinity }}
+          {{- toYaml .Values.airflow.affinity | nindent 8 }}
+        {{- else }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.role: apps
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+        {{- end }}
+
+      containers:
+      - name: airflow-init-user
+        imagePullPolicy: IfNotPresent
+
+        image: "{{ .Values.airflow.images.airflow.repository }}:{{ .Values.airflow.images.airflow.tag }}"
+
+        envFrom:
+        - secretRef:
+            name: airflow-secrets
+
+        # Add any command arguments or environment variables needed
+        # Notes: airflow dags command requires an airflow connected
+        # environment, move those to makefile targets will be eaiser
+        command: ["/bin/bash"]
+        args:
+        - -c
+        - |
+          echo "** Environment Variables **"
+          env | grep -E "MYSQL_|NOTION|OPENAI|GOOGLE"
+          echo "===="
+          echo "User: `id`"
+          echo "PWD: `pwd`"
+          echo "----"
+          echo "Apply patches ..."
+          python3 ~/airflow/run/auto-news/src/patches.py
+          echo "Apply patches finished"
+          echo "----"
+          echo "Job finished"
+
+      # Ensures the job runs only once
+      restartPolicy: Never
+
+      {{ if .Values.airflow.registry.secretName  }}
+      imagePullSecrets:
+        - name: {{ .Values.airflow.registry.secretName }}
+      {{ end }}

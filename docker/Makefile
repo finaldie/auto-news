@@ -54,8 +54,17 @@ build:
 build-nocache:
 	docker compose build --no-cache
 
+# build-k8s repo=xxx tag=1.0.0
+build-k8s:
+	@echo "Building docker image for k8s environment, topdir: [$(topdir)]"
+	docker build --pull --rm -t ${repo}:${tag} -f Dockerfile.k8s $(topdir)
+
+# push-k8s repo=xxx tag=1.0.0
+push-k8s:
+	docker push ${repo}:${tag}
+
 deploy: deploy-airflow deploy-postgres deploy-redis deploy-mysql deploy-milvus
-deploy: post-deploy
+deploy: post-deploy build-k8s
 
 
 init: push_dags copy_files

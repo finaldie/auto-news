@@ -1,6 +1,9 @@
 # Auto-News: An Automatic News Aggregator with LLM
 
 [![GitHub Build](https://github.com/finaldie/auto-news/actions/workflows/python.yml/badge.svg)](https://github.com/finaldie/auto-news/actions)
+![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=Flat&logo=kubernetes&logoColor=white)
+![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=Flat&logo=notion&logoColor=white)
+![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=Flat&logo=openai&logoColor=white)
 
 A personal news aggregator to pull information from multi-sources + LLM (ChatGPT) to help us read efficiently with less noise, the sources including Tweets, RSS, YouTube, Web Articles, Reddit, and random Journal notes.
 
@@ -34,6 +37,7 @@ https://github.com/finaldie/auto-news/wiki
 ## Architecture
 * UI: Notion-based, cross-platform (Web browser, iOS/Android app)
 * Backend: Runs on Linxu/MacOS
+  * For deployment: Support both [docker-compose](https://docs.docker.com/compose/) and [kubernetes](https://kubernetes.io/)
 
 ![image](https://github.com/finaldie/auto-news/assets/1088543/d1923ea8-6e4f-46b8-a654-45e21372438e)
 
@@ -42,11 +46,11 @@ https://github.com/finaldie/auto-news/wiki
 | Component | Minimum Requirements | Recommended  |
 | --------- | -----------          | ----         |
 | OS        | Linux, MacOS         | Linux, MacOS |
-| CPU       | 2 cores              | 4 cores      |
-| Memory    | 6GB                  | 12GB         |
-| Disk      | 20GB                 | 50GB         |
+| CPU       | 2 cores              | 8 cores      |
+| Memory    | 6GB                  | 16GB         |
+| Disk      | 20GB                 | 100GB        |
 
-# Quick Start Guide
+# Quick Start Guide (Docker-compose)
 ## Preparison
 * [Required] [Docker](https://www.docker.com/)
 * [Required] [Notion Token](https://www.notion.so/my-integrations)
@@ -107,6 +111,10 @@ Readings
 Go to Notion `ToRead` database page, all the data will flow into this database later on, create the database views for different sources to help us organize flows easier. E.g. Tweets, Articles, YouTube, RSS, etc
 
 Now, enjoy and have fun.
+
+# Kubernetes Deployment
+
+See the installation guide from: [Installation using Helm](https://github.com/finaldie/auto-news/wiki/Installation-using-Helm)
 
 # Operations
 ## [Monitoring] Control Panel
