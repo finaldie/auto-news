@@ -3,7 +3,8 @@ project: default
 # global vars
 source:
   repoURL: git@github.com:finaldie/auto-news.git
-  targetRevision: HEAD
+  # targetRevision: HEAD
+  targetRevision: undo.argocd.init-240401
   path: helm
 
 destination:
