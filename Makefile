@@ -165,10 +165,9 @@ k8s-env-create:
 	if [ ! -f $(build_dir)/.env.k8s ]; then \
 		cp .env.template.k8s $(build_dir)/.env.k8s; \
 	fi
-	if [ ! -f $(build_dir)/.env.k8s.docker ]; then \
-		cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s.docker; \
-		echo "**env file generating completed (secrets removed):**"; \
-	fi
+	@echo "***Create env file for k8s docker image**"
+	cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|NOTION_ENTRY_PAGE_ID|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s.docker;
+	@echo "**env file generating completed (secrets removed):**";
 	@echo ""
 	cat $(build_dir)/.env.k8s.docker
 	@echo "===="
@@ -178,6 +177,7 @@ k8s-secret-create:
 	-kubectl create secret generic airflow-secrets \
 	-n ${namespace} \
   --from-literal=NOTION_TOKEN=$(NOTION_TOKEN) \
+  --from-literal=NOTION_ENTRY_PAGE_ID=$(NOTION_ENTRY_PAGE_ID) \
   --from-literal=OPENAI_API_KEY=$(OPENAI_API_KEY) \
   --from-literal=GOOGLE_API_KEY=$(GOOGLE_API_KEY) \
   --from-literal=REDDIT_CLIENT_ID=$(REDDIT_CLIENT_ID) \
