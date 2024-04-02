@@ -155,17 +155,35 @@ airflow:
 #######################################################################
 redis:
   enabled: true
-  password: bot
 
-  resources:
-  #   limits:
-  #     cpu: 1
-  #     memory: 1Gi
-    requests:
-      cpu: 200m
-      memory: 32Mi
+  # `standalone` or `replication`
+  architecture: standalone
 
-  affinity: {}
+  # Internal use only, no auth
+  auth:
+    enabled: false
+
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+    resources:
+    #   limits:
+    #     cpu: 1
+    #     memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 32Mi
+
+    affinity: {}
+
+  metrics:
+    enabled: true
+
+    # Enable/disable prometheus service monitor
+    serviceMonitor:
+      enabled: false
 
 
 #######################################################################
