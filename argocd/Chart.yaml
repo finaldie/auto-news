@@ -1,0 +1,15 @@
+name: argo-cd apps - auto-news
+description: A Helm Chart for argo-cd apps - auto-news
+version: 1.0.0
+apiVersion: v2
+keywords:
+  - argo-cd
+  - apps
+  - auto-news
+home: https://github.com/finaldie/auto-news
+sources:
+  - https://github.com/finaldie/auto-news
+
+maintainers:
+  - email: hyzwowtools@gmail.com
+    name: Yuzhang Hu
