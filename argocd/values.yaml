@@ -10,7 +10,7 @@ destination:
   # in-cluster
   server: https://kubernetes.default.svc
 
-# Automated (comment out entire section if disable automation)
-syncPolicy:
-  prune: true
-  selfHeal: true
+## Automated (uncomment below if enable automated sync)
+# syncPolicy:
+#   prune: true
+#   selfHeal: true
