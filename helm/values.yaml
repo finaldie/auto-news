@@ -169,17 +169,22 @@ redis:
       size: 8Gi
 
     resources:
-    #   limits:
-    #     cpu: 1
-    #     memory: 1Gi
+      # limits:
+      #   cpu: 1
+      #   memory: 1Gi
       requests:
-        cpu: 200m
+        cpu: 100m
         memory: 32Mi
 
     affinity: {}
 
   metrics:
     enabled: true
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 32Mi
 
     # Enable/disable prometheus service monitor
     serviceMonitor:
