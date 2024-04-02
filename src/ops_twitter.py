@@ -336,11 +336,14 @@ class OperatorTwitter(OperatorBase):
         tot = 0
         cnt = 0
 
-        min_score_param: str = os.getenv("TWITTER_FILTER_MIN_SCORES")
+        min_score_param: str = os.getenv("TWITTER_FILTER_MIN_SCORES", "")
         min_scores: list = min_score_param.split(",")
 
         min_scores_dict: dict = {}
         for data in min_scores:
+            if not data:
+                continue
+
             print(f"parsing min_score: [{data}]")
 
             if not data or len(data.split(":")) < 2:
