@@ -1,0 +1,16 @@
+project: default
+
+# global vars
+source:
+  repoURL: git@github.com:finaldie/auto-news.git
+  targetRevision: HEAD
+  path: helm
+
+destination:
+  # in-cluster
+  server: https://kubernetes.default.svc
+
+## Automated (uncomment below if enable automated sync)
+# syncPolicy:
+#   prune: true
+#   selfHeal: true

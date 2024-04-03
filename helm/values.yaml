@@ -5,7 +5,7 @@ airflow:
   images:
     airflow:
       repository: finaldie/auto-news
-      tag: 0.9.3
+      tag: 0.9.6
 
     useDefaultImageForMigration: true
 
@@ -155,17 +155,40 @@ airflow:
 #######################################################################
 redis:
   enabled: true
-  password: bot
 
-  resources:
-  #   limits:
-  #     cpu: 1
-  #     memory: 1Gi
-    requests:
-      cpu: 200m
-      memory: 32Mi
+  # `standalone` or `replication`
+  architecture: standalone
 
-  affinity: {}
+  # Internal use only, no auth
+  auth:
+    enabled: false
+
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+    resources:
+      # limits:
+      #   cpu: 1
+      #   memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 32Mi
+
+    affinity: {}
+
+  metrics:
+    enabled: true
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 32Mi
+
+    # Enable/disable prometheus service monitor
+    serviceMonitor:
+      enabled: false
 
 
 #######################################################################

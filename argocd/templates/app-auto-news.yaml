@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: auto-news
+  namespace: argocd
+spec:
+  destination:
+    namespace: {{ .Release.Namespace }}
+    server: {{ .Values.destination.server }}
+  project: {{ .Values.project }}
+  source:
+    repoURL: {{ .Values.source.repoURL }}
+    path: {{ .Values.source.path }}
+    targetRevision: {{ .Values.source.targetRevision }}
+    helm:
+      valueFiles:
+        - values.yaml
+  {{- if .Values.syncPolicy }}
+  syncPolicy:
+    automated:
+      prune: {{ .Values.syncPolicy.prune }}
+      selfHeal: {{ .Values.syncPolicy.selfHeal }}
+  {{- end }}

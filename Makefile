@@ -30,6 +30,10 @@ help:
 	@echo "\_ make k8s-helm-install"
 	@echo "\_ make k8s-airflow-dags-enable"
 	@echo ""
+	@echo "=== ArgoCD deployment ==="
+	@echo "\_ make k8s-argocd-install"
+	@echo "\_ make k8s-airflow-dags-enable"
+	@echo ""
 	@echo "=== k8s port-fowarding ==="
 	@echo "Airflow: 'kubectl port-forward service/auto-news-webserver 8080:8080 --namespace ${namespace} --address=0.0.0.0'"
 	@echo "Milvus : 'kubectl port-forward service/auto-news-milvus-attu -n ${namespace} 9100:3001 --address=0.0.0.0'"
@@ -161,10 +165,9 @@ k8s-env-create:
 	if [ ! -f $(build_dir)/.env.k8s ]; then \
 		cp .env.template.k8s $(build_dir)/.env.k8s; \
 	fi
-	if [ ! -f $(build_dir)/.env.k8s.docker ]; then \
-		cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s.docker; \
-		echo "**env file generating completed (secrets removed):**"; \
-	fi
+	@echo "***Create env file for k8s docker image**"
+	cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|NOTION_ENTRY_PAGE_ID|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s.docker;
+	@echo "**env file generating completed (secrets removed):**";
 	@echo ""
 	cat $(build_dir)/.env.k8s.docker
 	@echo "===="
@@ -174,6 +177,7 @@ k8s-secret-create:
 	-kubectl create secret generic airflow-secrets \
 	-n ${namespace} \
   --from-literal=NOTION_TOKEN=$(NOTION_TOKEN) \
+  --from-literal=NOTION_ENTRY_PAGE_ID=$(NOTION_ENTRY_PAGE_ID) \
   --from-literal=OPENAI_API_KEY=$(OPENAI_API_KEY) \
   --from-literal=GOOGLE_API_KEY=$(GOOGLE_API_KEY) \
   --from-literal=REDDIT_CLIENT_ID=$(REDDIT_CLIENT_ID) \
@@ -239,6 +243,32 @@ airflow-dags-disable:
 	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause journal_daily
 	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause action
 	@echo "Airflow DAGs pausing finished"
+
+k8s-argocd-install:
+	@echo "ArgoCD: Installing Auto-News argocd helm chart..."
+	helm upgrade \
+		--install \
+		--debug \
+		--namespace=${namespace} \
+		--create-namespace \
+		--timeout=${TIMEOUT} \
+		--wait=true \
+		argocd-apps-auto-news \
+		./argocd
+	@echo "ArgoCD: Auto-News argocd helm chart installation finished, goto ArgoCD dashboard to check the service deployment status"
+
+# Notes: uninstall argocd helm chart won't uninstall the auto-news
+# services, to uninstall auto-news, click 'Delete' button from ArgoCD
+# dashboard
+k8s-argocd-uninstall:
+	@echo "ArgoCD uninstallation ..."
+	helm uninstall \
+		--ignore-not-found \
+		--wait=true \
+		--namespace=${namespace} \
+		--debug \
+		argocd-apps-auto-news
+
 
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags
 .PHONY: test upgrade enable_dags info ps help prepare-env docker-network
