@@ -22,7 +22,7 @@ dependencies:
   condition: milvus.enabled
 
 - name: airflow
-  version: '1.13.0'
+  version: '1.13.1'
   repository: https://airflow.apache.org
   # condition: airflow.enabled
 
