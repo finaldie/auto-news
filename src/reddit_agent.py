@@ -94,7 +94,7 @@ class RedditAgent:
             ts = post["data"]["created_utc"]
             dt_utc = datetime.fromtimestamp(ts).isoformat()
             dt_pdt = utils.convertUTC2PDT_str(dt_utc).isoformat()
-            author = post["data"]["author"]
+            author = post["data"].get("author") or post["data"].get("author_fullname") or "unknown_author"
             subreddit = post["data"]["subreddit"]
             title = post["data"]["title"]
             post_long_id = f"{subreddit}_{title}_{author}_{ts}"
