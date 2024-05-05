@@ -17,7 +17,7 @@ type: application
 # User could decide use the below dependencies or setup their own
 dependencies:
 - name: milvus
-  version: '4.1.26'
+  version: '4.1.29'
   repository: https://zilliztech.github.io/milvus-helm
   condition: milvus.enabled
 
