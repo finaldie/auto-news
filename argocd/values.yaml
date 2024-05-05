@@ -3,8 +3,7 @@ project: default
 # global vars
 source:
   repoURL: git@github.com:finaldie/auto-news.git
-  # targetRevision: HEAD
-  targetRevision: undo.milvus.upgrade-240505
+  targetRevision: HEAD
   path: helm
 
 destination:
