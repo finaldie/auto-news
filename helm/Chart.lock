@@ -1,7 +1,7 @@
 dependencies:
 - name: milvus
   repository: https://zilliztech.github.io/milvus-helm
-  version: 4.1.26
+  version: 4.1.29
 - name: airflow
   repository: https://airflow.apache.org
   version: 1.13.1
@@ -14,5 +14,5 @@ dependencies:
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 19.0.1
-digest: sha256:a451f074992366741d9a9023739d96eaa27e2d58a113dcc8d8d46b82aad8b068
-generated: "2024-04-10T02:57:27.256074612Z"
+digest: sha256:6584abbbbd157ed1ef2953d7ab5fab16ed38565e2c3f96dd349907b1f1194bde
+generated: "2024-05-05T17:13:08.719396504Z"

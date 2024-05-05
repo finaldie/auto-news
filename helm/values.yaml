@@ -203,9 +203,9 @@ milvus:
   cluster:
     enabled: false
 
-  image:
-    all:
-      tag: v2.3.8
+  # image:
+  #   all:
+  #     tag: v2.3.8
 
   metrics:
     enabled: true
