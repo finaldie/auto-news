@@ -29,15 +29,15 @@ https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105
 
 ## Features
 - Aggregate feed sources (including RSS, Reddit, Tweets, etc), and proactive generate with insights
-- Gen insights of YouTube videos (Do transcoding if no transcript provided)
-- Gen insights of Web Articles
+- Generate insights of YouTube videos (Do transcoding if no transcript provided)
+- Generate insights of Web Articles
 - Filter content based on personal interests and remove 80%+ noises
 - Unified and central reading experience (RSS reader-like style, Notion-based)
 - Generate `TODO` list from takeaways and journal notes
-- [LLM] Organize Journal notes with summarization and insights
-- [LLM] **Experimental** [Deepdive](https://github.com/finaldie/auto-news/wiki/Deepdive-(Experimental)) topic via web search agent and [autogen](https://github.com/microsoft/autogen)
+- Organize Journal notes with insights daily
+- [Multi-Agents] **Experimental** [Deepdive](https://github.com/finaldie/auto-news/wiki/Deepdive-(Experimental)) topic via web search agent and [autogen](https://github.com/microsoft/autogen)
 - Multi-LLM backend: OpenAI ChatGPT, Google Gemini
-- Weekly top-k aggregations
+- Weekly Top-k Recap
 
 <img src="https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639" width="80%" />
 
