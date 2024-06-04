@@ -8,28 +8,36 @@
 [![iOS](https://img.shields.io/itunes/v/6481704531)](https://apps.apple.com/app/dots-agent/id6481704531)
 [![Android](https://img.shields.io/badge/Google_Play-v1.1.2-blue)](https://play.google.com/store/apps/details?id=com.dotsfy.dotsagent)
 
-A personal news aggregator to pull information from multi-sources + LLM (ChatGPT) to help us read efficiently with less noise, the sources including Tweets, RSS, YouTube, Web Articles, Reddit, and random Journal notes.
+The ultimate personal productivity content aggregator: Designed to effortlessly navigate and maximize your efficiency in the AI era.
 
-## Why need it?
-In the world of this information explosion, we live with noise every day, it becomes even worse after the generative AI was born. Time is a precious resource for each of us, How to use our time more efficiently? It becomes more challenging than ever.
+## Use Cases
 
-Also, think about how much time we spent on pulling/searching/filtering content from different sources, how many times we put the article/paper or long video as a side tab, but never got a chance to look at, and how much effort to organize the information we have read. We need a better way to get rid of the noises, focus on reading the information efficiently based on our interests, and stay on track with the goals we defined.
+1. [x] **Super busy but still wants to catch the trends in a few minutes?** `Yes`
+2. [x] **Want to be a super individual, to handle vast amounts of information in the GenAI world?** `Yes`
+3. [x] **Become a super executor, tell less, and achieve more?** `Yes`
 
-See this [Blog post](https://finaldie.com/blog/auto-news-an-automated-news-aggregator-with-llm/) and these videos [Introduction](https://www.youtube.com/watch?v=hKFIyfAF4Z4), [Data flows](https://www.youtube.com/watch?v=WAGlnRht8LE) for more details.
+With `auto-news` you'll get:
+- `Faster learning:` Navigate trends and catch up in minutes.
+- `Recap reinforcement:` Smooth and periodic memory recall.
+- `Intelligent actions:` Route actions with a single message.
+
+In the AI era, speed and productivity are extremely important. We need AI tools to help us talk less and achieve more!
+
+For more background, see this [Blog post](https://finaldie.com/blog/auto-news-an-automated-news-aggregator-with-llm/) and these videos [Introduction](https://www.youtube.com/watch?v=hKFIyfAF4Z4), [Data flows](https://www.youtube.com/watch?v=WAGlnRht8LE).
 
 https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105aa8ee0ea9
 
 ## Features
-- Aggregate feed sources (including RSS, Reddit, Tweets, etc) with summarization
-- Summarize YouTube videos (generate transcript if needed)
-- Summarize Web Articles (generate transcript if needed)
+- Aggregate feed sources (including RSS, Reddit, Tweets, etc), and proactive generate with insights
+- Generate insights of YouTube videos (Do transcoding if no transcript provided)
+- Generate insights of Web Articles
 - Filter content based on personal interests and remove 80%+ noises
-- A unified/central reading experience (e.g., RSS reader-like style, Notion based)
-- [LLM] Generate `TODO` list from Takeaways/Journal-notes
-- [LLM] Organize Journal notes with summarization and insights
-- [LLM] **Experimental** [Deepdive](https://github.com/finaldie/auto-news/wiki/Deepdive-(Experimental)) topic via web search agent and [autogen](https://github.com/microsoft/autogen)
+- Unified and central reading experience (RSS reader-like style, Notion-based)
+- Generate `TODO` list from takeaways and journal notes
+- Organize Journal notes with insights daily
+- [Multi-Agents] **Experimental** [Deepdive](https://github.com/finaldie/auto-news/wiki/Deepdive-(Experimental)) topic via web search agent and [autogen](https://github.com/microsoft/autogen)
 - Multi-LLM backend: OpenAI ChatGPT, Google Gemini
-- Weekly top-k aggregations
+- Weekly Top-k Recap
 
 <img src="https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639" width="80%" />
 
