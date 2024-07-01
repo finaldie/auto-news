@@ -36,7 +36,7 @@ https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105
 - Generate `TODO` list from takeaways and journal notes
 - Organize Journal notes with insights daily
 - [Multi-Agents] **Experimental** [Deepdive](https://github.com/finaldie/auto-news/wiki/Deepdive-(Experimental)) topic via web search agent and [autogen](https://github.com/microsoft/autogen)
-- Multi-LLM backend: OpenAI ChatGPT, Google Gemini
+- Multi-LLM backend: OpenAI ChatGPT, Google Gemini, Ollama
 - Weekly Top-k Recap
 
 <img src="https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639" width="80%" />
