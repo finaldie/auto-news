@@ -3,6 +3,8 @@
 [![GitHub Build](https://github.com/finaldie/auto-news/actions/workflows/python.yml/badge.svg)](https://github.com/finaldie/auto-news/actions)
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=Flat&logo=kubernetes&logoColor=white)
 ![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=Flat&logo=openai&logoColor=white)
+![Google Gemini](https://img.shields.io/badge/Google%20Gemini-8A2BE2?style=Flat&logo=googlegemini&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-8A2BE2?style=Flat&logo=ollama&logoColor=white)
 ![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=Flat&logo=notion&logoColor=white)
 ![Helm](https://img.shields.io/badge/Helm-0F1689?style=Flat&logo=Helm&labelColor=0F1689)
 [![iOS](https://img.shields.io/itunes/v/6481704531)](https://apps.apple.com/app/dots-agent/id6481704531)
