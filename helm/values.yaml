@@ -2,6 +2,9 @@
 # Upstream values: https://github.com/apache/airflow/blob/main/chart/values.yaml
 
 airflow:
+  defaultAirflowTag: "2.8.4"
+  airflowVersion: "2.8.4"
+
   images:
     airflow:
       repository: finaldie/auto-news
