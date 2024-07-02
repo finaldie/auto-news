@@ -81,12 +81,12 @@ x-airflow-common:
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
-    # - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-    - ${AIRFLOW_PROJ_DIR:-.}/run:/opt/airflow/run
-    - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
+    # - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/dags:/opt/airflow/dags
+    # - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/run:/opt/airflow/run
+    - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/config:/opt/airflow/config
+    - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/data:/opt/airflow/data
     # - ${OBSIDIAN_DIR:-.}:${OBSIDIAN_DIR}
     # - /var/run/docker.sock:/var/run/docker.sock
     # - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
@@ -109,7 +109,7 @@ services:
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
     volumes:
-      - ${POSTGRES_PROJ_DIR}/data:/var/lib/postgresql/data
+      - ${POSTGRES_PROJ_DIR:-./workspace/postgres}/data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
@@ -125,7 +125,7 @@ services:
       - 6379
     volumes:
       # Persist data in host
-      - ${REDIS_PROJ_DIR}/data:/data
+      - ${REDIS_PROJ_DIR:-./workspace/redis}/data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -277,8 +277,8 @@ services:
           echo "   https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#before-you-begin"
           echo
         fi
-        mkdir -p /sources/logs /sources/dags /sources/plugins
-        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        mkdir -p /sources/logs /sources/dags /sources/plugins /sources/data
+        chown -R "${AIRFLOW_UID:-50000}:0" /sources/{logs,dags,plugins,data}
         exec /entrypoint airflow version
     # yamllint enable rule:line-length
     environment:
@@ -291,7 +291,7 @@ services:
       _PIP_ADDITIONAL_REQUIREMENTS: ''
     user: "0:0"
     volumes:
-      - ${AIRFLOW_PROJ_DIR:-.}:/sources
+      - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}:/sources
 
   airflow-cli:
     <<: *airflow-common
@@ -374,7 +374,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-bot}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-bot}
     volumes:
-      - ${MYSQL_PROJ_DIR}/data:/var/lib/mysql
+      - ${MYSQL_PROJ_DIR:-./workspace/mysql}/data:/var/lib/mysql
     # command: --default-authentication-plugin=mysql_native_password
     command: --mysql-native-password=ON
     restart: always
@@ -414,7 +414,7 @@ services:
     networks:
       - bot_network
     volumes:
-      - ${MILVUS_PROJ_DIR:-.}/volumes/etcd:/etcd
+      - ${MILVUS_PROJ_DIR:-./workspace/milvus}/volumes/etcd:/etcd
     command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
     restart: always
 
@@ -427,7 +427,7 @@ services:
     networks:
       - bot_network
     volumes:
-      - ${MILVUS_PROJ_DIR:-.}/volumes/minio:/minio_data
+      - ${MILVUS_PROJ_DIR:-./workspace/milvus}/volumes/minio:/minio_data
     command: minio server /minio_data
     restart: always
     healthcheck:
@@ -446,7 +446,7 @@ services:
     networks:
       - bot_network
     volumes:
-      - ${MILVUS_PROJ_DIR:-.}/volumes/milvus:/var/lib/milvus
+      - ${MILVUS_PROJ_DIR:-./workspace/milvus}/volumes/milvus:/var/lib/milvus
     ports:
       - "19530:19530"
       - "9091:9091"
@@ -463,7 +463,7 @@ services:
     networks:
       - bot_network
     volumes:
-      - ${MILVUS_PROJ_DIR:-.}/volumes/ui:/ui
+      - ${MILVUS_PROJ_DIR:-./workspace/milvus}/volumes/ui:/ui
     ports:
       - "9100:3000"
     restart: always
