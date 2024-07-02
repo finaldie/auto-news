@@ -1,15 +1,12 @@
 help:
 	@echo "deploy|init|start|stop"
 
-# TODO: I don't like the way it is, should be optional.
+# Copy src to target workspace
 deploy-code:
 	echo "Deploying code ..."
 	mkdir -p $(AIRFLOW_PROJ_DIR)
-	if [ ! -d $(BOT_HOME) ]; then \
-		mkdir -p $(AIRFLOW_PROJ_DIR)/run; \
-		cd $(AIRFLOW_PROJ_DIR)/run && git clone $(GITHUB_LINK); \
-		chmod -R 777 $(BOT_HOME)/.git; \
-	fi
+	mkdir -p $(BOT_HOME)/src;
+	cp -r $(topdir)/src/*.py $(BOT_HOME)/src;
 	echo "Deploying code done"
 
 # Airflow operations
