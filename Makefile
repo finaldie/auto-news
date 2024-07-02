@@ -106,7 +106,7 @@ ps:
 
 clean:
 	docker system prune -f
-	docker volume prune
+	docker volume prune -f
 
 info:
 	cd docker && make info topdir=$(topdir)
