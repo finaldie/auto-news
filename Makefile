@@ -73,7 +73,8 @@ prepare-env:
 
 # High-level execution order:
 # deps -> build -> deploy -> init -> start
-deps: prepare-env docker-network
+deps: prepare-env
+# deps: docker-network
 
 repo ?= finaldie/auto-news
 tag ?= 0.9.10
