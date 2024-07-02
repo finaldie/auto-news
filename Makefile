@@ -136,7 +136,7 @@ upgrade:
 #######################################################################
 -include build/.env.k8s
 
-image_repo ?= finaldie/auto-news
+repo ?= finaldie/auto-news
 TIMEOUT ?= 10m0s
 
 # steps to deploy to k8s:
@@ -201,11 +201,11 @@ k8s-secret-delete:
 
 # k8s-docker-build repo=xxx tag=1.0.0
 k8s-docker-build:
-	cd docker && make build-k8s repo=${image_repo} tag=${tag} topdir=$(topdir)
+	cd docker && make build-k8s repo=${repo} tag=${tag} topdir=$(topdir)
 
 # k8s-docker-push repo=xxx tag=1.0.0
 k8s-docker-push:
-	cd docker && make push-k8s repo=${image_repo} tag=${tag}
+	cd docker && make push-k8s repo=${repo} tag=${tag}
 
 k8s-helm-install:
 	cd ./helm && helm dependency build
