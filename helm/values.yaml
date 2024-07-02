@@ -72,6 +72,10 @@ airflow:
       - name: airflow-worker-data-pvc
         mountPath: "/opt/airflow/data"
 
+    logGroomerSidecar:
+      enabled: true
+      retentionDays: 7
+
     args:
       - "bash"
       - "-c"
@@ -101,7 +105,7 @@ airflow:
 
 
   triggerer:
-    replicas: 2
+    replicas: 1
     persistence:
       size: 5Gi
 
@@ -114,7 +118,7 @@ airflow:
         memory: 128Mi
 
   scheduler:
-    replicas: 2
+    replicas: 1
     resources:
       # limits:
       #   cpu: 1
