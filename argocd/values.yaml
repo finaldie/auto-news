@@ -3,7 +3,8 @@ project: default
 # global vars
 source:
   repoURL: git@github.com:finaldie/auto-news.git
-  targetRevision: HEAD
+  # targetRevision: HEAD
+  targetRevision: undo.llm.ollama-240630
   path: helm
 
 destination:
