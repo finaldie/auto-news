@@ -17,11 +17,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Build the Docker image - Local Deployment
-      run: |
-        cd docker && docker build . --file Dockerfile --tag autonews-github-action:$(date +%s)
-
-    - name: Build the Docker image - k8s Deployment
+    - name: Build the Docker image
       run: |
         make k8s-env-create
         make k8s-docker-build repo=autonews-github-action-k8s tag=$(date +%s)
