@@ -134,9 +134,9 @@ upgrade:
 #######################################################################
 # K8S / Helm
 #######################################################################
--include build/.env
+-include build/.env.k8s
 
-image_repo ?= finaldie/auto-news
+repo ?= finaldie/auto-news
 TIMEOUT ?= 10m0s
 
 # steps to deploy to k8s:
@@ -166,10 +166,10 @@ k8s-env-create:
 		cp .env.template.k8s $(build_dir)/.env.k8s; \
 	fi
 	@echo "***Create env file for k8s docker image**"
-	cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|NOTION_ENTRY_PAGE_ID|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD" > $(build_dir)/.env.k8s.docker;
+	cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|NOTION_ENTRY_PAGE_ID|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD|OLLAMA_URL" > $(build_dir)/.env.k8s.generated;
 	@echo "**env file generating completed (secrets removed):**";
 	@echo ""
-	cat $(build_dir)/.env.k8s.docker
+	cat $(build_dir)/.env.k8s.generated
 	@echo "===="
 
 k8s-secret-create:
@@ -189,7 +189,8 @@ k8s-secret-create:
   --from-literal=TWITTER_API_KEY=$(TWITTER_API_KEY) \
   --from-literal=TWITTER_API_KEY_SECRET=$(TWITTER_API_KEY_SECRET) \
   --from-literal=TWITTER_ACCESS_TOKEN=$(TWITTER_ACCESS_TOKEN) \
-  --from-literal=TWITTER_ACCESS_TOKEN_SECRET=$(TWITTER_ACCESS_TOKEN_SECRET)
+  --from-literal=TWITTER_ACCESS_TOKEN_SECRET=$(TWITTER_ACCESS_TOKEN_SECRET) \
+  --from-literal=OLLAMA_URL=$(OLLAMA_URL)
 
 k8s-secret-delete:
 	@echo "**Deleting airflow secret (namespace: ${namespace}) ...**"
@@ -200,11 +201,11 @@ k8s-secret-delete:
 
 # k8s-docker-build repo=xxx tag=1.0.0
 k8s-docker-build:
-	cd docker && make build-k8s repo=${image_repo} tag=${tag} topdir=$(topdir)
+	cd docker && make build-k8s repo=${repo} tag=${tag} topdir=$(topdir)
 
 # k8s-docker-push repo=xxx tag=1.0.0
 k8s-docker-push:
-	cd docker && make push-k8s repo=${image_repo} tag=${tag}
+	cd docker && make push-k8s repo=${repo} tag=${tag}
 
 k8s-helm-install:
 	cd ./helm && helm dependency build

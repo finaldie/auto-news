@@ -150,6 +150,7 @@ class MilvusClient:
         fallback=None,
         emb=None,
         distance_metric="L2",
+        timeout=60,  # timeout (unit second)
     ):
         collection = None
 
@@ -177,12 +178,20 @@ class MilvusClient:
         emb = emb or self.emb_agent.create(text)
 
         result = collection.search(
-            [emb], "embeddings", search_params, topk,
-            output_fields=["item_id"])
+            [emb],
+            "embeddings",
+            search_params,
+            topk,
+            output_fields=["item_id"],
+            timeout=timeout,
+        )
 
         print(f"[Milvus Client] get relevant results: {result}")
 
-        return [{"item_id": item.entity.value_of_field("item_id"), "distance": item.distance} for item in result[0]]
+        return [{
+            "item_id": hit.entity.get("item_id"),
+            "distance": hit.distance
+        } for hit in result[0]]
 
     def exist(self, name):
         return utility.has_collection(name)

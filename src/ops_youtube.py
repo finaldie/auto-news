@@ -9,7 +9,6 @@ from notion import NotionAgent
 from llm_agent import (
     LLMAgentCategoryAndRanking,
     LLMAgentSummary,
-    LLMAgentGemini,
 )
 import utils
 from ops_base import OperatorBase
