@@ -156,6 +156,9 @@ airflow:
       - name: AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS
         value: "true"
 
+  redis:
+    password: bot
+
 
 #######################################################################
 # Redis
