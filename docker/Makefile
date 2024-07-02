@@ -64,7 +64,7 @@ push-k8s:
 	docker push ${repo}:${tag}
 
 deploy: deploy-airflow deploy-postgres deploy-redis deploy-mysql deploy-milvus
-deploy: post-deploy build-k8s
+deploy: post-deploy
 
 
 init: push_dags copy_files

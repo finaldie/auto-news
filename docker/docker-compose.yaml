@@ -450,7 +450,7 @@ services:
 
   milvus-standalone:
     container_name: milvus-standalone
-    image: milvusdb/milvus:v2.2.8
+    image: milvusdb/milvus:v2.4.0
     command: ["milvus", "run", "standalone"]
     environment:
       ETCD_ENDPOINTS: etcd:2379
@@ -469,7 +469,7 @@ services:
 
   milvus-ui:
     container_name: milvus-ui
-    image: zilliz/attu:v2.2.5
+    image: zilliz/attu:v2.3.0
     environment:
       MILVUS_URL: milvus-standalone:19530
     networks:
