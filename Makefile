@@ -75,11 +75,17 @@ prepare-env:
 # deps -> build -> deploy -> init -> start
 deps: prepare-env docker-network
 
+repo ?= finaldie/auto-news
+tag ?= 0.9.10
+
 build:
-	cd docker && make build topdir=$(topdir)
+	cd docker && make build repo=$(repo) tag=$(tag) topdir=$(topdir)
 
 build-nocache:
-	cd docker && make build-nocache topdir=$(topdir)
+	cd docker && make build-nocache repo=$(repo) tag=$(tag) topdir=$(topdir)
+
+push:
+	cd docker && make push repo=$(repo) tag=$(tag)
 
 deploy-airflow:
 	cd docker && make deploy topdir=$(topdir) build_dir=$(build_dir)
@@ -134,9 +140,8 @@ upgrade:
 #######################################################################
 # K8S / Helm
 #######################################################################
--include build/.env.k8s
+# -include build/.env.k8s
 
-repo ?= finaldie/auto-news
 TIMEOUT ?= 10m0s
 
 # steps to deploy to k8s:
@@ -160,37 +165,18 @@ k8s-namespace-create:
 	-kubectl create namespace ${namespace}
 
 k8s-env-create:
-	@echo "***Create env file for k8s**"
+	@echo "**Create env file for k8s**"
 	mkdir -p $(build_dir)
 	if [ ! -f $(build_dir)/.env.k8s ]; then \
 		cp .env.template.k8s $(build_dir)/.env.k8s; \
 	fi
-	@echo "***Create env file for k8s docker image**"
-	cat $(build_dir)/.env.k8s | grep -vE "NOTION_TOKEN|NOTION_ENTRY_PAGE_ID|OPENAI_API_KEY|GOOGLE_API_KEY|REDDIT_CLIENT_ID|REDDIT_CLIENT_SECRET|AUTOGEN_GPT4_API_KEY|AUTOGEN_GPT3_API_KEY|TWITTER_API_KEY|TWITTER_API_KEY_SECRET|TWITTER_ACCESS_TOKEN|TWITTER_ACCESS_TOKEN_SECRET|MYSQL_USER|MYSQL_PASSWORD|OLLAMA_URL" > $(build_dir)/.env.k8s.generated;
-	@echo "**env file generating completed (secrets removed):**";
-	@echo ""
-	cat $(build_dir)/.env.k8s.generated
-	@echo "===="
+	@echo "Review and adjust $(build_dir)/.env.k8s if needed"
 
 k8s-secret-create:
 	@echo "**Create airflow secret (namespace: ${namespace})**"
 	-kubectl create secret generic airflow-secrets \
 	-n ${namespace} \
-  --from-literal=NOTION_TOKEN=$(NOTION_TOKEN) \
-  --from-literal=NOTION_ENTRY_PAGE_ID=$(NOTION_ENTRY_PAGE_ID) \
-  --from-literal=OPENAI_API_KEY=$(OPENAI_API_KEY) \
-  --from-literal=GOOGLE_API_KEY=$(GOOGLE_API_KEY) \
-  --from-literal=REDDIT_CLIENT_ID=$(REDDIT_CLIENT_ID) \
-  --from-literal=REDDIT_CLIENT_SECRET=$(REDDIT_CLIENT_SECRET) \
-  --from-literal=MYSQL_USER=$(MYSQL_USER) \
-  --from-literal=MYSQL_PASSWORD=$(MYSQL_PASSWORD) \
-  --from-literal=AUTOGEN_GPT4_API_KEY=$(AUTOGEN_GPT4_API_KEY) \
-  --from-literal=AUTOGEN_GPT3_API_KEY=$(AUTOGEN_GPT3_API_KEY) \
-  --from-literal=TWITTER_API_KEY=$(TWITTER_API_KEY) \
-  --from-literal=TWITTER_API_KEY_SECRET=$(TWITTER_API_KEY_SECRET) \
-  --from-literal=TWITTER_ACCESS_TOKEN=$(TWITTER_ACCESS_TOKEN) \
-  --from-literal=TWITTER_ACCESS_TOKEN_SECRET=$(TWITTER_ACCESS_TOKEN_SECRET) \
-  --from-literal=OLLAMA_URL=$(OLLAMA_URL)
+	--from-env-file=build/.env.k8s
 
 k8s-secret-delete:
 	@echo "**Deleting airflow secret (namespace: ${namespace}) ...**"
@@ -201,11 +187,11 @@ k8s-secret-delete:
 
 # k8s-docker-build repo=xxx tag=1.0.0
 k8s-docker-build:
-	cd docker && make build-k8s repo=${repo} tag=${tag} topdir=$(topdir)
+	cd docker && make build repo=${repo} tag=${tag} topdir=$(topdir)
 
 # k8s-docker-push repo=xxx tag=1.0.0
 k8s-docker-push:
-	cd docker && make push-k8s repo=${repo} tag=${tag}
+	cd docker && make push repo=${repo} tag=${tag}
 
 k8s-helm-install:
 	cd ./helm && helm dependency build
