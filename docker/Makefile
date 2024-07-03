@@ -1,21 +1,18 @@
 help:
 	@echo "deploy|init|start|stop"
 
-# TODO: I don't like the way it is, should be optional.
+# Copy src to target workspace
 deploy-code:
 	echo "Deploying code ..."
 	mkdir -p $(AIRFLOW_PROJ_DIR)
-	if [ ! -d $(BOT_HOME) ]; then \
-		mkdir -p $(AIRFLOW_PROJ_DIR)/run; \
-		cd $(AIRFLOW_PROJ_DIR)/run && git clone $(GITHUB_LINK); \
-		chmod -R 777 $(BOT_HOME)/.git; \
-	fi
+	mkdir -p $(BOT_HOME)/src;
+	cp -r $(topdir)/src/*.py $(BOT_HOME)/src;
 	echo "Deploying code done"
 
 # Airflow operations
 # - The init steps: in venv, install.sh -> init-airflow -> push_dag
 # - Then go to airflow home, start web and scheduler
-deploy-airflow: deploy-code
+deploy-airflow:
 	@echo "Assembling Airflow ..."
 	mkdir -p $(AIRFLOW_PROJ_DIR)
 	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs config plugins run data
@@ -48,23 +45,22 @@ init-airflow:
 	docker compose --env-file ../build/.env up airflow-init
 
 # Platform targets
+# build repo=xxx tag=1.0.0
 build:
-	docker compose build
+	@echo "Building docker image, topdir: [$(topdir)]"
+	docker build --pull --rm -t ${repo}:${tag} -f Dockerfile $(topdir)
 
+# build repo=xxx tag=1.0.0
 build-nocache:
-	docker compose build --no-cache
+	@echo "Building docker image (no-cache), topdir: [$(topdir)]"
+	docker build --pull --no-cache --rm -t ${repo}:${tag} -f Dockerfile $(topdir)
 
-# build-k8s repo=xxx tag=1.0.0
-build-k8s:
-	@echo "Building docker image for k8s environment, topdir: [$(topdir)]"
-	docker build --pull --rm -t ${repo}:${tag} -f Dockerfile.k8s $(topdir)
-
-# push-k8s repo=xxx tag=1.0.0
-push-k8s:
+# push repo=xxx tag=1.0.0
+push:
 	docker push ${repo}:${tag}
 
 deploy: deploy-airflow deploy-postgres deploy-redis deploy-mysql deploy-milvus
-deploy: post-deploy build-k8s
+deploy: post-deploy
 
 
 init: push_dags copy_files

@@ -8,6 +8,7 @@ from langchain.text_splitter import (
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.summarize import load_summarize_chain
+from langchain_community.chat_models import ChatOllama
 from langchain_community.document_loaders import YoutubeLoader
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.document_loaders import ArxivLoader
@@ -217,6 +218,16 @@ class LLMAgentBase:
             llm = ChatGoogleGenerativeAI(
                 model=model_name,
                 temperature=temperature)
+
+        elif provider == "ollama":
+            model_name = model_name or os.getenv("OLLAMA_MODEL", "llama3")
+            ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+
+            llm = ChatOllama(
+                base_url=ollama_url,
+                model=model_name,
+                temperature=temperature,
+            )
 
         else:
             print(f"[ERROR] Non-supported LLM provider: {provider}")
