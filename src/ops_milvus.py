@@ -1,3 +1,4 @@
+import os
 import json
 import copy
 import traceback
@@ -7,6 +8,7 @@ from db_cli import DBClient
 from notion import NotionAgent
 from milvus_cli import MilvusClient
 from embedding_agent import EmbeddingAgent
+import embedding_utils as emb_utils
 import utils
 
 
@@ -154,21 +156,24 @@ class OperatorMilvus:
             db_client=client,
             key_ttl=key_ttl)
 
+        # response_arr: [{item_id, distance}, ...]
         response_arr = milvus_client.get(
             collection_name, text, topk=topk,
             fallback=fallback, emb=embedding)
 
+        # filter by distance (similiarity value) according to the
+        # metrics type
+        metric_type = os.getenv("MILVUS_SIMILARITY_METRICS", "L2")
+        valid_embs = emb_utils.similarity_topk(response_arr, metric_type, max_distance, topk)
+        print(f"[get_relevant] metric_type: {metric_type}, max_distance: {max_distance}, raw emb response_arr size: {len(response_arr)}, post emb_utils.topk: {len(valid_embs)}")
+
         res = []
 
-        for response in response_arr:
+        for response in valid_embs:
             print(f"[get_relevant] Processing response: {response}")
 
             page_id = response["item_id"]
             distance = response["distance"]
-
-            if distance > max_distance:
-                print(f"[get_relevant] Filtered it out due to the distance: {distance} > max_distance {max_distance}, page_id: {page_id}")
-                continue
 
             page_metadata = client.get_page_item_id(page_id)
 

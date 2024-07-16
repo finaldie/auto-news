@@ -2,6 +2,7 @@ import os
 from embedding_openai import EmbeddingOpenAI
 from embedding_hf import EmbeddingHuggingFace
 from embedding_hf_inst import EmbeddingHuggingFaceInstruct
+from embedding_ollama import EmbeddingOllama
 
 
 class EmbeddingAgent:
@@ -30,6 +31,10 @@ class EmbeddingAgent:
 
         elif self.provider == "hkunlp/instructor-xl":
             self.model = EmbeddingHuggingFaceInstruct(model_name=self.model_name)
+
+        elif self.provider == "ollama":
+            self.model = EmbeddingOllama(model_name=self.model_name)
+
         else:
             print(f"[ERROR] Unknown embedding model: {self.model_name}")
             return None
