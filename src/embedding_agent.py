@@ -36,7 +36,7 @@ class EmbeddingAgent:
             self.model = EmbeddingOllama(model_name=self.model_name)
 
         else:
-            print(f"[ERROR] Unknown embedding model: {self.model_name}")
+            print(f"[ERROR] Unknown embedding provider: {self.provider}")
             return None
 
     def dim(self):
