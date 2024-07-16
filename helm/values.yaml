@@ -7,8 +7,10 @@ airflow:
 
   images:
     airflow:
-      repository: finaldie/auto-news
-      tag: 0.9.10
+      # repository: finaldie/auto-news
+      # tag: 0.9.10
+      repository: finaldie/auto-news-staging
+      tag: 0.9.12
 
     useDefaultImageForMigration: true
 
