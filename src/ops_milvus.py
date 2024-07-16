@@ -306,7 +306,7 @@ class OperatorMilvus:
         print(f"Collections: {collections}")
 
         for name in collections:
-            suffix = name.split("__")[1]
+            suffix = name.split("__")[-1]
             dt = date.fromisoformat(suffix.replace("_", "-"))
             stats = milvus_client.get_stats(name)
 
