@@ -4,7 +4,7 @@ import time
 
 import numpy as np
 
-from common.embedding import Embedding
+from embedding import Embedding
 from langchain_community.embeddings import OllamaEmbeddings
 import utils
 
