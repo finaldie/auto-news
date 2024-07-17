@@ -27,7 +27,7 @@ In the AI era, speed and productivity are extremely important. We need AI tools 
 
 For more background, see this [Blog post](https://finaldie.com/blog/auto-news-an-automated-news-aggregator-with-llm/) and these videos [Introduction](https://www.youtube.com/watch?v=hKFIyfAF4Z4), [Data flows](https://www.youtube.com/watch?v=WAGlnRht8LE).
 
-https://github.com/finaldie/auto-news/assets/1088543/4387f688-61d3-4270-b5a6-105aa8ee0ea9
+[<img src="https://img.youtube.com/vi/hKFIyfAF4Z4/0.jpg" width="80%" />](https://www.youtube.com/watch?v=hKFIyfAF4Z4 "AutoNews Intro on YouTube")
 
 ## Features
 - Aggregate feed sources (including RSS, Reddit, Tweets, etc), and proactive generate with insights

@@ -49,8 +49,10 @@ class MilvusClient:
         name="embedding_table",
         desc="embeddings",
         dim=1536,
-        distance_metric="L2",
+        distance_metric="",
     ):
+        distance_metric = distance_metric or os.getenv("MILVUS_SIMILARITY_METRICS", "L2")
+
         # Create table schema
         self.fields = [
             FieldSchema(name="pk",
@@ -149,9 +151,10 @@ class MilvusClient:
         topk=1,
         fallback=None,
         emb=None,
-        distance_metric="L2",
+        distance_metric="",
         timeout=60,  # timeout (unit second)
     ):
+        distance_metric = distance_metric or os.getenv("MILVUS_SIMILARITY_METRICS", "L2")
         collection = None
 
         try:
