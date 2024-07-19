@@ -34,12 +34,12 @@ For more background, see this [Blog post](https://finaldie.com/blog/auto-news-an
 - Generate insights of YouTube videos (Do transcoding if no transcript provided)
 - Generate insights of Web Articles
 - Filter content based on personal interests and remove 80%+ noises
+- Weekly Top-k Recap
 - Unified and central reading experience (RSS reader-like style, Notion-based)
 - Generate `TODO` list from takeaways and journal notes
 - Organize Journal notes with insights daily
 - [Multi-Agents] **Experimental** [Deepdive](https://github.com/finaldie/auto-news/wiki/Deepdive-(Experimental)) topic via web search agent and [autogen](https://github.com/microsoft/autogen)
 - Multi-LLM backend: OpenAI ChatGPT, Google Gemini, Ollama
-- Weekly Top-k Recap
 
 <img src="https://github.com/finaldie/auto-news/assets/1088543/778242a7-5811-49e1-8982-8bd32d141639" width="80%" />
 
@@ -61,15 +61,16 @@ For more details, please check out the [App official website](https://dotsfy.com
 The client is using [Notion](https://www.notion.so/), and the backend is fully `self-hosted` by ourselves.
 
 #### Backend System Requirements
-| Component | Minimum Requirements | Recommended  |
-| --------- | -----------          | ----         |
-| OS        | Linux, MacOS         | Linux, MacOS |
-| CPU       | 2 cores              | 8 cores      |
-| Memory    | 6GB                  | 16GB         |
-| Disk      | 20GB                 | 100GB        |
+| Component | Minimum      | Recommended  |
+| --------- | -----------  | ----         |
+| OS        | Linux, MacOS | Linux, MacOS |
+| CPU       | 2 cores      | 8 cores      |
+| Memory    | 6GB          | 16GB         |
+| Disk      | 20GB         | 100GB        |
 
 #### Docker-compose
 - [Installation using Docker-compose](https://github.com/finaldie/auto-news/wiki/Docker-Installation)
+- [Installation using Portainer](https://github.com/finaldie/auto-news/wiki/Installation-using-Portainer)
 
 #### Kubernetes
 - [Installation using Helm](https://github.com/finaldie/auto-news/wiki/Installation-using-Helm)
