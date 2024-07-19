@@ -61,15 +61,16 @@ For more details, please check out the [App official website](https://dotsfy.com
 The client is using [Notion](https://www.notion.so/), and the backend is fully `self-hosted` by ourselves.
 
 #### Backend System Requirements
-| Component | Minimum Requirements | Recommended  |
-| --------- | -----------          | ----         |
-| OS        | Linux, MacOS         | Linux, MacOS |
-| CPU       | 2 cores              | 8 cores      |
-| Memory    | 6GB                  | 16GB         |
-| Disk      | 20GB                 | 100GB        |
+| Component | Minimum      | Recommended  |
+| --------- | -----------  | ----         |
+| OS        | Linux, MacOS | Linux, MacOS |
+| CPU       | 2 cores      | 8 cores      |
+| Memory    | 6GB          | 16GB         |
+| Disk      | 20GB         | 100GB        |
 
 #### Docker-compose
 - [Installation using Docker-compose](https://github.com/finaldie/auto-news/wiki/Docker-Installation)
+- [Installation using Portainer](https://github.com/finaldie/auto-news/wiki/Installation-using-Portainer)
 
 #### Kubernetes
 - [Installation using Helm](https://github.com/finaldie/auto-news/wiki/Installation-using-Helm)
