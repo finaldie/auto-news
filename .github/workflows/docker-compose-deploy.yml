@@ -1,0 +1,23 @@
+name: Docker compose deploy (pre-start)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Docker compose deploy (pre-start)
+      run: |
+        make deps
+        make deploy

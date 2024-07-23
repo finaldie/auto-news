@@ -77,7 +77,7 @@ deps: prepare-env
 # deps: docker-network
 
 repo ?= finaldie/auto-news
-tag ?= 0.9.10
+tag ?= 0.9.11
 
 build:
 	cd docker && make build repo=$(repo) tag=$(tag) topdir=$(topdir)
@@ -94,7 +94,7 @@ deploy-airflow:
 deploy-env:
 	cp $(build_dir)/.env $(BOT_HOME)/src
 
-deploy: deploy-airflow deploy-env
+deploy: deploy-airflow
 
 init: deploy-env
 	cd docker && make init topdir=$(topdir)
