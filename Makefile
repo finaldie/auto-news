@@ -94,7 +94,7 @@ deploy-airflow:
 deploy-env:
 	cp $(build_dir)/.env $(BOT_HOME)/src
 
-deploy: deploy-airflow deploy-env
+deploy: deploy-airflow
 
 init: deploy-env
 	cd docker && make init topdir=$(topdir)
