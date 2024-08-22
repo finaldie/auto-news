@@ -147,7 +147,6 @@ def dist(args, data, source, target):
 
 
 def run(args):
-    print(f"environment: {os.environ}")
     sources = args.sources.split(",")
     targets = args.targets.split(",")
     exec_date = date.fromisoformat(args.start)

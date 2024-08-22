@@ -26,7 +26,6 @@ def pull(args, op, sources):
     print("######################################################")
     print("# Pull Journal")
     print("######################################################")
-    print(f"environment: {os.environ}")
     data = op.pull(sources=sources)
     return data
 

@@ -77,7 +77,6 @@ def publish_dd(args, op, pages, targets):
 
 
 def run(args):
-    print(f"environment: {os.environ}")
     targets = args.targets.split(",")
     exec_date = date.fromisoformat(args.start)
     workdir = os.getenv("WORKDIR")

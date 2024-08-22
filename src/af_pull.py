@@ -35,7 +35,6 @@ def pull_twitter(args, op):
     print("######################################################")
     print("# Pull from Twitter")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     def run():
         return op.pull(args.pulling_count, args.pulling_interval)
@@ -60,7 +59,6 @@ def pull_article(args, op):
     print("######################################################")
     print("# Pull from Inbox - Articles")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     def run():
         return op.pull()
@@ -82,7 +80,6 @@ def pull_youtube(args, op):
     print("######################################################")
     print("# Pull from Inbox - Youtube")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     def run():
         return op.pull(data_folder=args.data_folder, run_id=args.run_id)
@@ -104,7 +101,6 @@ def pull_rss(args, op):
     print("######################################################")
     print("# Pull from RSS")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     def run():
         return op.pull()
@@ -126,7 +122,6 @@ def pull_reddit(args, op):
     print("######################################################")
     print("# Pull from Reddit")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     def run():
         pulling_count = os.getenv("REDDIT_PULLING_COUNT", 25)

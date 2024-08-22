@@ -26,7 +26,6 @@ def pull_todo(args, op):
     print("######################################################")
     print("# TODO: Pulling")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     # Pull from non-TODO sources (past N days)
     # - Takeaways
@@ -50,7 +49,6 @@ def pull_deepdive(args, op):
     print("######################################################")
     print("# DeepDive: Pulling")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     # Pull from non-TODO sources (past N days)
     # - Takeaways

@@ -30,7 +30,6 @@ def pull(args, op, sources):
     print("######################################################")
     print("# Pull Collections")
     print("######################################################")
-    print(f"environment: {os.environ}")
     data = op.pull(collection_type=args.collection_type, sources=sources)
     filtered_data = op.pre_filter(data, min_score=args.min_rating)
     return filtered_data

@@ -220,7 +220,6 @@ def process_reddit(args):
 
 
 def run(args):
-    print(f"environment: {os.environ}")
     sources = args.sources.split(",")
     stats = []
 

@@ -72,7 +72,6 @@ def publish(args, op, data, takeaway_pages, targets):
 
 
 def run(args):
-    print(f"environment: {os.environ}")
     sources = args.sources.split(",")
     targets = args.targets.split(",")
     exec_date = date.fromisoformat(args.start)
