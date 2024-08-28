@@ -26,10 +26,10 @@ class EmbeddingAgent:
         if self.provider == "openai":
             self.model = EmbeddingOpenAI(model_name=self.model_name)
 
-        elif self.provider == "all-MiniLM-L6-v2":
+        elif self.provider == "hf":
             self.model = EmbeddingHuggingFace(model_name=self.model_name)
 
-        elif self.provider == "hkunlp/instructor-xl":
+        elif self.provider == "hf_inst":
             self.model = EmbeddingHuggingFaceInstruct(model_name=self.model_name)
 
         elif self.provider == "ollama":

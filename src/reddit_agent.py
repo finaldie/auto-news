@@ -102,9 +102,9 @@ class RedditAgent:
 
             page_url = post["data"]["url"]
             if page_url.startswith("/r/"):
-                print("[RedditAgent]: Fixing page_url: original: {page_url}")
+                print(f"[RedditAgent]: Fixing page_url: original: {page_url}")
                 page_url = f"https://www.reddit.com{page_url}"
-                print("[RedditAgent]: Fixing page_url: Fixed: {page_url}")
+                print(f"[RedditAgent]: Fixing page_url: Fixed: {page_url}")
 
             page_permalink = f'https://www.reddit.com{post["data"]["permalink"]}'
             is_video = self._is_video(post, page_url)
