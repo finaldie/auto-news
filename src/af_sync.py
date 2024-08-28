@@ -30,7 +30,6 @@ def pull_twitter(args, op, source):
     print("######################################################")
     print("# Pull from Twitter")
     print("######################################################")
-    print(f"environment: {os.environ}")
     data = op.sync(source)
     return data
 
@@ -53,7 +52,6 @@ def pull_article(args, op, source):
     print("######################################################")
     print("# Pull from Inbox - Articles")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     data = op.sync(source)
     return data
@@ -74,7 +72,6 @@ def pull_youtube(args, op, source):
     print("######################################################")
     print("# Pull from Inbox - Youtube")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     data = op.sync(source)
 
@@ -97,7 +94,6 @@ def pull_rss(args, op, source):
     print("######################################################")
     print("# Pull from Inbox - RSS")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     data = op.sync(source)
 
@@ -120,7 +116,6 @@ def pull_reddit(args, op, source):
     print("######################################################")
     print("# Pull from Inbox - Reddit")
     print("######################################################")
-    print(f"environment: {os.environ}")
 
     data = op.sync(source)
 
