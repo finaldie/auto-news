@@ -1,6 +1,8 @@
-###############################################################################
+########################################################################
 # Embedding Utils
-###############################################################################
+########################################################################
+import numpy as np
+
 
 def similarity_topk(embedding_items: list, metric_type, threshold=None, k=3):
     """
@@ -64,3 +66,7 @@ def similarity_topk_cosine(items: list, threshold, k):
 
     # The returned value is sorted by most similar -> least similar
     return sorted_items[:k]
+
+
+def l2_norm(emb):
+    return (np.array(emb) / np.linalg.norm(emb)).tolist()
