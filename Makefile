@@ -77,7 +77,7 @@ deps: prepare-env
 # deps: docker-network
 
 repo ?= finaldie/auto-news
-tag ?= 0.9.12
+tag ?= 0.9.13
 
 build:
 	cd docker && make build repo=$(repo) tag=$(tag) topdir=$(topdir)

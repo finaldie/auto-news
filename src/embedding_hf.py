@@ -4,6 +4,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from embedding import Embedding
 from db_cli import DBClient
 import utils
+import embedding_utils as emb_utils
 
 
 class EmbeddingHuggingFace(Embedding):
@@ -12,7 +13,7 @@ class EmbeddingHuggingFace(Embedding):
     from HuggingFace)
     """
     def __init__(self, model_name="all-MiniLM-L6-v2"):
-        super.__init__(model_name)
+        super().__init__(model_name)
 
         self.api = HuggingFaceEmbeddings(model_name=self.model_name)
         print("Initialized EmbeddingHuggingFace")
@@ -23,12 +24,17 @@ class EmbeddingHuggingFace(Embedding):
     def getname(self, start_date, prefix="news"):
         return f"{prefix}_embedding_hf_{start_date}".replace("-", "_")
 
-    def create(self, text: str):
+    def create(self, text: str, normalize=True):
         """
-        It creates the embedding with 1536 dimentions by default
+        Query local HF embedding model
         """
 
-        return self.api.embed_query(text)
+        emb = self.api.embed_query(text)
+
+        if normalize:
+            emb = emb_utils.l2_norm(emb)
+
+        return emb
 
     def get_or_create(
         self,
