@@ -364,7 +364,7 @@ services:
         condition: service_completed_successfully
 
   mysql:
-    image: mysql:latest
+    image: mysql:8.4.2
     container_name: mysql-db
     networks:
       - bot_network
