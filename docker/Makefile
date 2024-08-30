@@ -17,6 +17,8 @@ deploy-airflow:
 	mkdir -p $(AIRFLOW_PROJ_DIR)
 	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs config plugins run data
 	cd $(AIRFLOW_PROJ_DIR) && chmod 777 run/ data/
+	@echo "Copy environment file ..."
+	cp $(topdir)/build/.env $(AIRFLOW_PROJ_DIR)/config
 	@echo "Airflow deployment finished"
 
 deploy-postgres:
@@ -66,7 +68,8 @@ deploy: post-deploy
 init: push_dags copy_files
 
 start-services:
-	docker-compose --env-file ../build/.env up -d
+	echo "Starting services with env file: $(topdir)/build/.env"
+	docker compose --env-file $(topdir)/build/.env up -d
 
 start: start-services
 	@echo ""
@@ -76,27 +79,27 @@ start: start-services
 	@echo "- Adminer: http://`hostname`:8070"
 
 stop:
-	docker-compose down
+	docker compose down
 
 logs:
-	docker-compose logs -n 1000
+	docker compose logs -n 1000
 
 ps:
-	docker-compose ps
+	docker compose ps
 
 info:
-	docker-compose run airflow-cli airflow info
-	docker-compose run airflow-cli airflow dags list
+	docker compose run airflow-cli airflow info
+	docker compose run airflow-cli airflow dags list
 
 upgrade:
-	docker-compose run airflow-cli airflow dags trigger upgrade
+	docker compose run airflow-cli airflow dags trigger upgrade
 
 enable_dags:
-	docker-compose run airflow-cli airflow dags unpause news_pulling
-	docker-compose run airflow-cli airflow dags unpause sync_dist
-	docker-compose run airflow-cli airflow dags unpause collection_weekly
-	docker-compose run airflow-cli airflow dags unpause upgrade
-	docker-compose run airflow-cli airflow dags unpause journal_daily
+	docker compose run airflow-cli airflow dags unpause news_pulling
+	docker compose run airflow-cli airflow dags unpause sync_dist
+	docker compose run airflow-cli airflow dags unpause collection_weekly
+	docker compose run airflow-cli airflow dags unpause upgrade
+	docker compose run airflow-cli airflow dags unpause journal_daily
 
 push_dags:
 	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags

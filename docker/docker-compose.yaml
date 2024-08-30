@@ -87,9 +87,6 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/data:/opt/airflow/data
-    # - ${OBSIDIAN_DIR:-.}:${OBSIDIAN_DIR}
-    # - /var/run/docker.sock:/var/run/docker.sock
-    # - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
   # user: "${AIRFLOW_UID:-50000}:0"
   user: "${AIRFLOW_UID:-0}:0"
   depends_on:
@@ -177,6 +174,9 @@ services:
       - |
         echo "User: `id`"
         echo "PWD: `pwd`"
+        echo "Environment vars:"
+        env
+        echo "----"
         pip install --upgrade pip
         echo "=================================================="
         echo "Upgrade pip packages from requirements-local.txt  "
@@ -189,6 +189,16 @@ services:
           echo "[pip] langchain version (after): `pip list | grep langchain`"
         fi
         pip3 install httpx[socks]
+        echo "=================================================="
+        echo "Picking up environment file "
+        echo "=================================================="
+        if [ -f ~/airflow/config/.env ]; then
+          cp ~/airflow/config/.env ~/airflow/run/auto-news/src
+          echo "Copied environment file to the runtime."
+        else
+          echo "ERROR: Environment file not found, exit"
+          exit 1
+        fi
         echo "=================================================="
         echo "Start airflow worker ...  "
         echo "=================================================="
@@ -317,7 +327,21 @@ services:
         echo "User: `id`"
         echo "PWD: `pwd`"
         echo "----"
+        echo "Env"
+        env
+        echo "=================================================="
+        echo "Picking up environment file "
+        echo "=================================================="
+        if [ -f ~/airflow/config/.env ]; then
+          cp ~/airflow/config/.env ~/airflow/run/auto-news/src
+          echo "Copied environment file to the runtime."
+        else
+          echo "ERROR: Environment file not found, exit"
+          exit 1
+        fi
+        echo "=================================================="
         echo "Apply patches ..."
+        echo "=================================================="
         python3 ~/airflow/run/auto-news/src/patches.py
         echo "Apply patches finished"
         echo "----"
