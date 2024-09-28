@@ -46,7 +46,7 @@ class EmbeddingHuggingFace(Embedding):
         """
         client = db_client or DBClient()
 
-        embedding = client.get_embedding_item_id(
+        embedding = client.get_milvus_embedding_item_id(
             "hf",
             self.model_name,
             source,
@@ -56,7 +56,7 @@ class EmbeddingHuggingFace(Embedding):
             embedding = self.create(text)
 
             # store embedding into redis (ttl = 1 month)
-            client.set_embedding_item_id(
+            client.set_milvus_embedding_item_id(
                 "hf",
                 self.model_name,
                 source,

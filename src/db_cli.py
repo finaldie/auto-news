@@ -86,23 +86,6 @@ class DBClient(DBClientBase):
         key = key_tpl.format(source, category, item_id)
         self.driver.set(key, "true", **kwargs)
 
-    def get_embedding_item_id(self, source, provider, item_id):
-        key_tpl = data_model.EMBEDDING_ITEM_ID
-        key = key_tpl.format(source, provider, item_id)
-        return self.driver.get(key)
-
-    def set_embedding_item_id(
-        self,
-        source,
-        provider,
-        item_id,
-        embed: list,
-        **kwargs
-    ):
-        key_tpl = data_model.EMBEDDING_ITEM_ID
-        key = key_tpl.format(source, provider, item_id)
-        self.driver.set(key, embed, **kwargs)
-
     def get_milvus_embedding_item_id(
         self,
         provider,
