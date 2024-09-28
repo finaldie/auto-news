@@ -35,12 +35,6 @@ class EmbeddingOllama(Embedding):
         self.dimensions = len(query_result)
         return self.dimensions
 
-    def getname(self, start_date, prefix="ollama"):
-        """
-        Get a embedding collection name of milvus
-        """
-        return f"embedding__{prefix}__ollama_{self.model_name}__{start_date}".replace("-", "_")
-
     def create(
         self,
         text: str,

@@ -21,9 +21,6 @@ class EmbeddingOpenAI_0x(Embedding):
     def dim(self):
         return 1536
 
-    def getname(self, start_date, prefix="news"):
-        return f"{prefix}_embedding__{start_date}".replace("-", "_")
-
     def create(
         self,
         text: str,

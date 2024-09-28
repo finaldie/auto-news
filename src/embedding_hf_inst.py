@@ -21,9 +21,6 @@ class EmbeddingHuggingFaceInstruct(Embedding):
     def dim(self):
         return 384
 
-    def getname(self, start_date, prefix="news"):
-        return f"{prefix}_embedding_hf_inst_{start_date}".replace("-", "_")
-
     def create(self, text: str, normalize=True):
         """
         Query local HF embedding model
