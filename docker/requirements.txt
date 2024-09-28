@@ -6,6 +6,7 @@ langchain==0.3.1
 langchain-community==0.3.1
 langchain-google-genai
 transformers
+sentence_transformers
 pillow
 tiktoken
 openai
