@@ -21,9 +21,6 @@ class EmbeddingHuggingFaceInstruct(Embedding):
     def dim(self):
         return 384
 
-    def getname(self, start_date, prefix="news"):
-        return f"{prefix}_embedding_hf_inst_{start_date}".replace("-", "_")
-
     def create(self, text: str, normalize=True):
         """
         Query local HF embedding model
@@ -49,7 +46,7 @@ class EmbeddingHuggingFaceInstruct(Embedding):
         """
         client = db_client or DBClient()
 
-        embedding = client.get_embedding_item_id(
+        embedding = client.get_milvus_embedding_item_id(
             "hf_inst",
             self.model_name,
             source,
@@ -59,7 +56,7 @@ class EmbeddingHuggingFaceInstruct(Embedding):
             embedding = self.create(text)
 
             # store embedding into redis (ttl = 1 month)
-            client.set_embedding_item_id(
+            client.set_milvus_embedding_item_id(
                 "hf_inst",
                 self.model_name,
                 source,
