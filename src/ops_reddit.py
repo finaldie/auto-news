@@ -450,12 +450,15 @@ class OperatorReddit(OperatorBase):
                         print(f"[ERROR] Exception from llm_agent.run(): {e}")
 
                     if not summary and os.getenv("LLM_PROVIDER", "") != "openai":
-                        print("Fallback to OpenAI")
-                        fallback_agent = LLMAgentSummary()
-                        fallback_agent.init_prompt()
-                        fallback_agent.init_llm(provider="openai")
+                        try:
+                            print("Fallback to OpenAI")
+                            fallback_agent = LLMAgentSummary()
+                            fallback_agent.init_prompt()
+                            fallback_agent.init_llm(provider="openai")
 
-                        summary = fallback_agent.run(content)
+                            summary = fallback_agent.run(content)
+                        except Exception as e:
+                            print(f"[ERROR] Exception from fallback_agent.run(): {e}")
 
                 else:
                     print("Found llm summary from cache, decoding (utf-8) ...")
