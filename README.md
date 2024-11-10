@@ -48,12 +48,13 @@ https://github.com/finaldie/auto-news/wiki
 
 ## Installation
 ### :star: :star: Managed Solution :star: :star:
-Great News! Now we have the in-house managed solution, it is powered by the `auto-news` as the backend. For the client App, download it from `App Store` or `Google Play`, install and enjoy. It is the **quickest** and **easiest** solution for anyone who doesn't want to/or does not have time to set up by themselves. (**Notes:** _App is available in US and Canada at this point_)
+Great News! Now we have the in-house managed solution, it is powered by the `auto-news` as the backend. It supports the [Web version](https://dots.dotsfy.com/) and the mobile Apps, download it from `App Store` or `Google Play`, install and enjoy. It is the **quickest** and **easiest** solution for anyone who doesn't want to/or does not have time to set up by themselves. (**Notes:** _App is available in US and Canada at this point_)
 
 <img src="https://github.com/finaldie/auto-news/assets/1088543/3b072078-17eb-4f1d-b301-75bc8295479c" width="80%" />
 
 For more details, please check out the [App official website](https://dotsfy.com/dots-agent/). Click below to install the App directly:
 
+* [Web version (Beta)](https://dots.dotsfy.com/)
 * [![iOS](https://img.shields.io/itunes/v/6481704531)](https://apps.apple.com/app/dots-agent/id6481704531)
 * [![Android](https://img.shields.io/badge/Google_Play-v1.1.2-blue)](https://play.google.com/store/apps/details?id=com.dotsfy.dotsagent)
 
